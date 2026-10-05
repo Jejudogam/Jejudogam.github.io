@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RGQMRL9PFE"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RR901FVB5S"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-RGQMRL9PFE');
+    gtag('config', 'G-RR901FVB5S');
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
@@ -452,6 +452,98 @@
         }
       });
     }
+    (() => {
+      if (window.__jejudogamAnalytics) return;
+
+      const sectionTargets = new Map([
+        [document.querySelector('#hero-title'), 'hero'],
+        [document.querySelector('#detail-space-title'), 'detail'],
+        [document.querySelector('#purchase-title'), 'cta']
+      ].filter(([target]) => target));
+      const viewedSections = new Set();
+      const analyticsState = {
+        sectionObserver: null,
+        headerObserver: null,
+        ctaListeners: new Map(),
+        viewedSections
+      };
+      window.__jejudogamAnalytics = analyticsState;
+
+      const sendEvent = (eventName, parameters) => {
+        try {
+          if (typeof window.gtag === 'function') window.gtag('event', eventName, parameters);
+        } catch {}
+      };
+      const recordSectionView = target => {
+        if (document.visibilityState !== 'visible') return;
+        const sectionName = sectionTargets.get(target);
+        if (!sectionName || viewedSections.has(sectionName)) return;
+        viewedSections.add(sectionName);
+        analyticsState.sectionObserver?.unobserve(target);
+        sendEvent('section_view', { section_name: sectionName });
+      };
+      const getHeaderHeight = () => Math.ceil(document.querySelector('#site-header')?.getBoundingClientRect().height || 0);
+      const observeSections = () => {
+        analyticsState.sectionObserver?.disconnect();
+        analyticsState.sectionObserver = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && entry.intersectionRatio >= .5) recordSectionView(entry.target);
+          });
+        }, {
+          rootMargin: `-${getHeaderHeight()}px 0px 0px 0px`,
+          threshold: .5
+        });
+        sectionTargets.forEach((sectionName, target) => {
+          if (!viewedSections.has(sectionName)) analyticsState.sectionObserver.observe(target);
+        });
+      };
+      const checkVisibleSections = () => {
+        if (document.visibilityState !== 'visible') return;
+        const headerHeight = getHeaderHeight();
+        sectionTargets.forEach((sectionName, target) => {
+          if (viewedSections.has(sectionName)) return;
+          const rect = target.getBoundingClientRect();
+          const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
+          const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, headerHeight));
+          if (rect.width > 0 && rect.height > 0 && visibleWidth * visibleHeight / (rect.width * rect.height) >= .5) {
+            recordSectionView(target);
+          }
+        });
+      };
+
+      if ('IntersectionObserver' in window) observeSections();
+
+      const siteHeader = document.querySelector('#site-header');
+      if (siteHeader && 'IntersectionObserver' in window && 'ResizeObserver' in window) {
+        let headerHeight = getHeaderHeight();
+        analyticsState.headerObserver = new ResizeObserver(() => {
+          const nextHeaderHeight = getHeaderHeight();
+          if (nextHeaderHeight === headerHeight) return;
+          headerHeight = nextHeaderHeight;
+          observeSections();
+        });
+        analyticsState.headerObserver.observe(siteHeader);
+      }
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') requestAnimationFrame(checkVisibleSections);
+      });
+
+      const ctaTargets = new Map();
+      [
+        ['#cta-hero, [data-cta-location="hero"]', 'hero'],
+        ['#cta-final, [data-cta-location="final"]', 'final']
+      ].forEach(([selector, buttonLocation]) => {
+        document.querySelectorAll(selector).forEach(element => {
+          if (!ctaTargets.has(element)) ctaTargets.set(element, buttonLocation);
+        });
+      });
+      ctaTargets.forEach((buttonLocation, element) => {
+        const handleClick = () => sendEvent('cta_click', { button_location: buttonLocation });
+        element.addEventListener('click', handleClick);
+        analyticsState.ctaListeners.set(element, handleClick);
+      });
+    })();
   </script>
 </body>
 </html>
