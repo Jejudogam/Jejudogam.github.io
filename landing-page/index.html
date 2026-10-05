@@ -96,8 +96,6 @@
     .footer-product { font-size: 16px; font-weight: 700; }
     .image-note { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.5; }
     .site-footer .text-link { min-height: 32px; font-size: 14px; }
-    .notice { position: fixed; bottom: 28px; left: 50%; transform: translate(-50%, 15px); padding: 18px 28px; z-index: 50; max-width: calc(100% - 32px); border: 1px solid var(--line); background: var(--button); color: var(--on-button); box-shadow: 0 8px 32px #0002; font-size: 16px; text-align: center; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .2s, transform .2s, visibility .2s; }
-    .notice.is-visible { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
     .reveal { transition: opacity .6s, transform .6s; }
     .reveal.is-pending { opacity: 0; transform: translateY(22px); }
     @media (min-width: 1600px) {
@@ -153,13 +151,11 @@
       .site-footer { padding-top: 28px; flex-wrap: wrap; gap: 12px 20px; }
       .image-note { max-width: 220px; }
       .site-footer .text-link { font-size: 13px; }
-      .notice { bottom: 20px; width: max-content; }
     }
     @media (prefers-color-scheme: dark) {
       :root { --paper: #211e1a; --canvas: #29251f; --ink: #f2ece2; --muted: #c2b7a7; --line: #51473c; --accent: #9c7454; --offer: #483b2d; --button: #e7d7bf; --on-button: #211e1a; }
       .cta:hover { background: #d4b997; }
       .crop img { filter: brightness(.9); }
-      .notice { box-shadow: 0 8px 32px #0005; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
@@ -229,6 +225,11 @@
       .detail-color-pair { gap: 18px; }
       .detail-color-pair figcaption { font-size: 16px; padding-top: 14px; }
     }
+    .affiliate-disclosure { margin-top: 10px; max-width: 420px; color: #737373; font-size: 13px; font-weight: 400; line-height: 1.6; letter-spacing: -.02em; }
+    .hero-actions .affiliate-disclosure { margin-top: 0; max-width: 340px; }
+    @media (prefers-color-scheme: dark) {
+      .affiliate-disclosure { color: #bdbdbd; }
+    }
   </style>
 </head>
 <body>
@@ -247,10 +248,11 @@
         <h1 id="hero-title" tabindex="-1">좁은 주방도<br>넓게 쓰세요.</h1>
         <p class="hero-description">싱크볼 위에 펼쳐 쓰면,<br>조리대에 도마 놓을 자리가 생깁니다.</p>
         <div class="hero-actions">
-          <button class="cta" id="cta-hero" data-cta-location="hero" type="button">
+          <a class="cta" id="cta-hero" data-cta-location="hero" href="https://link.coupang.com/a/hARk3HQhiu" target="_blank" rel="sponsored noopener">
             <span>쿠팡에서 옵션·가격 확인하기</span>
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.5"/></svg>
-          </button>
+          </a>
+        <p class="affiliate-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
           <a class="text-link" href="#detail-space">사용 방법 보기 <span aria-hidden="true">↓</span></a>
         </div>
       </div>
@@ -381,10 +383,11 @@
       <div class="purchase-info">
         <p class="offer-product">실리콘 롤매트 1P · 18롤 대형</p>
         <p class="offer-colors">화이트 / 그레이</p>
-        <button class="cta" id="cta-final" data-cta-location="final" type="button">
+        <a class="cta" id="cta-final" data-cta-location="final" href="https://link.coupang.com/a/hARk3HQhiu" target="_blank" rel="sponsored noopener">
           <span>쿠팡에서 옵션·가격 확인하기</span>
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.5"/></svg>
-        </button>
+        </a>
+        <p class="affiliate-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
         <p class="offer-condition">옵션·가격·배송·반품 조건은 쿠팡에서 확인하세요.</p>
       </div>
     </section>
@@ -393,26 +396,7 @@
     <div><p class="footer-product">집앤 실리콘 롤매트</p><p class="image-note">제품 이미지는 사용 방식 참고용입니다.</p></div>
     <a class="text-link" href="#hero">처음으로 <span aria-hidden="true">↑</span></a>
   </footer>
-  <div class="notice" id="cta-notice" role="status" aria-live="polite" aria-atomic="true"></div>
   <script>
-    const notice = document.getElementById('cta-notice');
-    let noticeTimer;
-    function closeNotice() {
-      clearTimeout(noticeTimer);
-      notice.classList.remove('is-visible');
-      notice.textContent = '';
-    }
-    document.querySelectorAll('[data-cta-location]').forEach(button => {
-      button.addEventListener('click', () => {
-        clearTimeout(noticeTimer);
-        notice.textContent = '아직 준비 중입니다.';
-        notice.classList.add('is-visible');
-        noticeTimer = setTimeout(closeNotice, 5000);
-      });
-    });
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape') closeNotice();
-    });
     const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
     document.querySelectorAll('a[href^="#"]').forEach(link => {
       link.addEventListener('click', event => {
