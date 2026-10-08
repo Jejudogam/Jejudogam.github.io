@@ -1,10 +1,16 @@
 document.documentElement.classList.add('js');
 
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
   setupSectionReveals();
   setupAccordion();
   setupAnalyticsTracking();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 function setupSectionReveals() {
   const items = [...document.querySelectorAll('.reveal')];
@@ -57,8 +63,8 @@ function setupAnalyticsTracking() {
 
   const sections = [
     { element: document.getElementById('hero-title'), name: 'hero' },
-    { element: document.getElementById('proof-title'), name: 'detail' },
-    { element: document.getElementById('final-title'), name: 'cta' }
+    { element: document.getElementById('detail-space-title') || document.getElementById('proof-title'), name: 'detail' },
+    { element: document.getElementById('purchase-title') || document.getElementById('final-title'), name: 'cta' }
   ].filter((section) => section.element);
 
   const sentSectionNames = new Set();
