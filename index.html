@@ -1,363 +1,324 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#285e49">
-  <meta name="description" content="SQLD 벼락치기 스터디룸. 50문제 모의고사, 실제 SQL 실행 실습, 해설과 오답 복습을 한 화면에서.">
-  <title>SQLD Sprint · 한 문제씩, 합격에 가까이</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f8faf7">
+  <meta name="description" content="SQLD 문제 풀이와 SQL 실습">
+  <title>SQLD Sprint</title>
   <style>:root {
-  --ink: #21372c; --muted: #586b5f; --green: #285e49; --green-dark: #194631;
-  --mint: #edf4ed; --line: #d9e2d7; --paper: #fff; --bg: #f6f8f3;
-  --orange: #845a1e; --red: #a23c30;
-  --mono: Consolas, 'SFMono-Regular', monospace;
-  --type-meta: .875rem; --type-ui: .9375rem; --type-body: 1rem;
-  --type-reading: 1.125rem; --type-code: 1.0625rem; --type-question: 1.5rem;
-  --sidebar-width: 16rem; --page-gutter: 2rem; --nav-height: 0px;
-  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ink:#263a31; --muted:#5e6c63; --green:#2c604b; --green-dark:#204b3a;
+  --paper:#fff; --bg:#f8faf7; --line:#dce3da; --soft:#eef3eb; --red:#a24034;
+  --mono:Consolas,'SFMono-Regular',monospace;
+  --type-reading:1.125rem; --type-code:1.0625rem; --type-question:1.5rem;
+  --nav-height:0px; --ease-out:cubic-bezier(.22,1,.36,1);
 }
-:root[data-reading="large"] { --type-reading: 1.25rem; --type-code: 1.125rem; --type-question: 1.625rem; }
-:root[data-reading="extra"] { --type-reading: 1.375rem; --type-code: 1.25rem; --type-question: 1.75rem; }
-* { box-sizing: border-box; }
-html { font-size: 100%; scroll-padding-bottom: calc(var(--nav-height) + 1rem); }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif; font-size: var(--type-body); line-height: 1.7; letter-spacing: -.012em; }
-button, input, select, textarea { font: inherit; }
-button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
-button { cursor: pointer; border: 0; background: none; color: inherit; }
-button:disabled { cursor: not-allowed; }
-button, a { touch-action: manipulation; }
-a { color: var(--green); text-underline-offset: .2em; }
-button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 3px solid var(--green); outline-offset: 4px; }
-::selection { background: #cce3cc; color: var(--green-dark); }
-input, textarea { caret-color: var(--green); }
-::placeholder { color: var(--muted); opacity: 1; }
-h1, h2, h3, p { margin: 0; overflow-wrap: anywhere; word-break: keep-all; }
-h1, h2, h3 { text-wrap: balance; }
-p { text-wrap: pretty; }
-h1 { font-size: 2.125rem; line-height: 1.4; letter-spacing: -.04em; font-weight: 750; }
-h2 { font-size: var(--type-question); line-height: 1.6; letter-spacing: -.025em; }
-h3 { font-size: var(--type-reading); line-height: 1.65; }
-small { font-size: var(--type-meta); }
-code, pre { font-family: var(--mono); letter-spacing: 0; }
-pre { white-space: pre; overflow: auto; max-width: 100%; }
-svg { display: block; }
-.icon { width: 1.25rem; height: 1.25rem; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.icon-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
-.skip { position: fixed; top: -5rem; z-index: 20; background: var(--green); color: #fff; padding: 1rem; }
-.skip:focus { top: 0; }
-.app-shell { display: flex; min-height: 100vh; }
-.sidebar { position: fixed; inset: 0 auto 0 0; width: var(--sidebar-width); display: flex; flex-direction: column; padding: 2rem 1.25rem 1.5rem; background: #fcfdfa; border-right: 1px solid var(--line); z-index: 3; overflow-y: auto; }
-.brand { display: flex; gap: .75rem; align-items: center; text-decoration: none; font-size: 1.5rem; letter-spacing: -.04em; font-weight: 750; color: var(--ink); margin-bottom: 2.5rem; line-height: 1.2; }
-.brand b { font-weight: 450; }
-.brand small { display: block; margin-top: .625rem; font-size: var(--type-meta); letter-spacing: -.015em; font-weight: 400; color: var(--muted); }
-.brand-mark { background: var(--green); color: #fff; width: 2.625rem; height: 2.875rem; border-radius: .625rem; display: grid; place-items: center; font-size: 1.75rem; font-weight: 700; flex-shrink: 0; }
-.nav-label { font-size: var(--type-meta); font-weight: 600; color: var(--muted); margin: 0 .75rem .75rem; }
-.nav-item { display: flex; align-items: center; gap: .75rem; text-align: left; width: 100%; min-height: 3.25rem; padding: .75rem; border-radius: .5rem; font-weight: 550; font-size: var(--type-ui); margin-bottom: .375rem; }
-.nav-item.active { background: var(--green); color: white; }
-.nav-icon { width: 1.25rem; flex-shrink: 0; }
-.nav-count { margin-left: auto; border-radius: .25rem; padding: 0 .4rem; background: #e8ede6; font-size: var(--type-meta); color: var(--green); font-variant-numeric: tabular-nums; }
-.sidebar-progress { margin: 2.25rem .75rem 0; }
-.sidebar-progress .nav-label { margin: 0 0 .875rem; }
-.sidebar-progress .spread { font-size: var(--type-meta); }
-.sidebar-progress .spread b { font-family: var(--mono); font-size: var(--type-meta); font-weight: 500; white-space: nowrap; }
-.progress { height: .375rem; background: #e4ebe1; border-radius: .5rem; overflow: hidden; margin-top: .75rem; }
-.progress > span { height: 100%; display: block; background: var(--green); width: 0; border-radius: .5rem; }
-.sidebar-progress p { font-size: var(--type-meta); color: var(--muted); margin-top: .875rem; line-height: 1.8; }
-.sidebar-bottom { margin-top: auto; padding-top: 2.5rem; }
-.study-card { padding: 1.5rem .75rem; border-top: 1px solid var(--line); }
-.study-card p { font-size: 1.0625rem; font-weight: 550; line-height: 1.85; }
-.save-status { display: flex; align-items: center; gap: .5rem; font-size: var(--type-meta); color: var(--muted); margin: .75rem .5rem; }
-.dot { display: inline-block; width: .375rem; height: .375rem; border-radius: 50%; background: var(--green); flex-shrink: 0; }
-.text-button { display: inline-flex; align-items: center; min-height: 2.75rem; font-size: var(--type-ui); text-decoration: underline; text-underline-offset: .25em; padding: .5rem 0; }
-.sidebar-bottom .text-button { margin-left: .5rem; font-size: var(--type-meta); }
-.workspace { margin-left: var(--sidebar-width); min-width: 0; width: calc(100% - var(--sidebar-width)); }
-.topbar { min-height: 5rem; padding: 1rem var(--page-gutter); display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--line); background: #fbfcf9; }
-.breadcrumb { font-size: var(--type-meta); color: var(--muted); }
-.breadcrumb span { margin: 0 .75rem; }
-.breadcrumb b { color: var(--ink); font-weight: 500; }
-.top-actions { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
-.reading-control { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; max-width: 100%; min-width: 0; color: var(--muted); font-size: var(--type-meta); }
-.reading-control select { font-size: 1rem; width: 6.75rem; min-width: 0; }
-.key-help { display: inline-flex; gap: .5rem; align-items: center; font-size: var(--type-meta); min-height: 2.75rem; padding: .5rem 0; }
-main { max-width: 91rem; margin: 0 auto; padding: 2.5rem var(--page-gutter) 2rem; min-height: calc(100vh - 10rem); }
-.hero, .view-intro { margin-bottom: 2rem; }
-.hero p, .view-intro p { font-size: 1.0625rem; color: var(--muted); margin-top: .75rem; max-width: 46ic; }
-.modebar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-.segmented { display: flex; gap: .25rem; background: #e8eee3; padding: .3125rem; border-radius: .625rem; max-width: 100%; }
-.segment { padding: .75rem 1rem; min-height: 2.875rem; border-radius: .375rem; font-size: var(--type-ui); color: var(--muted); }
-.segment.active { background: #fff; color: var(--green-dark); font-weight: 650; }
-.segment small { margin-left: .5rem; font-size: var(--type-meta); color: var(--muted); white-space: nowrap; }
-.mode-info { font-size: var(--type-meta); color: var(--muted); }
-.quiz-layout { display: grid; grid-template-columns: minmax(0,1fr) 17.5rem; gap: 1.5rem; align-items: start; }
-.quiz-layout > *, .lab-layout > *, .note-grid > *, .right-rail > * { min-width: 0; }
-.panel { background: var(--paper); border: 1px solid var(--line); border-radius: .875rem; }
-.question-panel { overflow: hidden; }
-.question-top { padding: 1.25rem 1.75rem; border-bottom: 1px solid var(--line); display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; font-size: var(--type-meta); }
-.tag { display: inline-flex; align-items: center; background: var(--mint); color: var(--green); padding: .25rem .625rem; border-radius: .25rem; font-size: var(--type-meta); font-weight: 600; line-height: 1.5; }
-.tag.amber { background: #f7f1e1; color: var(--orange); }
-.timer { display: inline-flex; align-items: center; gap: .5rem; margin-left: auto; font-family: var(--mono); color: var(--muted); font-size: 1rem; font-variant-numeric: tabular-nums; }
-.timer.urgent, .timer .urgent { color: var(--red); font-weight: 700; }
-.question-body { padding: 1.75rem; }
-.question-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
-.question-number { font-family: var(--mono); font-size: var(--type-ui); font-weight: 600; color: var(--green); font-variant-numeric: tabular-nums; }
-.question-number small { font-size: var(--type-meta); color: var(--muted); font-weight: 400; margin-left: .375rem; }
-.bookmark { color: var(--muted); font-size: var(--type-meta); display: flex; align-items: center; gap: .5rem; min-height: 2.75rem; padding: .5rem .25rem; }
-.bookmark.on { color: var(--orange); }
-.bookmark.on .icon { fill: #f4e7cb; }
-.question-title { margin-bottom: 1.5rem; max-width: 40ic; }
-.code-block { border-radius: .5rem; background: #f4f7f1; border: 1px solid var(--line); overflow: hidden; margin: 1.25rem 0 1.75rem; }
-.code-label { padding: .625rem 1rem; border-bottom: 1px solid var(--line); font-size: var(--type-meta); color: var(--muted); display: flex; justify-content: space-between; gap: .75rem; }
-.code-label > span:first-child { font-family: var(--mono); }
-.code-block pre { padding: 1.125rem 1.25rem; margin: 0; color: #2d5140; font-size: var(--type-code); line-height: 1.8; }
-.sql-keyword { color: #25654e; font-weight: 650; }
-.sql-comment { color: var(--muted); font-weight: 400; }
-.choices { display: grid; gap: .75rem; }
-.choice { border: 1px solid #cbd7c9; border-radius: .5rem; min-height: 4rem; padding: 1rem 1.125rem; display: flex; align-items: flex-start; gap: .875rem; text-align: left; background: #fff; font-size: var(--type-reading); line-height: 1.75; overflow-wrap: anywhere; word-break: keep-all; }
-.choice.selected { border-color: var(--green); background: #f0f6ed; }
-.choice.correct { border-color: #527e53; background: #eef6ec; }
-.choice.incorrect { border-color: #b16e5f; background: #fcf1ed; }
-.choice:disabled { opacity: 1; color: var(--ink); cursor: default; }
-.choice-letter { border: 1px solid #b7c6b3; width: 1.875rem; height: 1.875rem; display: grid; place-items: center; border-radius: 50%; color: var(--muted); font-family: var(--mono); flex-shrink: 0; font-size: var(--type-ui); margin-top: .0625rem; }
-.selected .choice-letter, .correct .choice-letter { background: var(--green); border-color: var(--green); color: white; }
-.incorrect .choice-letter { background: var(--red); color: white; border-color: var(--red); }
-.choice-text { flex: 1; min-width: 0; }
-.choice-check { width: 1.25rem; flex-shrink: 0; align-self: center; }
-.question-bottom { padding: 1.25rem 1.75rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; background: #fcfdfb; border-top: 1px solid var(--line); gap: 1rem; }
-.keyboard-hint { font-size: var(--type-meta); color: var(--muted); line-height: 1.8; }
-.kbd { font-family: var(--mono); border: 1px solid #c2cdbd; border-bottom-width: 2px; border-radius: .25rem; padding: .0625rem .3125rem; margin: 0 .125rem; font-size: var(--type-meta); }
-.primary, .secondary, .ghost { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; border-radius: .5rem; padding: .75rem 1.125rem; font-size: var(--type-ui); font-weight: 600; min-height: 2.875rem; text-decoration: none; }
-.primary { background: var(--green); color: white; border: 1px solid var(--green); }
-.secondary { background: white; border: 1px solid #bccbb6; color: var(--green); }
-.ghost { padding: .75rem; color: var(--muted); }
-.primary:disabled, .secondary:disabled { background: #e9eee5; border-color: var(--line); color: #60705b; }
-.button-row { display: flex; align-items: center; gap: .625rem; flex-wrap: wrap; }
-.spread { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
-.right-rail { display: grid; gap: 1.25rem; }
-.rail-card { padding: 1.5rem; }
-.rail-title { font-size: 1rem; font-weight: 650; }
-.mini-muted { font-size: var(--type-meta); color: var(--muted); }
-.rail-card .progress { margin: 1rem 0 1.25rem; }
-.question-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: .5rem; }
-.q-dot { min-height: 2.75rem; min-width: 0; border-radius: .375rem; border: 1px solid #cbd7c3; font-family: var(--mono); font-size: var(--type-ui); color: var(--muted); background: #fff; position: relative; }
-.q-dot.current { outline: 2px solid var(--green); outline-offset: 1px; color: var(--green); font-weight: 700; }
-.q-dot.answered { background: #e7efdf; border-color: #b9cbae; color: #405f36; }
-.q-dot.good { background: #deecdb; color: #315c38; border-color: #aac3a7; }
-.q-dot.bad { background: #f9e6de; color: #8b3d27; border-color: #dbad9a; }
-.q-dot.flagged::after { content: ''; position: absolute; right: .25rem; top: .25rem; width: .3125rem; height: .3125rem; background: var(--orange); border-radius: 50%; }
-.legend { display: flex; gap: .75rem; margin-top: 1.125rem; font-size: var(--type-meta); color: var(--muted); flex-wrap: wrap; }
-.legend i { display: inline-block; width: .625rem; height: .625rem; border-radius: .125rem; border: 1px solid #9aac8f; margin-right: .25rem; }
-.legend i.filled { background: #deecdb; }
-.legend i.flag { background: var(--orange); border-color: var(--orange); }
-.rail-separator { border: 0; border-top: 1px solid var(--line); margin: 1.25rem 0 .875rem; }
-.finish-btn { width: 100%; }
-.tip-card { background: #f0f4e9; border-color: #d7e1c9; }
-.tip-heading { display: flex; align-items: center; gap: .5rem; color: #4f643b; font-size: var(--type-meta); font-weight: 600; margin-bottom: .875rem; }
-.tip-card h3 { margin-bottom: .625rem; }
-.tip-card p { font-size: 1rem; color: var(--muted); line-height: 1.85; }
-.lab-link { display: flex; align-items: center; text-align: left; gap: .875rem; padding: 1.25rem; }
-.lab-symbol { color: var(--green); flex-shrink: 0; }
-.lab-link b { font-size: 1rem; display: block; }
-.lab-link small { font-size: var(--type-meta); color: var(--muted); }
-.lab-link > span:last-child { margin-left: auto; }
-.subfooter { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; font-size: var(--type-meta); color: var(--muted); }
-.subfooter .ghost { padding: .5rem 0; }
-.feedback { margin-top: 1.5rem; padding: 1.25rem; border-radius: .5rem; background: #f0f7ed; border: 1px solid #bbd2b1; }
-.feedback.bad { background: #fbf2ec; border-color: #e4c7b5; }
-.feedback h3 { margin-bottom: .5rem; }
-.feedback p { font-size: var(--type-reading); color: #40583a; line-height: 1.9; max-width: 44ic; }
-.feedback.bad p { color: #694e3d; }
-.feedback .tag { margin-bottom: .625rem; }
-.lab-toolbar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; align-items: center; margin-bottom: 1.5rem; }
-.select-wrap { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; font-size: var(--type-ui); color: var(--muted); min-width: 0; }
-select { max-width: 100%; border: 1px solid #b9c8b5; background: #fff; color: var(--ink); padding: .625rem 2rem .625rem .75rem; border-radius: .375rem; font-size: 1rem; min-height: 2.75rem; }
-.lab-layout { display: grid; grid-template-columns: 16rem minmax(0,1fr); gap: 1.5rem; align-items: start; }
-.schema-panel { padding: 1.25rem; }
-.schema-title { font-size: var(--type-meta); color: var(--muted); margin-bottom: 1rem; font-weight: 600; }
-.schema-table { margin-bottom: 1.25rem; min-width: 0; }
-details summary { cursor: pointer; font-size: 1rem; font-weight: 600; min-height: 2.75rem; padding: .5rem 0; overflow-wrap: anywhere; }
-.schema-col { display: flex; justify-content: space-between; gap: .5rem; flex-wrap: wrap; font-size: var(--type-ui); font-family: var(--mono); padding: .375rem 0 .375rem .5rem; color: var(--muted); }
-.schema-col small { font-family: inherit; font-size: var(--type-meta); }
-.schema-table .text-button { margin-left: .5rem; }
-.engine-note { font-size: var(--type-meta); line-height: 1.9; color: var(--muted); padding-top: 1rem; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
-.lab-task { padding: 1.75rem; }
-.lab-task h2 { margin: .875rem 0 .75rem; }
-.lab-task p { color: var(--muted); font-size: var(--type-reading); line-height: 1.9; max-width: 44ic; }
-.lab-task .spread { flex-wrap: wrap; }
-.editor-panel { margin-top: 1.25rem; overflow: hidden; }
-.editor-header { display: flex; justify-content: space-between; align-items: center; gap: .75rem; padding: .5rem 1.25rem; border-bottom: 1px solid var(--line); background: #f5f8f1; font-family: var(--mono); font-size: var(--type-ui); color: var(--muted); }
-.editor-header .text-button { font-family: inherit; }
-.editor { display: flex; background: #fcfdfb; min-height: 18rem; }
-.line-numbers { width: calc(3ch + 1.5rem); flex-shrink: 0; padding: 1.25rem .75rem; font-family: var(--mono); font-size: var(--type-code); line-height: 1.8; color: var(--muted); text-align: right; white-space: pre; overflow: hidden; }
-.editor textarea { width: 100%; min-width: 0; min-height: 18rem; resize: vertical; border: 0; background: transparent; padding: 1.25rem 1rem 1.25rem .375rem; font-family: var(--mono); font-size: var(--type-code); line-height: 1.8; color: #2d5140; tab-size: 2; letter-spacing: 0; white-space: pre; overflow: auto; }
-.editor textarea:focus-visible { outline-offset: -3px; }
-.editor-hint { padding: .5rem 1.25rem; font-size: var(--type-meta); color: var(--muted); background: #fcfdfb; }
-.editor-footer { display: flex; justify-content: space-between; flex-wrap: wrap; padding: 1rem 1.25rem; border-top: 1px solid var(--line); gap: 1rem; align-items: center; }
-.result-panel { margin-top: 1.25rem; overflow: hidden; }
-.result-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--line); font-size: var(--type-ui); display: flex; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
-.result-empty { padding: 2.5rem 1.25rem; text-align: center; font-size: 1rem; color: var(--muted); }
-.result-empty .empty-symbol { font-family: var(--mono); display: block; font-size: 1.5rem; margin-bottom: .75rem; color: var(--green); }
-.table-wrap { overflow: auto; max-height: 28rem; }
-table { border-collapse: collapse; width: 100%; font-size: var(--type-code); letter-spacing: 0; }
-th, td { padding: .75rem 1rem; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
-th { font-size: var(--type-meta); font-weight: 600; color: var(--muted); background: #f4f7ee; position: sticky; top: 0; }
-td { font-family: var(--mono); color: #405b38; }
-td.null { color: var(--muted); font-style: italic; }
-tr:last-child td { border-bottom: 0; }
-.result-message { padding: 1rem 1.25rem; font-size: 1rem; background: #edf6e9; color: #385b30; }
-.result-message.bad { background: #fcf2eb; color: #874a30; }
-.result-message.error { background: #fdf0ec; color: #923d2d; overflow-wrap: anywhere; }
-.note-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.25rem; }
-.note-card { padding: 1.75rem; }
-.note-card h2 { margin: .75rem 0 1rem; }
-.note-card p { font-size: var(--type-reading); line-height: 1.9; color: var(--muted); max-width: 44ic; }
-.note-card pre { font-size: var(--type-code); padding: 1.125rem; background: #f4f7ee; border-radius: .375rem; color: #405b38; margin: 1.25rem 0 0; line-height: 1.8; }
-.search-field { border: 1px solid #b9c8b5; border-radius: .5rem; background: white; padding: .75rem 1rem; font-size: 1rem; width: 21rem; max-width: 100%; color: var(--ink); min-height: 2.875rem; }
-.review-list { display: grid; gap: 1rem; }
-.review-row { display: flex; align-items: center; gap: 1.25rem; padding: 1.5rem; }
-.review-index { color: var(--muted); font-family: var(--mono); font-size: var(--type-ui); flex-shrink: 0; }
-.review-content { flex: 1; min-width: 0; }
-.review-content h3 { font-size: var(--type-reading); font-weight: 550; margin-top: .5rem; }
-.review-content small { color: var(--muted); font-size: var(--type-meta); }
-.empty-state { padding: 3.5rem 1.5rem; text-align: center; }
-.empty-state .empty-symbol { color: var(--green); margin-bottom: 1rem; display: flex; justify-content: center; }
-.empty-state .empty-symbol .icon { width: 2.5rem; height: 2.5rem; }
-.empty-state p { font-size: var(--type-reading); color: var(--muted); margin: 1rem auto 1.75rem; max-width: 40ic; }
-.result-summary { padding: 2rem; }
-.score-layout { display: flex; align-items: center; gap: 2rem; margin: 2rem 0; }
-.score-ring { flex-shrink: 0; min-width: 8rem; padding: .5rem 1.5rem .5rem 0; border-right: 1px solid var(--line); }
-.score-ring > div { display: flex; align-items: flex-start; flex-direction: column; }
-.score-ring b { font-size: 3.5rem; line-height: 1.2; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
-.score-ring b small { font-size: 1rem; letter-spacing: 0; margin-left: .25rem; }
-.score-ring small { font-size: var(--type-meta); color: var(--muted); }
-.score-copy h2 { font-size: var(--type-question); }
-.score-copy p { font-size: var(--type-reading); margin-top: .75rem; color: var(--muted); }
-.subject-scores { display: flex; gap: 1rem; margin: 1.5rem 0; }
-.subject-score { background: #f4f7ee; flex: 1; padding: 1.25rem; border-radius: .5rem; font-size: var(--type-ui); color: var(--muted); }
-.subject-score b { display: block; font-size: 1.75rem; font-weight: 550; color: var(--green); margin-top: .5rem; }
-.subject-score.bad b { color: var(--red); }
-.result-summary .disclaimer { font-size: var(--type-meta); color: var(--muted); margin-top: 1.5rem; }
-.session-review { margin-top: 1.75rem; }
-.session-review .review-row { border-bottom: 1px solid var(--line); padding: 1.25rem 0; }
-.session-review .review-row:last-child { border-bottom: 0; }
-footer { padding: 0 var(--page-gutter) 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; color: var(--muted); font-size: var(--type-meta); }
-footer .text-button { font-size: var(--type-meta); }
-dialog { border: 1px solid var(--line); border-radius: .875rem; padding: 2rem; width: min(44rem,calc(100% - 2rem)); max-height: 85vh; max-height: 85dvh; overflow: auto; box-shadow: 0 1.25rem 5rem #1e382c26; color: var(--ink); }
-dialog::backdrop { background: #21382c66; }
-dialog h2 { margin-bottom: 1.25rem; }
-dialog p { font-size: var(--type-reading); color: var(--muted); margin-bottom: 1.25rem; line-height: 1.85; }
-dialog .button-row { justify-content: flex-end; margin-top: 1.75rem; }
-dialog ul { padding-left: 1.25rem; font-size: 1rem; color: var(--muted); line-height: 2.2; }
-#toast { position: fixed; bottom: calc(var(--nav-height) + 1.25rem); left: 50%; transform: translate(-50%,.5rem); opacity: 0; pointer-events: none; background: #294b37; color: #fff; border-radius: .5rem; padding: .875rem 1.25rem; font-size: 1rem; z-index: 10; transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out); width: max-content; max-width: calc(100vw - 2rem); text-align: center; }
-#toast.show { opacity: 1; transform: translate(-50%,0); }
-.muted { color: var(--muted); }
-.source-links { font-size: var(--type-meta); line-height: 2; margin-top: 1.75rem; color: var(--muted); }
-.badge-success { color: var(--green); font-size: var(--type-meta); }
-.search-empty { grid-column: 1/-1; padding: 2rem; text-align: center; color: var(--muted); font-size: 1rem; }
-.history-line { font-size: var(--type-meta); color: var(--muted); margin-top: 1rem; }
-.primary, .secondary, .segment { transition: transform 120ms var(--ease-out); }
-.primary:active:not(:disabled):not(:focus-visible), .secondary:active:not(:disabled):not(:focus-visible), .segment:active:not(:focus-visible) { transform: scale(.98); }
-@media (hover: hover) and (pointer: fine) {
-  .nav-item:hover:not(.active), .secondary:hover:not(:disabled), .ghost:hover { background: var(--mint); }
-  .choice:hover:not(:disabled) { border-color: var(--green); background: #f4f8f0; }
-  .primary:hover:not(:disabled) { background: var(--green-dark); }
-  .text-button:hover, .key-help:hover, .bookmark:hover { color: var(--green-dark); }
+:root[data-reading="large"] { --type-reading:1.25rem; --type-code:1.125rem; --type-question:1.625rem; }
+:root[data-reading="extra"] { --type-reading:1.375rem; --type-code:1.25rem; --type-question:1.75rem; }
+* { box-sizing:border-box; }
+html { font-size:100%; scroll-padding-bottom:calc(var(--nav-height) + 1.5rem); }
+body { margin:0; color:var(--ink); background:var(--bg); font:1rem/1.7 'Pretendard','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif; letter-spacing:-.015em; }
+button,input,select,textarea { font:inherit; }
+button { border:0; background:none; color:inherit; cursor:pointer; }
+button:disabled { cursor:not-allowed; }
+button,a,summary { touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+a { color:var(--green); text-underline-offset:.2em; }
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible,[tabindex="0"]:focus-visible { outline:3px solid var(--green); outline-offset:4px; }
+::selection { color:var(--green-dark); background:#cee2cd; }
+input,textarea { caret-color:var(--green); }
+::placeholder { color:var(--muted); opacity:1; }
+[hidden] { display:none!important; }
+h1,h2,h3,p { margin:0; word-break:keep-all; overflow-wrap:anywhere; }
+h1,h2,h3 { text-wrap:balance; }
+p { text-wrap:pretty; }
+h1 { font-size:var(--type-question); line-height:1.6; font-weight:650; letter-spacing:-.025em; }
+h2 { font-size:var(--type-reading); line-height:1.65; font-weight:600; }
+small { font-size:.875rem; }
+pre,code { font-family:var(--mono); letter-spacing:0; }
+svg { display:block; }
+.icon { width:1.25rem; height:1.25rem; flex-shrink:0; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.icon-defs { position:absolute; width:0; height:0; overflow:hidden; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+.skip { position:fixed; top:-5rem; z-index:20; padding:1rem; color:white; background:var(--green); }
+.skip:focus { top:0; }
+.app-header { background:var(--paper); border-bottom:1px solid var(--line); }
+.header-inner { max-width:82rem; min-height:5.25rem; margin:auto; padding:.75rem 2rem; display:flex; align-items:center; flex-wrap:wrap; gap:2.5rem; }
+.brand { display:inline-flex; gap:.625rem; align-items:center; color:var(--ink); text-decoration:none; white-space:nowrap; font-size:1.1875rem; font-weight:750; letter-spacing:-.035em; }
+.brand b { font-weight:450; }
+.brand-mark { display:grid; place-items:center; width:2.25rem; height:2.25rem; border-radius:.625rem; background:var(--green); color:white; }
+.main-nav { display:flex; align-items:center; gap:.375rem; margin-right:auto; }
+.nav-item { display:flex; align-items:center; gap:.5rem; padding:.75rem 1rem; min-height:2.875rem; white-space:nowrap; font-size:.9375rem; color:var(--muted); border-radius:.5rem; }
+.nav-item.active { color:var(--green-dark); background:var(--soft); font-weight:650; }
+.nav-count { display:inline-grid; place-items:center; min-width:1.25rem; font-size:.875rem; line-height:1.3; color:var(--green); font-variant-numeric:tabular-nums; }
+.header-tools { display:flex; align-items:center; flex-wrap:wrap; gap:.25rem; position:relative; min-width:0; }
+.icon-button { width:2.75rem; min-width:2.75rem; height:2.75rem; display:inline-flex; align-items:center; justify-content:center; padding:0; border-radius:.5rem; color:var(--muted); flex-shrink:0; }
+.icon-button:disabled { color:#adb8ab; }
+.reading-menu { position:static; }
+summary { cursor:pointer; }
+.reading-menu summary { list-style:none; }
+summary::-webkit-details-marker { display:none; }
+.reading-options { position:absolute; right:0; top:calc(100% + .625rem); z-index:10; width:13rem; max-width:calc(100vw - 2rem); padding:1rem; background:var(--paper); border:1px solid var(--line); border-radius:.75rem; }
+.reading-options label { display:block; margin-bottom:.5rem; font-size:.875rem; color:var(--muted); }
+.reading-options select { width:100%; }
+select { font-size:1rem; color:var(--ink); background:var(--paper); border:1px solid #bac7b6; padding:.625rem 2rem .625rem .75rem; min-height:2.75rem; max-width:100%; min-width:0; border-radius:.5rem; }
+main { max-width:76rem; margin:auto; padding:2.5rem 2rem 4rem; min-height:calc(100vh - 5.25rem); }
+.view-toolbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:2rem; min-height:3rem; }
+.segmented { display:inline-flex; align-items:stretch; gap:.25rem; background:#eaf0e6; border-radius:.625rem; padding:.25rem; max-width:100%; }
+.segment { display:flex; align-items:center; justify-content:center; gap:.625rem; min-height:2.75rem; padding:.625rem 1rem; border-radius:.4375rem; font-size:.9375rem; color:var(--muted); }
+.segment.active { background:var(--paper); color:var(--green-dark); font-weight:600; }
+.segment-count { font-size:.875rem; font-variant-numeric:tabular-nums; color:var(--muted); }
+.timer { display:flex; gap:.625rem; align-items:center; font:1rem/1.6 var(--mono); color:var(--muted); font-variant-numeric:tabular-nums; }
+.timer .urgent { color:var(--red); }
+.quiz-layout { display:grid; grid-template-columns:minmax(0,1fr) 12.5rem; gap:2.5rem; align-items:start; }
+.quiz-layout>*,.lab-layout>*,.note-row>* { min-width:0; }
+.question-sheet { background:var(--paper); border:1px solid var(--line); border-radius:1rem; padding:1.75rem 2rem; }
+.question-meta { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1.125rem; }
+.question-context { display:flex; align-items:center; flex-wrap:wrap; gap:1rem; min-width:0; }
+.question-number { font-size:1rem; font-variant-numeric:tabular-nums; font-weight:650; white-space:nowrap; }
+.question-number>span { color:var(--muted); font-size:.875rem; font-weight:400; }
+.question-topic { color:var(--muted); font-size:.875rem; }
+.bookmark.on { color:var(--green); background:var(--soft); }
+.bookmark.on .icon { fill:#d7e8d5; }
+.question-title { margin-bottom:1.75rem; max-width:38ic; }
+.sql-block { margin:1.25rem 0 1.75rem; padding:1.25rem 1.5rem; border-radius:.75rem; background:#f2f5ef; color:#31523f; font-size:var(--type-code); line-height:1.8; white-space:pre; overflow:auto; max-width:100%; }
+.sql-keyword { color:#246449; font-weight:650; }
+.sql-comment { color:var(--muted); }
+.choices { display:grid; gap:.75rem; }
+.choice { display:flex; align-items:flex-start; gap:.875rem; text-align:left; width:100%; min-height:4rem; padding:1rem 1.125rem; border:1px solid #d5dfcf; border-radius:.75rem; background:var(--paper); font-size:var(--type-reading); line-height:1.75; word-break:keep-all; overflow-wrap:anywhere; }
+.choice-letter { display:grid; place-items:center; width:1.875rem; height:1.875rem; flex-shrink:0; border:1px solid #b8c8b3; border-radius:50%; font-size:.875rem; color:var(--muted); margin-top:.0625rem; }
+.choice-text { min-width:0; flex:1; }
+.choice-indicator { display:grid; place-items:center; width:1.25rem; min-height:1.875rem; flex-shrink:0; color:var(--green); }
+.selection-dot { width:.5rem; height:.5rem; border-radius:50%; background:var(--green); }
+.choice.selected { border-color:var(--green); background:#f3f7ef; }
+.choice.selected .choice-letter,.choice.correct .choice-letter { background:var(--green); color:white; border-color:var(--green); }
+.choice.correct { border-color:#739773; background:#f0f7ed; }
+.choice.incorrect { border-color:#c59082; background:#fcf2ee; }
+.choice.incorrect .choice-letter { background:var(--red); color:white; border-color:var(--red); }
+.choice.incorrect .choice-indicator { color:var(--red); }
+.choice:disabled { color:var(--ink); opacity:1; cursor:default; }
+.question-actions { display:flex; justify-content:space-between; gap:1rem; margin-top:1.75rem; padding-top:1.5rem; border-top:1px solid var(--line); }
+.primary,.secondary { display:inline-flex; align-items:center; justify-content:center; gap:.75rem; min-height:2.875rem; padding:.75rem 1.125rem; border-radius:.5rem; font-size:.9375rem; font-weight:600; text-decoration:none; }
+.primary { background:var(--green); color:#fff; border:1px solid var(--green); }
+.secondary { background:var(--paper); color:var(--green); border:1px solid #becdb7; }
+.primary:disabled,.secondary:disabled { background:#e9eee5; border-color:var(--line); color:#64715e; }
+.text-button,.ghost { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; min-height:2.75rem; padding:.5rem .25rem; font-size:.9375rem; color:var(--muted); border-radius:.375rem; }
+.text-button { text-underline-offset:.25em; }
+.button-row { display:flex; align-items:center; flex-wrap:wrap; gap:.75rem; }
+.spread { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+.question-navigator { padding:.75rem 0; }
+.navigator-head { display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-bottom:1.125rem; color:var(--muted); font-size:.875rem; }
+.count { font-variant-numeric:tabular-nums; color:var(--ink); }
+.count>span { color:var(--muted); }
+.question-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.5rem; }
+.q-dot { position:relative; min-width:0; min-height:2.75rem; border:1px solid #cad7c4; border-radius:.5rem; background:var(--paper); color:var(--muted); font-size:.875rem; font-variant-numeric:tabular-nums; }
+.q-dot.current { outline:2px solid var(--green); outline-offset:1px; color:var(--green-dark); font-weight:700; }
+.q-dot.answered,.q-dot.good { background:#e7f0e1; color:var(--green-dark); }
+.q-dot.bad { background:#f9e9e2; color:var(--red); }
+.q-state { position:absolute; right:2px; bottom:2px; }
+.q-state .icon,.q-saved .icon { width:.625rem; height:.625rem; stroke-width:2; }
+.q-saved { position:absolute; right:2px; top:2px; color:var(--green-dark); }
+.q-saved .icon { fill:#cce0c7; }
+.answer-dot { position:absolute; width:3px; height:3px; background:var(--green); bottom:4px; left:calc(50% - 1.5px); border-radius:50%; }
+.submit-link { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:3rem; padding:.75rem 0; margin-top:1.25rem; border-top:1px solid var(--line); font-size:.9375rem; color:var(--green); }
+.feedback { padding-top:1.5rem; margin-top:1.75rem; border-top:1px solid var(--line); }
+.feedback h2 { display:flex; gap:.625rem; align-items:center; font-size:1rem; color:var(--green); margin-bottom:.875rem; }
+.feedback.bad h2 { color:var(--red); }
+.feedback p { font-size:var(--type-reading); line-height:1.9; max-width:42ic; color:var(--muted); }
+.lab-toolbar { margin-bottom:1.75rem; }
+.mission-picker { min-width:0; max-width:calc(100% - 6rem); }
+.mission-picker select { width:25rem; border-color:var(--line); }
+.lab-progress { display:flex; align-items:center; gap:.5rem; font-size:.9375rem; color:var(--green); }
+.lab-layout { display:grid; grid-template-columns:minmax(0,1fr) 17rem; gap:2.5rem; align-items:start; }
+.lab-task { margin-bottom:1.5rem; }
+.lab-task .spread { align-items:flex-start; }
+.lab-task p { font-size:var(--type-reading); line-height:1.9; margin-top:.875rem; color:var(--muted); max-width:42ic; }
+.solved-mark { display:grid; place-items:center; width:2rem; height:2rem; color:var(--green); background:var(--soft); border-radius:50%; flex-shrink:0; }
+.task-tools { display:flex; gap:1.5rem; margin-top:.75rem; }
+.hint-body { margin-top:.75rem; padding:1rem 1.25rem; background:#eef4e9; border-radius:.75rem; color:#46613c; font-size:var(--type-reading); line-height:1.8; }
+.editor-panel { overflow:hidden; border:1px solid var(--line); border-radius:1rem; background:var(--paper); }
+.editor-header { display:flex; align-items:center; justify-content:space-between; padding:.375rem 1.25rem; border-bottom:1px solid var(--line); font: .875rem/1.7 var(--mono); color:var(--muted); }
+.editor { display:flex; height:18rem; background:#fcfdfb; }
+.line-numbers { width:calc(3ch + 1.5rem); flex-shrink:0; padding:1.25rem .75rem; font:var(--type-code)/1.8 var(--mono); text-align:right; color:var(--muted); white-space:pre; overflow:hidden; }
+.editor textarea { width:100%; min-width:0; height:100%; resize:none; border:0; background:transparent; padding:1.25rem 1rem 1.25rem .375rem; font:var(--type-code)/1.8 var(--mono); color:#31523f; tab-size:2; letter-spacing:0; white-space:pre; overflow:auto; }
+.editor textarea:focus-visible { outline-offset:-3px; }
+.editor-footer { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:.75rem; padding:1rem 1.25rem; border-top:1px solid var(--line); }
+.result-panel { margin-top:1.5rem; }
+.result-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.75rem; padding:.75rem 0; border-bottom:1px solid var(--line); }
+.result-header h2 { font-size:1rem; }
+.result-metrics { display:flex; gap:1rem; font-size:.875rem; color:var(--muted); font-variant-numeric:tabular-nums; }
+.result-empty { padding:2rem; display:flex; align-items:center; justify-content:center; gap:.75rem; color:var(--muted); font-size:1rem; min-height:9rem; }
+.empty-table { width:10rem; height:4.375rem; fill:none; stroke:#b6c9ae; stroke-width:1.25; }
+.table-wrap { overflow:auto; max-height:26rem; }
+table { border-collapse:collapse; width:100%; font-size:var(--type-code); letter-spacing:0; }
+th,td { padding:.75rem 1rem; border-bottom:1px solid var(--line); text-align:left; white-space:nowrap; }
+th { color:var(--muted); font-size:.875rem; font-weight:600; position:sticky; top:0; background:var(--bg); }
+td { font-family:var(--mono); }
+td.null { font-style:italic; color:var(--muted); }
+.result-message { display:flex; align-items:flex-start; gap:.75rem; padding:1rem 0; color:var(--green); font-size:1rem; }
+.result-message .icon { margin-top:.2rem; }
+.result-message.bad,.result-message.error { color:var(--red); }
+.result-message p { margin-top:.5rem; }
+.result-message strong { font-weight:600; }
+.lab-next { display:flex; justify-content:flex-end; margin-top:1rem; }
+.schema-panel { padding-top:.375rem; }
+.schema-table { background:var(--paper); border:1px solid #cedbc6; border-radius:.75rem; overflow:hidden; }
+.schema-table header { display:flex; align-items:center; justify-content:space-between; padding:.375rem .625rem .375rem 1rem; border-bottom:1px solid var(--line); }
+.schema-table header>span { display:flex; align-items:center; gap:.625rem; min-width:0; }
+.schema-table b { font:600 .9375rem/1.7 var(--mono); }
+.schema-table header .icon { width:1rem; height:1rem; }
+.schema-columns { padding:.625rem .875rem; }
+.schema-col { display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.375rem 0; font-size:.875rem; }
+.schema-col>span { display:flex; align-items:center; gap:.375rem; min-width:0; }
+.schema-col .icon,.schema-col i { width:.875rem; height:.875rem; flex-shrink:0; color:var(--green); }
+.schema-col small { font-size:.875rem; color:var(--muted); }
+.schema-col code { font-size:.875rem; }
+.relation-line { position:relative; height:3.25rem; color:var(--muted); margin-left:1.25rem; }
+.relation-line svg { width:4rem; height:3.25rem; fill:none; stroke:#8da184; stroke-width:1.5; }
+.relation-line code { position:absolute; left:3rem; top:.875rem; font-size:.875rem; }
+.environment { margin-top:1.25rem; color:var(--muted); font-size:.875rem; }
+.environment summary,.sources summary,.score-help summary { display:flex; align-items:center; gap:.5rem; min-height:2.75rem; list-style:none; }
+.environment summary>.icon:last-child { margin-left:auto; width:1rem; height:1rem; }
+.environment p { padding:.75rem 0; line-height:1.85; }
+.environment .text-button { font-size:.875rem; }
+.search-wrap { display:flex; align-items:center; gap:.75rem; width:27rem; max-width:100%; border-bottom:1px solid #b8c8b0; padding:.75rem 0; color:var(--muted); }
+.search-wrap input { background:transparent; border:0; color:var(--ink); width:100%; min-width:0; font-size:1rem; }
+.note-list { border-top:1px solid var(--line); }
+.note-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,.95fr); gap:2.5rem; padding:2rem 0; border-bottom:1px solid var(--line); }
+.note-row h2 { margin-bottom:.75rem; font-size:var(--type-question); }
+.note-row p { font-size:var(--type-reading); line-height:1.9; color:var(--muted); }
+.note-row .sql-block { margin:0; align-self:start; }
+.sources { margin-top:1.5rem; color:var(--muted); font-size:.875rem; }
+.sources p { margin:.75rem 0; }
+.sources>div { display:flex; gap:1.5rem; padding:.5rem 0; }
+.source-links { display:flex; gap:1.5rem; flex-wrap:wrap; font-size:.875rem; }
+.review-list,.session-review { border-top:1px solid var(--line); }
+.review-row { display:flex; align-items:center; gap:1.5rem; padding:1.5rem 0; border-bottom:1px solid var(--line); }
+.review-index { color:var(--muted); font-size:.875rem; font-variant-numeric:tabular-nums; }
+.review-content { flex:1; min-width:0; }
+.review-content small { display:flex; align-items:center; flex-wrap:wrap; gap:.75rem; color:var(--muted); font-size:.875rem; margin-bottom:.5rem; }
+.review-content h2 { font-size:var(--type-reading); font-weight:500; }
+.meta-separator { width:1px; height:.875rem; background:var(--line); }
+.review-status { color:var(--green); }
+.review-status.bad { color:var(--red); }
+.empty-state { display:flex; align-items:center; flex-direction:column; padding:5rem 1rem; text-align:center; }
+.empty-state>.icon { width:2.5rem; height:2.5rem; margin-bottom:1.5rem; color:var(--green); stroke-width:1.3; }
+.empty-state h2 { font-size:var(--type-question); }
+.empty-state p { font-size:1rem; color:var(--muted); margin:.75rem 0 1.75rem; max-width:32ic; }
+.results-view { max-width:62rem; margin:0 auto; }
+.result-overview { display:grid; grid-template-columns:1fr 1.2fr; gap:4rem; padding:1rem 0 2rem; }
+.result-overview h1 { font-size:1.125rem; color:var(--muted); font-weight:500; }
+.score-value { font-size:4.5rem; font-weight:650; line-height:1.35; letter-spacing:-.04em; font-variant-numeric:tabular-nums; margin:.25rem 0 .75rem; }
+.score-value small { font-size:1.125rem; color:var(--muted); font-weight:400; margin-left:.75rem; letter-spacing:0; }
+.score-counts { display:flex; flex-wrap:wrap; gap:1.5rem; }
+.score-counts>span { display:flex; align-items:center; gap:.5rem; color:var(--muted); font-size:.9375rem; font-variant-numeric:tabular-nums; }
+.subject-scores { padding-top:1rem; }
+.subject-score { margin-bottom:1.5rem; font-size:.9375rem; }
+.score-bar { position:relative; height:.375rem; background:#e2eadc; margin-top:.875rem; border-radius:.25rem; }
+.score-bar>span { display:block; height:100%; background:var(--green); border-radius:.25rem; }
+.subject-score.bad .score-bar>span { background:var(--red); }
+.pass-mark { position:absolute; left:40%; top:-3px; height:12px; width:1px; background:var(--ink); }
+.exam-verdict { display:flex; gap:.5rem; align-items:center; color:var(--green); font-size:.9375rem; }
+.exam-verdict.bad { color:var(--red); }
+.result-actions { display:flex; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:2.5rem; }
+.score-help { margin-left:auto; font-size:.875rem; color:var(--muted); }
+.score-help p { max-width:40ic; padding:.75rem 0; }
+.score-help .icon { width:1rem; height:1rem; }
+.storage-warning { max-width:72rem; margin:1rem auto 0; padding:1rem; color:var(--red); font-size:1rem; }
+dialog { border:1px solid var(--line); border-radius:1rem; padding:2rem; width:min(43rem,calc(100% - 2rem)); max-height:85vh; max-height:85dvh; overflow:auto; color:var(--ink); background:var(--paper); }
+dialog::backdrop { background:#1b342c66; }
+dialog h2 { font-size:var(--type-question); margin-bottom:1.25rem; }
+dialog p { font-size:var(--type-reading); line-height:1.85; color:var(--muted); margin-bottom:1rem; }
+dialog .button-row { justify-content:flex-end; margin-top:1.75rem; }
+dialog ul { padding-left:1.25rem; font-size:1rem; color:var(--muted); line-height:2.2; }
+.kbd { font: .875rem/1.6 var(--mono); border:1px solid #c6d0bf; border-radius:.25rem; padding:.125rem .375rem; margin:0 .125rem; }
+#toast { position:fixed; bottom:calc(var(--nav-height) + 1.25rem); left:50%; transform:translate(-50%,.375rem); opacity:0; pointer-events:none; width:max-content; max-width:calc(100vw - 2rem); padding:.875rem 1.25rem; border-radius:.5rem; color:#fff; background:var(--green-dark); font-size:1rem; text-align:center; z-index:20; transition:opacity 150ms var(--ease-out),transform 150ms var(--ease-out); }
+#toast.show { transform:translate(-50%,0); opacity:1; }
+.primary,.secondary,.icon-button { transition:transform 120ms var(--ease-out); }
+.primary:active:not(:disabled):not(:focus-visible),.secondary:active:not(:disabled):not(:focus-visible),.icon-button:active:not(:disabled):not(:focus-visible) { transform:scale(.97); }
+@media (hover:hover) and (pointer:fine) {
+  .icon-button:hover:not(:disabled),.nav-item:hover:not(.active),.secondary:hover:not(:disabled) { background:var(--soft); color:var(--green-dark); }
+  .primary:hover:not(:disabled) { background:var(--green-dark); }
+  .choice:hover:not(:disabled) { border-color:var(--green); background:#f5f8f1; }
+  .text-button:hover,.ghost:hover,.submit-link:hover { color:var(--green-dark); }
 }
-@media (max-width: 90rem) {
-  :root { --page-gutter: 1.5rem; }
-  .mode-info { flex-basis: 100%; }
-  .question-bottom .keyboard-hint { flex-basis: 100%; }
-  .lab-layout { grid-template-columns: minmax(0,1fr); }
-  .schema-panel { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 1.5rem; }
-  .schema-title, .engine-note { grid-column: 1/-1; }
+@media (max-width:70rem) {
+  .header-inner { gap:1.25rem; padding-left:1.5rem; padding-right:1.5rem; }
+  .nav-item { padding:.75rem; }
+  .brand b { display:none; }
+  main { padding:2rem 1.5rem 3rem; }
+  .quiz-layout,.lab-layout { gap:1.75rem; }
+  .lab-layout { grid-template-columns:minmax(0,1fr) 16rem; }
 }
-@media (max-width: 80rem) {
-  .quiz-layout { grid-template-columns: minmax(0,1fr); }
-  .right-rail { grid-template-columns: repeat(2,minmax(0,1fr)); align-items: start; }
-  .question-grid { grid-template-columns: repeat(auto-fit,minmax(2.75rem,1fr)); }
-  .note-grid { grid-template-columns: minmax(0,1fr); }
+@media (max-width:56rem) {
+  :root { --nav-height:calc(4.5rem + env(safe-area-inset-bottom,0px)); }
+  .header-inner { min-height:4.75rem; justify-content:space-between; }
+  .brand b { display:inline; }
+  .main-nav { position:fixed; inset:auto 0 0; z-index:10; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.25rem; margin:0; min-height:var(--nav-height); padding:.375rem .5rem calc(.375rem + env(safe-area-inset-bottom,0px)); background:var(--paper); border-top:1px solid var(--line); }
+  .nav-item { flex-direction:column; gap:.25rem; justify-content:center; padding:.375rem .125rem; font-size:.875rem; position:relative; line-height:1.5; white-space:normal; word-break:keep-all; overflow-wrap:anywhere; }
+  .nav-count { position:absolute; top:.25rem; right:calc(50% - 2rem); font-size:.75rem; }
+  main { padding-bottom:calc(var(--nav-height) + 2rem); }
+  .lab-layout { grid-template-columns:minmax(0,1fr); }
+  .schema-panel { display:grid; grid-template-columns:minmax(0,1.3fr) 3rem minmax(0,1fr); align-items:start; margin-top:1rem; }
+  .relation-line { transform:rotate(-90deg); margin:3rem 0 0; }
+  .relation-line code { display:none; }
+  .environment { grid-column:1/-1; }
+  .quiz-layout { grid-template-columns:minmax(0,1fr); gap:1.5rem; }
+  .question-navigator { padding:0; }
+  .question-grid { grid-template-columns:repeat(auto-fill,minmax(2.75rem,1fr)); }
+  .navigator-head { justify-content:flex-start; gap:1rem; }
+  .submit-link { justify-content:flex-end; gap:1rem; }
+  .note-row { grid-template-columns:minmax(0,1fr); gap:1.25rem; }
 }
-@media (max-width: 74rem) {
-  :root { --nav-height: calc(4.75rem + env(safe-area-inset-bottom,0px)); }
-  .app-shell { display: block; }
-  .sidebar { position: static; width: 100%; padding: 1.25rem var(--page-gutter); border-right: 0; border-bottom: 1px solid var(--line); overflow: visible; }
-  .brand { margin: 0; width: fit-content; }
-  .brand small { display: none; }
-  .sidebar > .nav-label, .sidebar-progress, .sidebar-bottom { display: none; }
-  .sidebar nav { position: fixed; inset: auto 0 0; z-index: 5; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); padding: .375rem .5rem calc(.375rem + env(safe-area-inset-bottom,0px)); min-height: var(--nav-height); background: #fcfdfa; border-top: 1px solid var(--line); }
-  .nav-item { margin: 0; padding: .5rem .125rem; min-height: 3.875rem; display: flex; flex-direction: column; justify-content: center; gap: .25rem; font-size: var(--type-meta); line-height: 1.5; position: relative; }
-  .nav-count { position: absolute; top: .25rem; right: max(.125rem,calc(50% - 2rem)); font-size: .75rem; padding: 0 .25rem; }
-  .workspace { width: 100%; margin: 0; padding-bottom: calc(var(--nav-height) + 1rem); }
-  .topbar { min-height: 4.75rem; }
-  main { padding-top: 2rem; }
-  .quiz-layout { grid-template-columns: minmax(0,1fr) 17.5rem; }
-  .right-rail { grid-template-columns: minmax(0,1fr); }
-  .question-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+@media (max-width:40rem) {
+  .header-inner { padding:.625rem 1rem; gap:.5rem; }
+  .brand { font-size:1.0625rem; gap:.5rem; }
+  .brand-mark { width:2rem; height:2rem; }
+  .brand b { display:none; }
+  main { padding:1.5rem 1rem calc(var(--nav-height) + 2rem); }
+  .view-toolbar { margin-bottom:1.5rem; }
+  .segment { padding:.625rem .875rem; gap:.5rem; }
+  .question-sheet { padding:1.25rem; }
+  .question-context { gap:.625rem; }
+  .question-title { margin-bottom:1.5rem; }
+  .sql-block { padding:1rem; margin-bottom:1.5rem; }
+  .choice { padding:.875rem .75rem; gap:.625rem; }
+  .choice-indicator { width:1rem; }
+  .choice-indicator .icon { width:1rem; height:1rem; }
+  .question-actions { margin-top:1.5rem; padding-top:1.25rem; }
+  .question-grid { grid-template-columns:repeat(5,minmax(0,1fr)); }
+  .mission-picker { max-width:100%; width:100%; }
+  .mission-picker select { width:100%; }
+  .lab-progress { margin-left:auto; }
+  .lab-task p { font-size:var(--type-reading); }
+  .editor-header { padding-left:1rem; padding-right:1rem; }
+  .editor-footer { padding:1rem; }
+  .schema-panel { grid-template-columns:minmax(0,1fr); max-width:24rem; margin-left:auto; margin-right:auto; width:100%; }
+  .relation-line { transform:none; margin:0 0 0 1.25rem; }
+  .relation-line code { display:block; }
+  .schema-col code { font-size:.9375rem; }
+  .schema-col small { font-size:.875rem; }
+  .review-row { gap:.75rem; align-items:flex-start; }
+  .review-row>.icon-button { width:2.75rem; min-width:2.75rem; }
+  .review-index,.review-status { padding-top:.5rem; }
+  .review-row:has([data-remove-bookmark]) { flex-wrap:wrap; }
+  .review-row:has([data-remove-bookmark]) .review-content { flex-basis:calc(100% - 3rem); }
+  .review-row:has([data-remove-bookmark]) [data-review-id] { margin-left:auto; }
+  .result-overview { grid-template-columns:minmax(0,1fr); gap:1.25rem; }
+  .result-actions { align-items:stretch; }
+  .score-help { width:100%; margin-left:0; }
+  .score-value { font-size:4rem; }
+  dialog { padding:1.5rem; }
 }
-@media (max-width: 58rem) {
-  .quiz-layout { grid-template-columns: minmax(0,1fr); }
-  .right-rail { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .question-grid { grid-template-columns: repeat(auto-fit,minmax(2.75rem,1fr)); }
+@media (max-width:23rem) {
+  .question-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .question-sheet { padding:1rem; }
+  .question-topic { flex-basis:100%; }
+  .header-tools { gap:0; }
 }
-@media (max-width: 44rem) {
-  :root { --page-gutter: 1.125rem; }
-  h1 { font-size: 1.875rem; }
-  .sidebar { padding-top: 1rem; padding-bottom: 1rem; }
-  .brand { font-size: 1.375rem; }
-  .brand-mark { width: 2.25rem; height: 2.5rem; font-size: 1.5rem; }
-  .breadcrumb { display: none; }
-  .topbar { min-height: 4.5rem; padding-top: .75rem; padding-bottom: .75rem; }
-  .top-actions { justify-content: space-between; width: 100%; gap: .75rem; }
-  .reading-control { gap: .625rem; }
-  .key-help { gap: .375rem; }
-  main { padding-top: 1.75rem; }
-  .hero, .view-intro { margin-bottom: 1.5rem; }
-  .segmented { width: 100%; }
-  .segment { flex: 1; padding: .625rem .5rem; }
-  .segment small { display: block; margin-left: 0; margin-top: .125rem; }
-  .question-top { padding: 1rem 1.125rem; gap: .625rem; }
-  .question-top > .muted { flex-basis: calc(100% - 6rem); }
-  .question-body { padding: 1.25rem 1.125rem; }
-  .question-meta { margin-bottom: .875rem; }
-  .question-title { line-height: 1.65; }
-  .code-label > span:last-child { display: none; }
-  .code-block pre { padding: 1rem; }
-  .choice { padding: .875rem .75rem; gap: .75rem; }
-  .question-bottom { padding: 1rem 1.125rem; }
-  .question-bottom > .button-row { width: 100%; justify-content: space-between; }
-  .question-bottom .primary, .question-bottom .secondary { padding: .75rem .875rem; }
-  .right-rail { grid-template-columns: minmax(0,1fr); }
-  .rail-card { padding: 1.25rem; }
-  .question-grid { grid-template-columns: repeat(5,minmax(0,1fr)); }
-  .lab-toolbar { align-items: stretch; }
-  .select-wrap { display: block; width: 100%; }
-  .select-wrap select { display: block; width: 100%; margin-top: .5rem; }
-  .schema-panel { grid-template-columns: minmax(0,1fr); }
-  .schema-title, .engine-note { grid-column: auto; }
-  .lab-task, .note-card { padding: 1.25rem; }
-  .line-numbers { padding-right: .5rem; }
-  .editor-footer { padding: 1rem; }
-  .editor-footer .button-row { width: 100%; justify-content: flex-end; }
-  .editor-header, .editor-hint { padding-left: 1rem; padding-right: 1rem; }
-  .search-field { width: 100%; }
-  .review-row { padding: 1.25rem; gap: .875rem; flex-wrap: wrap; }
-  .review-content { flex-basis: calc(100% - 4rem); }
-  .review-row .secondary { margin-left: auto; }
-  .score-layout { flex-wrap: wrap; gap: 1.5rem; }
-  .score-ring { padding: 0; border: 0; }
-  .result-summary { padding: 1.25rem; }
-  .subject-scores { flex-direction: column; gap: .75rem; }
-  .feedback { padding: 1rem; }
-  dialog { padding: 1.5rem; }
-  footer { gap: .25rem; }
-}
-@media (max-width: 23rem) {
-  .question-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
-  .question-meta { align-items: flex-start; }
-  .question-number, .bookmark { font-size: var(--type-meta); }
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
-  .primary:active, .secondary:active, .segment:active { transform: none !important; }
-  #toast { transform: translateX(-50%); }
+@media (prefers-reduced-motion:reduce) {
+  *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; }
+  .primary:active,.secondary:active,.icon-button:active { transform:none!important; }
+  #toast { transform:translateX(-50%); }
 }
 </style>
 </head>
@@ -372,30 +333,40 @@ dialog ul { padding-left: 1.25rem; font-size: 1rem; color: var(--muted); line-he
   <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
   <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
   <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
+  <symbol id="icon-arrow-left" viewBox="0 0 24 24"><path d="M20 12H4m6-6-6 6 6 6"/></symbol>
+  <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></symbol>
+  <symbol id="icon-type" viewBox="0 0 24 24"><path d="m3 18 5-12 5 12M5 14h6m5-2c1-2 5-2 5 1v5m0-4c-7-2-7 6 0 3"/></symbol>
+  <symbol id="icon-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></symbol>
+  <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1"/></symbol>
+  <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></symbol>
+  <symbol id="icon-code" viewBox="0 0 24 24"><path d="m7 6-5 6 5 6m10-12 5 6-5 6M14 4l-4 16"/></symbol>
+  <symbol id="icon-bulb" viewBox="0 0 24 24"><path d="M9 18h6m-5 3h4M8 14a6 6 0 1 1 8 0l-1 2H9l-1-2Z"/></symbol>
+  <symbol id="icon-table" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M10 10v10"/></symbol>
+  <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="icon-key" viewBox="0 0 24 24"><circle cx="8" cy="9" r="4"/><path d="m11 12 8 8m-4-4 2-2m0 4 2-2"/></symbol>
+  <symbol id="icon-link" viewBox="0 0 24 24"><path d="m10 14 4-4m-6 2-2 2a4 4 0 0 0 6 6l2-2m2-6 2-2a4 4 0 0 0-6-6l-2 2"/></symbol>
+  <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
 </defs></svg>
 <a class="skip" href="#main">본문으로 이동</a>
-<div class="app-shell">
-  <aside class="sidebar">
-    <a href="#quiz" class="brand" aria-label="SQLD Sprint 홈"><span class="brand-mark">S</span><span>SQLD <b>sprint</b><small>나의 벼락치기 스터디룸</small></span></a>
-    <div class="nav-label">학습 메뉴</div>
-    <nav aria-label="학습 메뉴">
-      <button data-view="quiz" class="nav-item active"><svg class="icon nav-icon" aria-hidden="true"><use href="#icon-book"/></svg>문제 풀기</button>
-      <button data-view="lab" class="nav-item"><svg class="icon nav-icon" aria-hidden="true"><use href="#icon-terminal"/></svg>SQL 실습</button>
-      <button data-view="review" class="nav-item"><svg class="icon nav-icon" aria-hidden="true"><use href="#icon-bookmark"/></svg>오답 노트 <span class="nav-count" id="wrong-count">0</span></button>
-      <button data-view="notes" class="nav-item"><svg class="icon nav-icon" aria-hidden="true"><use href="#icon-notes"/></svg>핵심 요약</button>
-    </nav>
-    <section class="sidebar-progress"><div class="nav-label">나의 학습 기록</div><div class="spread"><span>개념 문제 정복</span><b id="mastery-count">0 / 50</b></div><div class="progress"><span id="mastery-bar"></span></div><p>마지막으로 맞힌 문제를 기준으로 차곡차곡 쌓이고 있어요.</p></section>
-    <div class="sidebar-bottom"><div class="study-card"><p>한 문제 더 풀면,<br>한 걸음 더 가까이.</p></div><div class="save-status"><span class="dot"></span><span id="save-label">이 브라우저에 자동 저장</span></div><button class="text-button muted" data-action="about">이 스터디룸에 대해</button></div>
-  </aside>
-  <div class="workspace">
-    <header class="topbar"><div class="breadcrumb">나의 스터디룸 <span>/</span> <b id="breadcrumb">문제 풀기</b></div><div class="top-actions"><label class="reading-control" for="reading-size"><span>글자 크기</span><select id="reading-size"><option value="comfortable">기본</option><option value="large">크게</option><option value="extra">더 크게</option></select></label><button class="key-help" data-action="help" aria-label="키보드 단축키 안내"><svg class="icon" aria-hidden="true"><use href="#icon-keyboard"/></svg><span>단축키</span></button></div></header>
-    <main id="main" tabindex="-1"></main>
-    <footer>매일 조금씩, SQL이 익숙해지는 시간.<button class="text-button" data-action="about">스터디룸 안내 · HTML 내려받기</button></footer>
+<header class="app-header"><div class="header-inner">
+  <a href="#quiz" class="brand" aria-label="SQLD Sprint"><span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#icon-terminal"/></svg></span><span>SQLD <b>Sprint</b></span></a>
+  <nav class="main-nav" aria-label="학습 메뉴">
+    <button data-view="quiz" class="nav-item active"><svg class="icon" aria-hidden="true"><use href="#icon-book"/></svg><span>문제 풀기</span></button>
+    <button data-view="lab" class="nav-item"><svg class="icon" aria-hidden="true"><use href="#icon-terminal"/></svg><span>SQL 실습</span></button>
+    <button data-view="review" class="nav-item"><svg class="icon" aria-hidden="true"><use href="#icon-bookmark"/></svg><span>복습</span><span class="nav-count" id="wrong-count" hidden>0</span></button>
+    <button data-view="notes" class="nav-item"><svg class="icon" aria-hidden="true"><use href="#icon-notes"/></svg><span>개념 정리</span></button>
+  </nav>
+  <div class="header-tools">
+    <details class="reading-menu"><summary class="icon-button" aria-label="글자 크기" title="글자 크기"><svg class="icon" aria-hidden="true"><use href="#icon-type"/></svg></summary><div class="reading-options"><label for="reading-size">글자 크기</label><select id="reading-size"><option value="comfortable">기본</option><option value="large">크게</option><option value="extra">더 크게</option></select></div></details>
+    <button class="icon-button" data-action="help" aria-label="단축키" title="단축키"><svg class="icon" aria-hidden="true"><use href="#icon-keyboard"/></svg></button>
+    <button class="icon-button" data-action="about" aria-label="학습 안내" title="학습 안내"><svg class="icon" aria-hidden="true"><use href="#icon-info"/></svg></button>
   </div>
-</div>
+</div></header>
+<p id="save-label" class="storage-warning" role="status" hidden></p>
+<main id="main" tabindex="-1"></main>
 <dialog id="modal" aria-label="학습 안내"><div id="modal-content"></div></dialog>
 <div id="toast" role="status" aria-live="polite"></div>
-<noscript>이 학습 화면을 사용하려면 브라우저에서 JavaScript를 허용해 주세요.</noscript>
+<noscript>이 화면을 사용하려면 브라우저에서 JavaScript를 허용해 주세요.</noscript>
 <!-- sql.js MIT license
 MIT license
 ===========
@@ -690,20 +661,20 @@ const questions = [];
 function q(id, topic, title, choices, answer, explanation, sql = '', level = '기본') {
   questions.push({id, subject:id <= 10 ? 1 : 2, topic, title, choices, answer, explanation, sql, level});
 }
-q(1,'엔터티','데이터 모델의 엔터티에 대한 설명으로 가장 적절한 것은?', ['업무에서 관리할 필요가 있는 대상의 집합이다.','모든 엔터티는 다른 엔터티와 반드시 1:1 관계를 가진다.','엔터티의 모든 속성은 식별자여야 한다.','엔터티에는 인스턴스가 정확히 하나만 존재해야 한다.'],0,'엔터티는 업무에서 관리할 필요가 있는 사물·사건·개념 등의 집합이다. 각각의 구체적 사례가 인스턴스이며, 엔터티는 속성을 가진다.');
-q(2,'식별자','주식별자의 특성에 해당하지 않는 것은?', ['유일성','최소성','불변성','가변성'],3,'주식별자는 유일성·최소성·불변성·존재성을 만족해야 한다. 값이 자주 바뀌면 이를 참조하는 관계의 유지가 어려워진다.');
-q(3,'정규화','주문상세(주문번호, 상품번호, 상품명, 수량)의 기본키가 (주문번호, 상품번호)이고 상품번호 → 상품명인 경우, 제거해야 할 종속은?', ['이행 함수 종속','부분 함수 종속','다치 종속','조인 종속'],1,'복합키의 일부인 상품번호만으로 상품명이 결정된다. 이 부분 함수 종속을 제거하는 것이 제2정규화다. 상품번호·상품명을 별도 상품 엔터티로 분리할 수 있다.');
+q(1,'엔터티','데이터 모델의 엔터티에 대한 설명으로 가장 적절한 것은?', ['업무에서 관리할 필요가 있는 대상의 집합이다.','모든 엔터티는 다른 엔터티와 반드시 1:1 관계를 가진다.','엔터티의 모든 속성은 식별자여야 한다.','엔터티에는 인스턴스가 정확히 하나만 존재해야 한다.'],0,'엔터티는 업무에서 관리할 필요가 있는 사물, 사건, 개념 등의 집합이다. 각각의 구체적 사례가 인스턴스이며 엔터티에는 속성이 있다.');
+q(2,'식별자','주식별자의 특성에 해당하지 않는 것은?', ['유일성','최소성','불변성','가변성'],3,'주식별자는 유일성, 최소성, 불변성, 존재성을 만족해야 한다. 값이 자주 바뀌면 이를 참조하는 관계의 유지가 어려워진다.');
+q(3,'정규화','주문상세(주문번호, 상품번호, 상품명, 수량)의 기본키가 (주문번호, 상품번호)이고 상품번호 → 상품명인 경우, 제거해야 할 종속은?', ['이행 함수 종속','부분 함수 종속','다치 종속','조인 종속'],1,'복합키의 일부인 상품번호만으로 상품명이 결정된다. 이 부분 함수 종속을 제거하는 것이 제2정규화다. 상품번호, 상품명을 별도 상품 엔터티로 분리할 수 있다.');
 q(4,'정규화','사원번호 → 부서번호, 부서번호 → 부서명일 때 사원 테이블에서 부서명을 분리하는 정규화는?', ['제1정규화','제2정규화','제3정규화','역정규화'],2,'사원번호 → 부서번호 → 부서명이라는 이행 함수 종속을 제거하는 제3정규화다. 부서 정보 변경 시 여러 사원 행을 수정하는 갱신 이상을 줄인다.');
 q(5,'관계','비식별 관계에 대한 설명으로 적절한 것은?', ['부모의 식별자가 자식의 일반 속성으로 전이된다.','부모의 식별자가 반드시 자식 주식별자의 일부가 된다.','외래키를 사용할 수 없다.','부모와 자식은 항상 동일한 생명주기를 가진다.'],0,'비식별 관계에서는 부모 식별자가 자식의 일반 속성인 외래키로 전이된다. 식별 관계에서는 자식 주식별자에 포함된다.');
 q(6,'속성','수량과 단가를 곱해 계산하는 주문금액의 속성 분류는?', ['기본 속성','설계 속성','파생 속성','식별 속성'],2,'다른 속성의 값으로 계산해서 얻는 값은 파생 속성이다. 저장한다면 원본 값과의 정합성 관리가 필요하다.');
-q(7,'모델링','데이터 모델링 단계의 일반적인 순서로 올바른 것은?', ['논리 → 개념 → 물리','개념 → 물리 → 논리','물리 → 논리 → 개념','개념 → 논리 → 물리'],3,'개념 모델링에서 핵심 업무 대상을 파악하고, 논리 모델링에서 상세 구조를 정의한 뒤, 물리 모델링에서 특정 DBMS의 저장 구조 등을 설계한다.');
-q(8,'관계','한 부서에 여러 사원이 있고, 각 사원은 하나의 부서에 소속된다. 외래키의 일반적인 위치는?', ['부서 테이블의 사원번호','사원 테이블의 부서번호','양쪽 테이블에 상대방의 모든 속성','어느 테이블에도 두지 않는다.'],1,'1:N 관계에서 일반적으로 N쪽인 사원 테이블이 1쪽 부서의 키를 외래키로 가진다. 사원.부서번호가 부서.부서번호를 참조한다.');
-q(9,'NULL 모델링','NULL을 허용하는 속성에 대한 설명으로 옳은 것은?', ['NULL은 숫자 0과 같다.','NULL은 반드시 오류 데이터다.','값을 모르거나 해당 사항이 없음을 표현할 수 있다.','NULL 두 개는 등호로 비교하면 항상 참이다.'],2,'NULL은 값이 없거나 알려지지 않은 상태다. 0이나 공백과 구별해야 하며, NULL 여부는 IS NULL로 확인한다.');
+q(7,'모델링','데이터 모델링 단계의 일반적인 순서로 올바른 것은?', ['논리 → 개념 → 물리','개념 → 물리 → 논리','물리 → 논리 → 개념','개념 → 논리 → 물리'],3,'개념 모델링에서 핵심 업무 대상을 파악하고 논리 모델링에서 상세 구조를 정의한 뒤 물리 모델링에서 특정 DBMS의 저장 구조 등을 설계한다.');
+q(8,'관계','한 부서에 여러 사원이 있고 각 사원은 하나의 부서에 소속된다. 외래키의 일반적인 위치는?', ['부서 테이블의 사원번호','사원 테이블의 부서번호','양쪽 테이블에 상대방의 모든 속성','어느 테이블에도 두지 않는다.'],1,'1:N 관계에서는 일반적으로 N쪽인 사원 테이블에 1쪽 부서의 키를 외래키로 둔다. 사원.부서번호가 부서.부서번호를 참조한다.');
+q(9,'NULL 모델링','NULL을 허용하는 속성에 대한 설명으로 옳은 것은?', ['NULL은 숫자 0과 같다.','NULL은 반드시 오류 데이터다.','값을 모르거나 해당 사항이 없음을 표현할 수 있다.','NULL 두 개는 등호로 비교하면 항상 참이다.'],2,'NULL은 값이 없거나 알려지지 않은 상태다. 0이나 공백과 구별해야 하며 NULL 여부는 IS NULL로 확인한다.');
 q(10,'인조식별자','인조식별자에 대한 설명으로 옳은 것은?', ['업무 의미가 있는 속성만 사용할 수 있다.','업무와 무관하게 부여한 일련번호 등을 식별자로 사용할 수 있다.','도입하면 업무상 중복 방지 제약은 항상 불필요하다.','문자형으로는 만들 수 없다.'],1,'인조식별자는 업무상 식별자를 대신해 인위적으로 부여한 값이다. 별도의 PK가 있어도 실제 업무의 유일성은 UNIQUE 제약 등으로 지켜야 할 수 있다.');
-q(11,'NULL · 집계','아래 SQL의 실행 결과로 올바른 것은?', ['TOTAL 4, PAID 4, AVG_BONUS 100','TOTAL 4, PAID 2, AVG_BONUS 200','TOTAL 2, PAID 2, AVG_BONUS 200','TOTAL 4, PAID 2, AVG_BONUS 100'],1,'COUNT(*)는 모든 행을 세므로 4다. COUNT(bonus)와 AVG(bonus)는 NULL을 제외한다. 따라서 PAID는 2, 평균은 (100 + 300) / 2 = 200이다.', '-- employees.bonus: 100, NULL, 300, NULL\nSELECT COUNT(*) AS total,\n       COUNT(bonus) AS paid,\n       AVG(bonus) AS avg_bonus\nFROM employees;');
+q(11,'NULL, 집계','아래 SQL의 실행 결과로 올바른 것은?', ['TOTAL 4, PAID 4, AVG_BONUS 100','TOTAL 4, PAID 2, AVG_BONUS 200','TOTAL 2, PAID 2, AVG_BONUS 200','TOTAL 4, PAID 2, AVG_BONUS 100'],1,'COUNT(*)는 모든 행을 세므로 4다. COUNT(bonus)와 AVG(bonus)는 NULL을 제외한다. 따라서 PAID는 2, 평균은 (100 + 300) / 2 = 200이다.', '-- employees.bonus: 100, NULL, 300, NULL\nSELECT COUNT(*) AS total,\n       COUNT(bonus) AS paid,\n       AVG(bonus) AS avg_bonus\nFROM employees;');
 q(12,'NULL 비교','bonus가 NULL인 행만 찾는 조건은?', ['WHERE bonus = NULL','WHERE bonus <> NULL','WHERE bonus IS NULL','WHERE bonus = 0'],2,'NULL과 =, <>로 비교하면 UNKNOWN이 된다. WHERE는 TRUE인 행만 통과시키므로 NULL 검사는 IS NULL 또는 IS NOT NULL을 사용한다.');
 q(13,'NULL 함수','다음 식의 결과는?', ['NULL','0','100','오류'],1,'COALESCE는 왼쪽부터 검사해서 처음으로 NULL이 아닌 값을 반환한다. 0은 NULL이 아니므로 결과는 0이다.', 'SELECT COALESCE(NULL, 0, 100);');
-q(14,'3값 논리','SQL의 3값 논리에서 TRUE OR UNKNOWN의 결과는?', ['TRUE','FALSE','UNKNOWN','NULL 비교 오류'],0,'OR는 한쪽이 TRUE면 전체가 TRUE다. 반대로 FALSE AND UNKNOWN은 FALSE이며, TRUE AND UNKNOWN은 UNKNOWN이다.');
+q(14,'3값 논리','SQL의 3값 논리에서 TRUE OR UNKNOWN의 결과는?', ['TRUE','FALSE','UNKNOWN','NULL 비교 오류'],0,'OR는 한쪽이 TRUE면 전체가 TRUE다. 반대로 FALSE AND UNKNOWN은 FALSE이며 TRUE AND UNKNOWN은 UNKNOWN이다.');
 q(15,'GROUP BY','부서별 평균 급여가 4000 이상인 부서만 조회하는 올바른 쿼리는?', ['SELECT dept_id FROM employees WHERE AVG(salary) >= 4000 GROUP BY dept_id;','SELECT dept_id FROM employees GROUP BY dept_id HAVING AVG(salary) >= 4000;','SELECT dept_id FROM employees HAVING salary >= 4000;','SELECT dept_id FROM employees ORDER BY AVG(salary) WHERE salary >= 4000;'],1,'WHERE는 그룹화 전 개별 행을 필터링하고 HAVING은 그룹화 후 집계 결과를 필터링한다. AVG(salary) 조건은 HAVING에 둔다.');
 q(16,'실행 순서','SELECT문의 논리적 처리 순서로 올바른 것은?', ['SELECT → WHERE → FROM → ORDER BY','FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY','WHERE → SELECT → GROUP BY → FROM','FROM → SELECT → HAVING → WHERE'],1,'논리적으로 FROM에서 대상 행을 구성하고 WHERE로 필터링한 뒤 GROUP BY와 HAVING을 처리한다. SELECT로 열을 정하고 ORDER BY로 정렬한다. 실제 물리 실행 계획과는 구별한다.');
 q(17,'OUTER JOIN','부서는 3개, 사원은 개발부에만 2명 있다. 아래 SQL의 결과 행 수는?', ['2행','3행','4행','6행'],2,'개발부는 매칭된 사원 2행을 만든다. 사원이 없는 나머지 2개 부서는 각각 오른쪽 열이 NULL인 1행씩 남는다. 총 2 + 1 + 1 = 4행이다.', 'SELECT d.dept_id, e.emp_id\nFROM departments d\nLEFT JOIN employees e\n  ON d.dept_id = e.dept_id;', '응용');
@@ -715,13 +686,13 @@ q(22,'EXISTS','EXISTS 서브쿼리의 판단 기준은?', ['첫 번째 열이 1�
 q(23,'NOT IN','id가 1, 2, 3인 테이블에 아래 조건을 적용했을 때 반환되는 행 수는?', ['0행','1행','2행','3행'],0,'id = 1인 행은 NOT IN 조건이 FALSE다. 2와 3은 NULL과의 비교 때문에 UNKNOWN이 되어 제외된다. NULL이 섞일 수 있는 서브쿼리에서는 NOT EXISTS를 검토한다.', 'WHERE id NOT IN (1, NULL)', '응용');
 q(24,'스칼라 서브쿼리','Oracle에서 SELECT절의 스칼라 서브쿼리가 2행을 반환하면?', ['첫 번째 행만 선택한다.','두 값을 쉼표로 연결한다.','오류가 발생한다.','항상 NULL을 반환한다.'],2,'Oracle의 스칼라 서브쿼리는 한 열, 최대 한 행을 반환해야 한다. 0행이면 NULL, 2행 이상이면 오류다. SQLite는 여러 행이면 첫 행을 쓰므로 엔진 차이에 주의한다.');
 q(25,'상관 서브쿼리','자기 부서의 평균 급여보다 많이 받는 사원을 조회하려 한다. 빈칸에 들어갈 조건은?', ['e2.emp_id = e.emp_id','e2.dept_id = e.dept_id','e2.salary = e.salary','e2.dept_id IS NULL'],1,'서브쿼리가 외부 사원의 부서번호를 참조하도록 연결한다. 각 사원과 같은 부서의 평균을 계산해 비교하는 상관 서브쿼리다.', 'SELECT e.name\nFROM employees e\nWHERE e.salary > (\n  SELECT AVG(e2.salary) FROM employees e2\n  WHERE /* 빈칸 */\n);', '응용');
-q(26,'윈도 함수','급여 5000, 5000, 4000에 RANK() OVER (ORDER BY salary DESC)를 적용한 순위는?', ['1, 2, 3','1, 1, 2','1, 1, 3','0, 0, 1'],2,'RANK는 동점에 같은 순위를 주고, 동점 인원 수만큼 다음 순위를 건너뛴다. 두 명이 1위이면 다음은 3위다.');
+q(26,'윈도 함수','급여 5000, 5000, 4000에 RANK() OVER (ORDER BY salary DESC)를 적용한 순위는?', ['1, 2, 3','1, 1, 2','1, 1, 3','0, 0, 1'],2,'RANK는 동점에 같은 순위를 주고 동점 인원 수만큼 다음 순위를 건너뛴다. 두 명이 1위이면 다음은 3위다.');
 q(27,'윈도 함수','급여 5000, 5000, 4000에 DENSE_RANK() OVER (ORDER BY salary DESC)를 적용한 순위는?', ['1, 1, 2','1, 1, 3','1, 2, 3','2, 2, 3'],0,'DENSE_RANK는 동점에 같은 순위를 주되 다음 순위를 건너뛰지 않는다. RANK와의 차이를 기억한다.');
-q(28,'PARTITION BY','SUM(salary) OVER (PARTITION BY dept_id)의 설명으로 옳은 것은?', ['부서별로 결과를 한 행씩 줄인다.','원래 행을 유지하면서 각 행에 소속 부서 급여 합계를 표시한다.','전체 급여 합계만 모든 행에 표시한다.','부서번호를 반드시 오름차순으로 정렬한다.'],1,'윈도 함수는 GROUP BY처럼 원래 행을 합치지 않는다. PARTITION BY는 계산 범위를 나누며, 각 사원 행에 해당 부서의 급여 합계가 붙는다.');
+q(28,'PARTITION BY','SUM(salary) OVER (PARTITION BY dept_id)의 설명으로 옳은 것은?', ['부서별로 결과를 한 행씩 줄인다.','원래 행을 유지하면서 각 행에 소속 부서 급여 합계를 표시한다.','전체 급여 합계만 모든 행에 표시한다.','부서번호를 반드시 오름차순으로 정렬한다.'],1,'윈도 함수는 GROUP BY처럼 원래 행을 합치지 않는다. PARTITION BY는 계산 범위를 나누며 각 사원 행에 해당 부서의 급여 합계가 붙는다.');
 q(29,'윈도 프레임','emp_id 순서의 급여가 100, 200, 300일 때 아래 식의 세 번째 행 값은?', ['300','400','500','600'],3,'UNBOUNDED PRECEDING부터 CURRENT ROW까지는 파티션 시작부터 현재 행까지다. 세 번째 행에서는 100 + 200 + 300 = 600이다.', 'SUM(salary) OVER (\n  ORDER BY emp_id\n  ROWS BETWEEN UNBOUNDED PRECEDING\n           AND CURRENT ROW\n)', '응용');
 q(30,'LAG','LAG(salary, 1, 0) OVER (ORDER BY emp_id)의 첫 번째 행 값은?', ['현재 행 급여','NULL','0','마지막 행 급여'],2,'LAG는 앞 행의 값을 가져온다. 첫 행에는 앞 행이 없으므로 세 번째 인자로 지정한 기본값 0을 반환한다.');
 q(31,'CASE','다음 CASE 식의 결과는?', ['A','B','C','NULL'],0,'CASE는 위에서부터 조건을 검사하고 처음 TRUE인 WHEN의 결과를 반환한다. 85 >= 80이 먼저 참이므로 A다.', "CASE WHEN 85 >= 80 THEN 'A'\n     WHEN 85 >= 60 THEN 'B'\n     ELSE 'C' END");
-q(32,'BETWEEN','salary BETWEEN 3000 AND 5000과 같은 조건은?', ['salary > 3000 AND salary < 5000','salary >= 3000 AND salary <= 5000','salary >= 3000 OR salary <= 5000','salary = 3000 AND salary = 5000'],1,'BETWEEN은 양쪽 경계를 모두 포함한다. 날짜·시간을 비교할 때는 종료 시각의 범위에 주의해야 한다.');
+q(32,'BETWEEN','salary BETWEEN 3000 AND 5000과 같은 조건은?', ['salary > 3000 AND salary < 5000','salary >= 3000 AND salary <= 5000','salary >= 3000 OR salary <= 5000','salary = 3000 AND salary = 5000'],1,'BETWEEN은 양쪽 경계를 모두 포함한다. 날짜, 시간을 비교할 때는 종료 시각의 범위에 주의해야 한다.');
 q(33,'LIKE',"LIKE 'A_%' 패턴에 매칭되지 않는 문자열은?", ['AB','A1Z','A_','A'],3,'밑줄(_)은 정확히 한 문자, %는 0개 이상의 문자다. A 뒤에 적어도 한 글자가 있어야 하므로 A만 있는 값은 매칭되지 않는다.');
 q(34,'DISTINCT','(dept_id, job)이 (10, 개발), (10, 개발), (10, 기획), (20, 개발)일 때 SELECT DISTINCT dept_id, job의 행 수는?', ['1행','2행','3행','4행'],2,'DISTINCT는 SELECT에 나열된 전체 열 조합을 기준으로 중복을 제거한다. (10, 개발) 한 행이 중복되어 총 3행이다.');
 q(35,'COUNT DISTINCT','값이 10, 10, 20, NULL인 열 x의 COUNT(DISTINCT x)는?', ['1','2','3','4'],1,'COUNT(DISTINCT x)는 NULL을 제외한 고유 값의 개수다. 10과 20이므로 2다.');
@@ -734,10 +705,10 @@ q(41,'GROUPING','GROUPING(dept_id)가 1인 행에 대한 설명은? (ROLLUP 사�
 q(42,'계층형 쿼리','Oracle 계층형 쿼리에서 부모 사원 → 자식 사원 방향으로 내려가는 조건은? (manager_id가 상사의 emp_id를 참조)', ['CONNECT BY PRIOR emp_id = manager_id','CONNECT BY PRIOR manager_id = emp_id','CONNECT BY emp_id = manager_id','CONNECT BY PRIOR emp_id = emp_id'],0,'PRIOR는 부모 행의 값을 가리킨다. 부모의 emp_id가 자식의 manager_id와 같아야 하므로 PRIOR emp_id = manager_id다. 루트 조건은 START WITH에 둔다.','', '응용');
 q(43,'PIVOT','PIVOT의 주요 목적은?', ['모든 행을 삭제한다.','행의 특정 값들을 열로 전환하면서 집계한다.','모든 NULL을 0으로 바꾼다.','기본키를 생성한다.'],1,'PIVOT은 범주 값들을 열로 펼쳐 집계하는 데 사용한다. 반대 방향인 열 → 행 변환은 UNPIVOT이다. SQLite에서는 CASE를 이용한 조건부 집계로 연습할 수 있다.');
 q(44,'정규 표현식',"Oracle의 REGEXP_LIKE(code, '^[0-9]{3}$')에 매칭되는 값은?", ['12','1234','A12','123'],3,'^와 $는 문자열 시작과 끝, [0-9]는 숫자 한 글자, {3}은 정확히 3회 반복이다. 정확히 숫자 3자리인 123만 매칭된다.');
-q(45,'DDL','다음 중 테이블 구조를 변경하는 DDL은?', ['INSERT','UPDATE','ALTER','GRANT'],2,'CREATE, ALTER, DROP 등은 데이터 정의어다. INSERT·UPDATE·DELETE는 DML이며, GRANT·REVOKE는 권한 제어에 사용한다.');
-q(46,'트랜잭션','트랜잭션의 원자성(Atomicity)에 대한 설명은?', ['동일한 쿼리는 항상 같은 실행 계획을 쓴다.','트랜잭션의 작업이 모두 반영되거나 모두 취소된다.','모든 사용자가 동시에 같은 행을 수정한다.','데이터를 반드시 메모리에만 저장한다.'],1,'원자성은 작업의 전부 성공 또는 전부 취소를 뜻한다. ACID의 나머지는 일관성·격리성·지속성이다.');
+q(45,'DDL','다음 중 테이블 구조를 변경하는 DDL은?', ['INSERT','UPDATE','ALTER','GRANT'],2,'CREATE, ALTER, DROP 등은 데이터 정의어다. INSERT, UPDATE, DELETE는 DML이며 GRANT, REVOKE는 권한 제어에 사용한다.');
+q(46,'트랜잭션','트랜잭션의 원자성(Atomicity)에 대한 설명은?', ['동일한 쿼리는 항상 같은 실행 계획을 쓴다.','트랜잭션의 작업이 모두 반영되거나 모두 취소된다.','모든 사용자가 동시에 같은 행을 수정한다.','데이터를 반드시 메모리에만 저장한다.'],1,'원자성은 작업의 전부 성공 또는 전부 취소를 뜻한다. ACID의 나머지는 일관성, 격리성, 지속성이다.');
 q(47,'제약조건','PRIMARY KEY 제약이 보장하는 것은?', ['NULL 허용과 중복 허용','NULL 금지와 중복 허용','NULL 허용과 중복 금지','NULL 금지와 중복 금지'],3,'관계형 모델의 기본키는 행을 식별하므로 중복과 NULL을 허용하지 않는다. 복합키라면 열 조합의 유일성을 판단한다. SQLite의 일부 레거시 일반 테이블에는 NULL 관련 예외가 있으므로 실습 스키마에 NOT NULL을 명시한다.');
-q(48,'DCL','사용자에게 테이블 조회 권한을 부여하는 명령은?', ['GRANT SELECT ON employees TO user_a;','REVOKE SELECT ON employees FROM user_a;','COMMIT SELECT ON employees;','ALTER USER employees SELECT;'],0,'GRANT는 권한 부여, REVOKE는 권한 회수다. SQLite에는 같은 형태의 사용자·권한 관리 명령이 없으므로 이 문법은 실습 엔진에서 실행하지 않는다.');
+q(48,'DCL','사용자에게 테이블 조회 권한을 부여하는 명령은?', ['GRANT SELECT ON employees TO user_a;','REVOKE SELECT ON employees FROM user_a;','COMMIT SELECT ON employees;','ALTER USER employees SELECT;'],0,'GRANT는 권한 부여, REVOKE는 권한 회수다. SQLite에는 같은 형태의 사용자, 권한 관리 명령이 없으므로 이 문법은 실습 엔진에서 실행하지 않는다.');
 q(49,'NULL 정렬','Oracle에서 ORDER BY salary ASC의 기본 NULL 위치는?', ['항상 맨 앞','항상 맨 뒤','항상 중간','매번 무작위'],1,'Oracle은 기본적으로 NULL을 큰 값처럼 정렬하므로 ASC에서는 마지막, DESC에서는 처음이다. SQLite는 기본 NULL 정렬이 다르다. NULLS FIRST / NULLS LAST를 명시하면 의도를 분명히 할 수 있다.');
 q(50,'집합 연산','A의 값은 (1, 2, 3), B의 값은 (2, 3, 4)다. A INTERSECT B의 결과는?', ['1, 4','1, 2, 3, 4','2, 3','1'],2,'INTERSECT는 양쪽에 공통으로 존재하는 행을 반환한다. 따라서 2와 3이다. 차집합은 Oracle의 MINUS 또는 SQLite의 EXCEPT를 사용한다.');
 
@@ -751,40 +722,44 @@ INSERT INTO employees VALUES
 const variant = `UPDATE employees SET salary = salary + emp_id * 150; UPDATE employees SET bonus = NULL WHERE emp_id = 5;
 INSERT INTO employees VALUES (9,'연습',40,6200,NULL,NULL),(10,'추가',10,3200,700,1);`;
 const labs = [
- {id:1,tag:'WHERE · ORDER BY',title:'조건에 맞는 사원 찾기',description:'급여가 4,000 이상인 사원의 name, salary를 조회하세요. 급여 내림차순, 급여가 같으면 emp_id 오름차순으로 정렬하세요.',starter:'SELECT name, salary\nFROM employees\n-- 조건과 정렬을 완성해 보세요\n',solution:'SELECT name, salary FROM employees WHERE salary >= 4000 ORDER BY salary DESC, emp_id ASC;',ordered:true,hint:'WHERE salary >= 4000으로 거르고 ORDER BY에 두 정렬 기준을 나열하세요.'},
- {id:2,tag:'NULL · 집계',title:'NULL을 빼면 몇 명일까?',description:'전체 사원 수, bonus가 NULL이 아닌 사원 수, bonus 평균을 순서대로 한 행에 조회하세요. 열 별칭은 자유입니다.',starter:'SELECT\n  COUNT(*) AS total\nFROM employees;',solution:'SELECT COUNT(*), COUNT(bonus), AVG(bonus) FROM employees;',hint:'COUNT(*)는 전체 행, COUNT(bonus)와 AVG(bonus)는 NULL을 제외합니다. 0은 포함돼요.'},
- {id:3,tag:'GROUP BY · HAVING',title:'평균 급여가 높은 부서',description:'dept_id가 NULL인 사원을 제외하고, 평균 급여가 4,000 이상인 부서의 dept_id와 평균 급여를 조회하세요. 부서번호 오름차순으로 정렬하세요.',starter:'SELECT dept_id, AVG(salary) AS avg_salary\nFROM employees\n',solution:'SELECT dept_id, AVG(salary) FROM employees WHERE dept_id IS NOT NULL GROUP BY dept_id HAVING AVG(salary) >= 4000 ORDER BY dept_id;',ordered:true,hint:'행 조건은 WHERE, 그룹의 평균 조건은 HAVING에 둡니다.'},
- {id:4,tag:'LEFT JOIN · COUNT',title:'사원이 없어도 부서는 남긴다',description:'모든 부서의 dept_name과 사원 수를 조회하세요. 사원이 없는 부서는 0으로 나오게 하고 dept_id 오름차순으로 정렬하세요.',starter:'SELECT d.dept_name\nFROM departments d\nLEFT JOIN employees e ON d.dept_id = e.dept_id\n',solution:'SELECT d.dept_name, COUNT(e.emp_id) FROM departments d LEFT JOIN employees e ON d.dept_id = e.dept_id GROUP BY d.dept_id, d.dept_name ORDER BY d.dept_id;',ordered:true,hint:'COUNT(*) 대신 COUNT(e.emp_id)를 쓰면 매칭되지 않은 NULL 행을 세지 않습니다.'},
+ {id:1,tag:'WHERE, ORDER BY',title:'조건에 맞는 사원 찾기',description:'급여가 4,000 이상인 사원의 name, salary를 조회하세요. 급여 내림차순, 급여가 같으면 emp_id 오름차순으로 정렬하세요.',starter:'SELECT name, salary\nFROM employees\n-- 조건과 정렬을 완성해 보세요\n',solution:'SELECT name, salary FROM employees WHERE salary >= 4000 ORDER BY salary DESC, emp_id ASC;',ordered:true,hint:'WHERE salary >= 4000으로 거르고 ORDER BY에 두 정렬 기준을 나열하세요.'},
+ {id:2,tag:'NULL, 집계',title:'NULL과 집계 함수',description:'전체 사원 수, bonus가 NULL이 아닌 사원 수, bonus 평균을 순서대로 한 행에 조회하세요. 열 별칭은 자유입니다.',starter:'SELECT\n  COUNT(*) AS total\nFROM employees;',solution:'SELECT COUNT(*), COUNT(bonus), AVG(bonus) FROM employees;',hint:'COUNT(*)는 전체 행을 세고 COUNT(bonus)와 AVG(bonus)는 NULL을 제외합니다. 0은 포함합니다.'},
+ {id:3,tag:'GROUP BY, HAVING',title:'평균 급여가 높은 부서',description:'dept_id가 NULL인 사원을 제외하고 평균 급여가 4,000 이상인 부서의 dept_id와 평균 급여를 조회하세요. 부서번호 오름차순으로 정렬하세요.',starter:'SELECT dept_id, AVG(salary) AS avg_salary\nFROM employees\n',solution:'SELECT dept_id, AVG(salary) FROM employees WHERE dept_id IS NOT NULL GROUP BY dept_id HAVING AVG(salary) >= 4000 ORDER BY dept_id;',ordered:true,hint:'행 조건은 WHERE, 그룹의 평균 조건은 HAVING에 둡니다.'},
+ {id:4,tag:'LEFT JOIN, COUNT',title:'사원이 없는 부서 조회',description:'모든 부서의 dept_name과 사원 수를 조회하세요. 사원이 없는 부서는 0으로 나오게 하고 dept_id 오름차순으로 정렬하세요.',starter:'SELECT d.dept_name\nFROM departments d\nLEFT JOIN employees e ON d.dept_id = e.dept_id\n',solution:'SELECT d.dept_name, COUNT(e.emp_id) FROM departments d LEFT JOIN employees e ON d.dept_id = e.dept_id GROUP BY d.dept_id, d.dept_name ORDER BY d.dept_id;',ordered:true,hint:'COUNT(*) 대신 COUNT(e.emp_id)를 쓰면 매칭되지 않은 NULL 행을 세지 않습니다.'},
  {id:5,tag:'서브쿼리',title:'전체 평균보다 높은 급여',description:'전체 사원의 평균 급여보다 많이 받는 사원의 name과 salary를 조회하세요. emp_id 오름차순으로 정렬하세요.',starter:'SELECT name, salary\nFROM employees\nWHERE salary > (\n  -- 전체 평균을 구해 보세요\n);',solution:'SELECT name, salary FROM employees WHERE salary > (SELECT AVG(salary) FROM employees) ORDER BY emp_id;',ordered:true,hint:'스칼라 서브쿼리 SELECT AVG(salary) FROM employees를 조건에 사용하세요.'},
  {id:6,tag:'NOT EXISTS',title:'아직 사원이 없는 부서',description:'소속 사원이 한 명도 없는 부서의 dept_name을 조회하세요. 결과 순서는 자유입니다.',starter:'SELECT d.dept_name\nFROM departments d\nWHERE NOT EXISTS (\n  -- 부서별로 사원이 있는지 확인\n);',solution:'SELECT d.dept_name FROM departments d WHERE NOT EXISTS (SELECT 1 FROM employees e WHERE e.dept_id = d.dept_id);',hint:'서브쿼리 안에서 e.dept_id와 외부 d.dept_id를 연결합니다. NULL이 섞인 NOT IN에 주의하세요.'},
  {id:7,tag:'DENSE_RANK',title:'부서별 급여 순위',description:'dept_id가 NULL이 아닌 사원의 name, dept_id, 부서 내 급여 내림차순 순위를 조회하세요. 동점 다음 순위는 건너뛰지 않습니다. 출력은 emp_id 오름차순으로 정렬하세요.',starter:'SELECT name, dept_id,\n  -- 윈도 함수를 작성하세요\nFROM employees\nWHERE dept_id IS NOT NULL;',solution:'SELECT name, dept_id, DENSE_RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC) FROM employees WHERE dept_id IS NOT NULL ORDER BY emp_id;',ordered:true,hint:'DENSE_RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC)를 사용합니다.'},
- {id:8,tag:'CASE · 조건부 집계',title:'부서별 고액 연봉자 세기',description:'dept_id가 NULL인 사원을 제외하고, 부서별로 급여가 4,000 이상인 사원 수를 구하세요. dept_id, 인원 수 순서로 출력하고 부서번호 오름차순으로 정렬하세요.',starter:'SELECT dept_id,\n  SUM(CASE WHEN /* 조건 */ THEN 1 ELSE 0 END) AS high_earners\nFROM employees\n',solution:'SELECT dept_id, SUM(CASE WHEN salary >= 4000 THEN 1 ELSE 0 END) FROM employees WHERE dept_id IS NOT NULL GROUP BY dept_id ORDER BY dept_id;',ordered:true,hint:'조건을 만족하면 1, 아니면 0을 반환하는 CASE를 SUM으로 합산합니다.'},
- {id:9,tag:'누적 합계',title:'행을 유지하며 누적하기',description:'사원의 emp_id, name, emp_id 오름차순 급여 누적 합계를 조회하세요. 결과도 emp_id 오름차순으로 정렬하세요.',starter:'SELECT emp_id, name,\n  SUM(salary) OVER (\n    -- 정렬과 프레임을 작성하세요\n  ) AS running_total\nFROM employees;',solution:'SELECT emp_id, name, SUM(salary) OVER (ORDER BY emp_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) FROM employees ORDER BY emp_id;',ordered:true,hint:'ORDER BY emp_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW를 넣어보세요.'},
+ {id:8,tag:'CASE, 조건부 집계',title:'부서별 고액 연봉자 세기',description:'dept_id가 NULL인 사원을 제외하고 부서별로 급여가 4,000 이상인 사원 수를 구하세요. dept_id, 인원 수 순서로 출력하고 부서번호 오름차순으로 정렬하세요.',starter:'SELECT dept_id,\n  SUM(CASE WHEN /* 조건 */ THEN 1 ELSE 0 END) AS high_earners\nFROM employees\n',solution:'SELECT dept_id, SUM(CASE WHEN salary >= 4000 THEN 1 ELSE 0 END) FROM employees WHERE dept_id IS NOT NULL GROUP BY dept_id ORDER BY dept_id;',ordered:true,hint:'조건을 만족하면 1, 아니면 0을 반환하는 CASE를 SUM으로 합산합니다.'},
+ {id:9,tag:'누적 합계',title:'급여 누적 합계',description:'사원의 emp_id, name, emp_id 오름차순 급여 누적 합계를 조회하세요. 결과도 emp_id 오름차순으로 정렬하세요.',starter:'SELECT emp_id, name,\n  SUM(salary) OVER (\n    -- 정렬과 프레임을 작성하세요\n  ) AS running_total\nFROM employees;',solution:'SELECT emp_id, name, SUM(salary) OVER (ORDER BY emp_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) FROM employees ORDER BY emp_id;',ordered:true,hint:'ORDER BY emp_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW를 넣어 보세요.'},
  {id:10,tag:'SELF JOIN',title:'사원과 상사 연결하기',description:'모든 사원의 name과 상사 이름을 조회하세요. 상사가 없으면 상사 이름은 NULL로 두세요. 사원의 emp_id 오름차순으로 정렬하세요.',starter:'SELECT e.name, m.name AS manager_name\nFROM employees e\n',solution:'SELECT e.name, m.name FROM employees e LEFT JOIN employees m ON e.manager_id = m.emp_id ORDER BY e.emp_id;',ordered:true,hint:'같은 테이블을 e와 m으로 두 번 사용하고 e.manager_id = m.emp_id로 LEFT JOIN합니다.'},
  {id:11,tag:'COALESCE',title:'NULL 보너스를 0으로',description:'모든 사원의 name, 급여와 보너스의 합계를 조회하세요. 보너스가 NULL이면 0으로 계산하고 emp_id 오름차순으로 정렬하세요.',starter:'SELECT name,\n  salary + bonus AS total_pay\nFROM employees;',solution:'SELECT name, salary + COALESCE(bonus,0) FROM employees ORDER BY emp_id;',ordered:true,hint:'salary + COALESCE(bonus, 0)으로 NULL의 전파를 막습니다.'},
- {id:12,tag:'상관 서브쿼리',title:'우리 부서 평균을 넘겨라',description:'자기 부서의 평균 급여보다 많이 받는 사원의 name과 salary를 조회하세요. emp_id 오름차순으로 정렬하세요.',starter:'SELECT e.name, e.salary\nFROM employees e\nWHERE e.salary > (\n  SELECT AVG(e2.salary) FROM employees e2\n  -- 자기 부서의 평균만 계산하세요\n);',solution:'SELECT e.name, e.salary FROM employees e WHERE e.salary > (SELECT AVG(e2.salary) FROM employees e2 WHERE e2.dept_id = e.dept_id) ORDER BY e.emp_id;',ordered:true,hint:'서브쿼리에서 e2.dept_id = e.dept_id로 외부 사원의 부서와 연결하세요.'}
+ {id:12,tag:'상관 서브쿼리',title:'부서 평균보다 높은 급여',description:'자기 부서의 평균 급여보다 많이 받는 사원의 name과 salary를 조회하세요. emp_id 오름차순으로 정렬하세요.',starter:'SELECT e.name, e.salary\nFROM employees e\nWHERE e.salary > (\n  SELECT AVG(e2.salary) FROM employees e2\n  -- 자기 부서의 평균만 계산하세요\n);',solution:'SELECT e.name, e.salary FROM employees e WHERE e.salary > (SELECT AVG(e2.salary) FROM employees e2 WHERE e2.dept_id = e.dept_id) ORDER BY e.emp_id;',ordered:true,hint:'서브쿼리에서 e2.dept_id = e.dept_id로 외부 사원의 부서와 연결하세요.'}
 ];
 const notes = [
- ['NULL부터 잡기','NULL은 0이 아니다. = NULL 대신 IS NULL. COUNT(*)는 전체 행, COUNT(열)·SUM·AVG는 NULL을 제외한다. 빈 집합의 COUNT는 0, SUM·AVG는 NULL이다.','SELECT COUNT(*), COUNT(bonus), AVG(bonus)\nFROM employees;','NULL'],
+ ['NULL 처리','NULL은 0이 아니다. = NULL 대신 IS NULL. COUNT(*)는 전체 행, COUNT(열), SUM, AVG는 NULL을 제외한다. 빈 집합의 COUNT는 0, SUM, AVG는 NULL이다.','SELECT COUNT(*), COUNT(bonus), AVG(bonus)\nFROM employees;','NULL'],
  ['WHERE와 HAVING','WHERE는 그룹화 전 행 조건, HAVING은 집계 후 그룹 조건. 논리적 순서는 FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY.','SELECT dept_id, AVG(salary)\nFROM employees\nGROUP BY dept_id\nHAVING AVG(salary) >= 4000;','집계'],
  ['LEFT JOIN의 함정','오른쪽에 매칭이 없어도 왼쪽 행은 남는다. 오른쪽 열 조건을 WHERE에 두면 NULL 행이 사라질 수 있다. 사원이 없는 부서를 0명으로 세려면 COUNT(e.emp_id).','FROM departments d\nLEFT JOIN employees e\n  ON d.dept_id = e.dept_id AND e.salary >= 4000','JOIN'],
- ['순위 함수 3형제','RANK: 1, 1, 3 / DENSE_RANK: 1, 1, 2 / ROW_NUMBER: 1, 2, 3. 동점의 ROW_NUMBER 순서를 고정하려면 추가 정렬키가 필요하다.','DENSE_RANK() OVER (\n  PARTITION BY dept_id ORDER BY salary DESC\n)','윈도'],
- ['집합 연산 한 장','UNION은 중복 제거, UNION ALL은 중복 유지. INTERSECT는 교집합. 차집합은 Oracle MINUS, SQLite EXCEPT. 양쪽 SELECT의 열 개수와 대응 자료형을 확인한다.','SELECT dept_id FROM departments\nEXCEPT\nSELECT dept_id FROM employees;','집합'],
- ['정규화 순서','1NF: 속성 값의 원자성. 2NF: 부분 함수 종속 제거. 3NF: 이행 함수 종속 제거. 정규화는 데이터 중복과 삽입·갱신·삭제 이상을 줄인다.','(주문번호, 상품번호) → 수량\n상품번호 → 상품명  // 상품 엔터티로 분리','모델링'],
- ['식별자와 관계','주식별자: 유일성·최소성·불변성·존재성. 식별 관계는 부모 키가 자식의 주식별자에 포함되고, 비식별 관계는 일반 속성으로 전이된다.','부서(부서번호 PK)\n사원(사원번호 PK, 부서번호 FK)','모델링'],
+ ['순위 함수 비교','RANK: 1, 1, 3 / DENSE_RANK: 1, 1, 2 / ROW_NUMBER: 1, 2, 3. 동점의 ROW_NUMBER 순서를 고정하려면 추가 정렬키가 필요하다.','DENSE_RANK() OVER (\n  PARTITION BY dept_id ORDER BY salary DESC\n)','윈도'],
+ ['집합 연산','UNION은 중복 제거, UNION ALL은 중복 유지. INTERSECT는 교집합. 차집합은 Oracle MINUS, SQLite EXCEPT. 양쪽 SELECT의 열 개수와 대응 자료형을 확인한다.','SELECT dept_id FROM departments\nEXCEPT\nSELECT dept_id FROM employees;','집합'],
+ ['정규화 순서','1NF: 속성 값의 원자성. 2NF: 부분 함수 종속 제거. 3NF: 이행 함수 종속 제거. 정규화는 데이터 중복과 삽입, 갱신, 삭제 이상을 줄인다.','(주문번호, 상품번호) → 수량\n상품번호 → 상품명  // 상품 엔터티로 분리','모델링'],
+ ['식별자와 관계','주식별자: 유일성, 최소성, 불변성, 존재성. 식별 관계는 부모 키가 자식의 주식별자에 포함되고 비식별 관계는 일반 속성으로 전이된다.','부서(부서번호 PK)\n사원(사원번호 PK, 부서번호 FK)','모델링'],
  ['NOT IN과 NULL','NOT IN 목록에 NULL이 있으면 일치하지 않는 값도 UNKNOWN이 되어 통과하지 못한다. NULL을 제거하거나 상관 NOT EXISTS로 의도를 표현한다.','WHERE NOT EXISTS (\n  SELECT 1 FROM employees e\n  WHERE e.dept_id = d.dept_id\n)','서브쿼리'],
  ['소계와 총계','ROLLUP(a,b): (a,b), (a), (). CUBE(a,b): (a,b), (a), (b), (). GROUPING은 집계로 생긴 NULL인지 구분한다. SQLite에서는 직접 지원하지 않는다.','GROUP BY ROLLUP(dept_id, job)\n-- 상세 → 부서 소계 → 전체 총계','집계'],
- ['트랜잭션과 명령어','ACID: 원자성·일관성·격리성·지속성. DDL은 CREATE/ALTER/DROP, DML은 INSERT/UPDATE/DELETE, DCL은 GRANT/REVOKE, TCL은 COMMIT/ROLLBACK.','BEGIN;\nUPDATE employees SET salary = salary + 100;\nROLLBACK;','트랜잭션'],
- ['Oracle와 SQLite 구분','실습은 SQLite다. NVL은 COALESCE, MINUS는 EXCEPT로 연습한다. Oracle의 빈 문자열은 NULL이지만 SQLite의 빈 문자열은 NULL이 아니다. 기본 NULL 정렬과 스칼라 서브쿼리 동작도 다르다.','-- 공통 의도를 명시\nORDER BY salary ASC NULLS LAST','DBMS 차이'],
- ['계층·PIVOT·정규식','Oracle 계층형: START WITH는 루트, CONNECT BY는 연결, PRIOR는 부모 값. PIVOT은 행을 열로 집계. 정규식 ^는 시작, $는 끝. SQLite에서 이 Oracle 전용 구문은 직접 지원하지 않는다.','START WITH manager_id IS NULL\nCONNECT BY PRIOR emp_id = manager_id','Oracle']
+ ['트랜잭션과 명령어','ACID: 원자성, 일관성, 격리성, 지속성. DDL은 CREATE/ALTER/DROP, DML은 INSERT/UPDATE/DELETE, DCL은 GRANT/REVOKE, TCL은 COMMIT/ROLLBACK.','BEGIN;\nUPDATE employees SET salary = salary + 100;\nROLLBACK;','트랜잭션'],
+ ['Oracle과 SQLite 구분','실습은 SQLite다. NVL은 COALESCE, MINUS는 EXCEPT로 연습한다. Oracle의 빈 문자열은 NULL이지만 SQLite의 빈 문자열은 NULL이 아니다. 기본 NULL 정렬과 스칼라 서브쿼리 동작도 다르다.','-- 공통 의도를 명시\nORDER BY salary ASC NULLS LAST','DBMS 차이'],
+ ['계층, PIVOT, 정규식','Oracle 계층형: START WITH는 루트, CONNECT BY는 연결, PRIOR는 부모 값. PIVOT은 행을 열로 집계. 정규식 ^는 시작, $는 끝. SQLite에서 이 Oracle 전용 구문은 직접 지원하지 않는다.','START WITH manager_id IS NULL\nCONNECT BY PRIOR emp_id = manager_id','Oracle']
 ];
 globalThis.COURSE = {questions, labs, notes, schema, variant};
 </script>
 <script>'use strict';
+const COPY={"navQuiz":"문제 풀기","navLab":"SQL 실습","navReview":"복습","navNotes":"개념 정리","textSize":"글자 크기","textDefault":"기본","textLarge":"크게","textExtra":"더 크게","shortcuts":"단축키","info":"학습 안내","quick":"연습","exam":"모의고사","submit":"제출","checkAnswer":"정답 확인","next":"다음","previous":"이전","saveQuestion":"문제 저장","unsaveQuestion":"저장 해제","results":"결과 보기","reviewWrong":"틀린 문제","reviewSaved":"저장한 문제","retryWrong":"틀린 문제 다시 풀기","newSet":"새 10문제","run":"쿼리 실행","grade":"답안 채점","solution":"모범 답안","hint":"힌트","hideHint":"힌트 접기","reset":"초기화","queryResult":"실행 결과","queryEmpty":"쿼리를 실행하면 결과를 확인할 수 있습니다.","nextLab":"다음 실습","database":"데이터 구조","viewData":"데이터 보기","environment":"실행 환경","environmentDescription":"SQLite로 실행하며 조회 전용입니다. 실행할 때마다 원본 데이터로 시작하며 Oracle의 NVL, ROLLUP, CONNECT BY 등은 지원하지 않습니다.","sources":"참고 자료","searchPlaceholder":"개념 검색","noMatches":"검색 결과가 없습니다.","noWrong":"틀린 문제가 없습니다.","noSaved":"저장한 문제가 없습니다.","emptyReviewHelp":"채점 후 틀린 문제가 여기에 표시됩니다.","emptySavedHelp":"문제의 저장 버튼을 누르면 여기에 표시됩니다.","cancel":"취소","close":"닫기","startExam":"모의고사 시작","startNewSet":"새 세트 시작","keepGoing":"계속 풀기","useSolution":"편집기에 넣기","pass":"합격 기준 충족","fail":"합격 기준 미달","resultTitle":"채점 결과","scoreCriteria":"총점 60점 이상, 각 과목 정답률 40% 이상이면 연습 합격입니다.","quickScoreNote":"이번 세트의 정답률이며 실제 시험의 합격 판정과는 다릅니다.","storageError":"저장 공간이 부족해 기록을 저장하지 못했습니다.","timeout":"실행 제한 시간인 8초를 넘었습니다. 조인 조건이나 재귀 쿼리를 확인해 주세요.","selectFirst":"답을 먼저 선택해 주세요.","correct":"정답","incorrect":"오답","matched":"예제와 추가 데이터의 결과가 모두 일치합니다.","mismatched":"결과가 다릅니다. 예제와 추가 데이터를 검사하므로 열 순서와 NULL 처리 및 정렬 조건을 확인해 주세요.","examStartTitle":"모의고사 시작","newSetTitle":"새 세트 시작","examStartDescription":"모델링 10문제와 SQL 40문제를 90분 동안 풉니다. 정답과 해설은 제출 후 공개되며 메뉴를 바꾸거나 브라우저를 닫아도 제한 시간은 계속 흐릅니다.","newSetDescription":"기존 문제 은행에서 문제를 다시 고릅니다. 채점한 기록은 유지됩니다.","replaceProgress":"진행 중인 세트가 새 세트로 바뀌며 채점하지 않은 답안은 기록에 반영되지 않습니다.","submitTitle":"답안 제출","submitMissing":"답하지 않은 문제가 {count}개 있으며 제출하면 오답으로 처리됩니다.","submitAll":"답안을 제출하고 채점 결과를 확인합니다.","reviewAnswers":"다시 확인","timeExpired":"제한 시간이 끝나 답안을 자동 제출했습니다.","resetTitle":"쿼리 초기화","resetDescription":"작성 중인 쿼리를 이 실습의 초기 코드로 바꿉니다.","solutionTitle":"모범 답안 확인","solutionDescription":"답안을 확인하면 이 실습은 도움을 받은 연습으로 기록되며 이후 정답을 제출해도 직접 해결한 실습 수에 추가되지 않습니다. 이미 직접 해결한 기록은 유지됩니다.","showSolution":"답안 보기","assistedCorrect":"결과가 일치하며 도움을 받은 연습으로 기록했습니다.","queryStale":"쿼리가 바뀌었습니다. 다시 실행하거나 채점해 주세요.","running":"실행 중","queryError":"SQL을 확인해 주세요.","queryZero":"조회 결과가 0행입니다.","enterSQL":"SQL을 입력해 주세요.","engineError":"SQL 엔진을 실행하지 못했습니다. 최신 Chrome 또는 Edge에서 다시 시도해 주세요.","previewDescription":"실습에 사용하는 원본 데이터입니다.","quickInProgress":"10문제 연습을 진행 중입니다.","examInProgress":"모의고사를 진행 중입니다.","answerMap":"문제 목록","question":"문제","answered":"답변 완료","unanswered":"미응답","saved":"저장됨","answerChoices":"답 선택","selectedIncorrect":"선택한 오답","correctAnswer":"정답은 {number}번입니다.","unansweredResult":"답하지 않아 오답으로 처리했습니다.","remaining":"남은 시간","elapsed":"풀이 시간","modeling":"데이터 모델링","sqlSubject":"SQL 기본 및 활용","reviewMode":"복습","examFormat":"50문제, 90분","questionNumber":"{number}번 문제","questionStatus":"{number}번 문제, {status}","quizRegion":"문제 풀이","allCorrect":"모든 문제를 맞혔습니다.","wrongCount":"틀린 문제 {count}개","subjectFail":"과목 기준 미달","explanations":"문제별 해설","explanation":"해설","labSelect":"실습 선택","selfSolved":"직접 해결","solved":"해결 완료","assisted":"답안 참고","relatedKey":"참조 관계","dbmsDifference":"DBMS 차이","sqlEditor":"SQL 편집기","editorHelp":"Tab으로 두 칸 들여쓰기, Shift+Tab으로 편집기에서 나가기","oldQueryResult":"이전 쿼리의 결과","columnOrderHelp":"열 별칭은 자유롭게 정하되 열 순서와 값은 문제 조건에 맞춰야 합니다.","readOnlyEnvironment":"조회 전용이며 실행할 때마다 원본 데이터로 시작합니다.","engineLimits":"조회 결과는 최대 500행이며 실행 제한 시간은 8초입니다.","unsupportedSyntax":"Oracle의 NVL, ROLLUP, CONNECT BY 등은 지원하지 않습니다.","reviewDescription":"마지막 풀이가 오답인 문제이며 다시 맞히면 목록에서 사라집니다.","reviewAll":"모아서 풀기","retry":"다시 풀기","lastCorrect":"마지막 풀이 정답","localSave":"이 브라우저에 자동 저장","historyCount":"누적 채점 {count}회","historyStorage":"학습 기록은 이 브라우저에만 저장됩니다.","aboutTitle":"SQLD 학습 안내","aboutQuestions":"직접 만든 연습문제이며 공식 기출문제가 아닙니다. 모델링 10문제, SQL 40문제와 SQL 실습 12개를 제공합니다.","aboutExam":"모의고사는 50문제, 90분이며 연습 합격 기준은 총점 60점 이상, 각 과목 정답률 40% 이상입니다.","aboutEngine":"실습은 SQLite(sql.js 1.14.1)로 실행하며 Oracle 전용 문법은 개념 문제에서 다룹니다. 엔진이 포함된 HTML 파일을 내려받으면 인터넷 없이 사용할 수 있습니다.","aboutStorage":"답안, 오답, 작성 중인 쿼리는 이 브라우저에만 저장되며 다른 기기와 동기화되지 않습니다. 브라우저 데이터를 삭제하거나 파일 경로를 바꾸면 기록이 사라질 수 있습니다.","downloadHtml":"HTML 내려받기","examInfo":"DataQ 시험 안내","license":"sql.js / MIT 라이선스","sourcesDescription":"직접 작성한 학습 자료이며 실제 시험 공지와 범위는 DataQ에서 확인해 주세요.","shortcutChoose":"1~4: 답 선택","shortcutEnter":"Enter: 정답 확인 또는 다음 문제","shortcutMove":"← →: 문제 이동","shortcutRun":"Ctrl+Enter: SQL 실행 (Mac: ⌘+Enter)","shortcutIndent":"Tab: 두 칸 들여쓰기","shortcutLeave":"Shift+Tab: 편집기에서 나가기","shortcutClose":"Esc: 팝업 닫기","skip":"본문으로 이동","navigation":"학습 메뉴","javascriptRequired":"이 화면을 사용하려면 브라우저에서 JavaScript를 허용해 주세요.","pageTitle":"SQLD Sprint","pageDescription":"SQLD 연습문제 50개와 SQL 실습 12개, 해설과 오답 복습을 제공합니다.","rows":"행","scoreHelp":"합격 기준"};
+'use strict';
 const {questions: BANK, labs: LABS, notes: NOTES} = COURSE;
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const KEY = 'sqld-sprint-v1';
+const C=COPY;
+const copy=(key,values={})=>C[key].replace(/\{(\w+)\}/g,(_,name)=>values[name]??'');
 const READING_SIZES = ['comfortable','large','extra'];
 const icon = name => `<svg class="icon" aria-hidden="true"><use href="#icon-${name}"/></svg>`;
 const blankState = () => ({version:1,session:null,latest:{},bookmarks:[],history:[],drafts:{},solved:[],assisted:[],labId:1,readingSize:'comfortable'});
@@ -808,7 +783,7 @@ const lookup = id => BANK.find(q=>q.id===id);
 const wrongIds = () => BANK.filter(q=>state.latest[q.id]?.correct===false).map(q=>q.id);
 function save() {
   try {localStorage.setItem(KEY,JSON.stringify(state));}
-  catch {$('#save-label').textContent='저장 공간 제한 · 이번 학습만 유지';}
+  catch {$('#save-label').textContent=C.storageError;$('#save-label').hidden=false;}
   updateSidebar();
 }
 function applyReadingSize() {
@@ -820,10 +795,8 @@ function setReadingSize(size) {
   state.readingSize=size;applyReadingSize();save();
 }
 function updateSidebar() {
-  $('#wrong-count').textContent=wrongIds().length;
-  const mastered=BANK.filter(q=>state.latest[q.id]?.correct===true).length;
-  $('#mastery-count').textContent=`${mastered} / 50`;
-  $('#mastery-bar').style.width=`${mastered*2}%`;
+  const count=wrongIds().length, badge=$('#wrong-count');
+  badge.textContent=count;badge.hidden=count===0;
 }
 function shuffle(list) {const copy=[...list];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]];}return copy;}
 function startSession(mode,ids) {
@@ -832,10 +805,8 @@ function startSession(mode,ids) {
   resultView=false;view='quiz';save();render();
 }
 function requestStart(mode,ids) {
-  const s=state.session;
-  const hasProgress=s && !s.done && Object.keys(s.answers).length;
-  const text=mode==='exam'?'모델링 10문제와 SQL 40문제를 90분 동안 풉니다. 정답과 해설은 제출 후 공개됩니다. 다른 메뉴로 이동하거나 브라우저를 닫아도 제한 시간은 계속 흐릅니다.':'기존 문제 은행에서 새로 골라 연습합니다. 이미 채점된 학습 기록은 오답 노트에 남습니다.';
-  if(mode==='exam'||hasProgress) openModal(`<h2>${mode==='exam'?'실전 모드로 들어갈까요?':'새 문제 세트를 시작할까요?'}</h2><p>${text}</p>${hasProgress?'<p>진행 중인 세트는 새 세트로 바뀝니다. 아직 채점하지 않은 답안은 기록에 반영되지 않습니다.</p>':''}<div class="button-row"><button class="secondary" data-action="close">계속 풀기</button><button class="primary" id="confirm-start">${mode==='exam'?'90분 모의고사 시작':'새 세트 시작'} →</button></div>`,()=>{$('#confirm-start').onclick=()=>{closeModal();startSession(mode,ids);};});
+  const s=state.session,hasProgress=s&&!s.done&&Object.keys(s.answers).length;
+  if(mode==='exam'||hasProgress)openModal(`<h2>${mode==='exam'?C.examStartTitle:C.newSetTitle}</h2><p>${mode==='exam'?C.examStartDescription:C.newSetDescription}</p>${hasProgress?`<p>${C.replaceProgress}</p>`:''}<div class="button-row"><button class="secondary" data-action="close">${C.keepGoing}</button><button class="primary" id="confirm-start">${mode==='exam'?C.startExam:C.startNewSet}${icon('arrow')}</button></div>`,()=>{$('#confirm-start').onclick=()=>{closeModal();startSession(mode,ids);};});
   else startSession(mode,ids);
 }
 function record(q,selected) {
@@ -848,14 +819,14 @@ function record(q,selected) {
 function gradeCurrent() {
   const s=state.session, q=lookup(s.ids[s.index]);
   if(s.done || s.mode==='exam' || s.graded[q.id]) return;
-  if(!Number.isInteger(s.answers[q.id])) {toast('먼저 답을 골라주세요.');return;}
+  if(!Number.isInteger(s.answers[q.id])) {toast(C.selectFirst);return;}
   record(q,s.answers[q.id]);save();render();
 }
 function finish(force=false) {
   const s=state.session;if(s.done){resultView=true;render();return;}
   const missing=s.ids.filter(id=>!Number.isInteger(s.answers[id])).length;
   if(!force) {
-    openModal(`<h2>답안을 제출할까요?</h2><p>${missing?`아직 답하지 않은 문제가 ${missing}개 있어요. 제출하면 미응답은 오답으로 처리됩니다.`:'모든 문제에 답했어요. 점수와 과목별 결과를 확인해 보세요.'}</p><div class="button-row"><button class="secondary" data-action="close">다시 확인</button><button class="primary" data-action="finish-confirm">제출하고 결과 보기 →</button></div>`);return;
+    openModal(`<h2>${C.submitTitle}</h2><p>${missing?copy('submitMissing',{count:missing}):C.submitAll}</p><div class="button-row"><button class="secondary" data-action="close">${C.reviewAnswers}</button><button class="primary" data-action="finish-confirm">${C.submit}${icon('arrow')}</button></div>`);return;
   }
   for(const id of s.ids) if(!s.graded[id]) record(lookup(id),s.answers[id]);
   s.done=true;s.finished=Date.now();resultView=true;save();closeModal();render();
@@ -868,7 +839,7 @@ function selectAnswer(choice) {
 }
 function moveQuestion(index) {
   const s=state.session;if(index<0||index>=s.ids.length)return;
-  s.index=index;resultView=false;save();render();
+  s.index=index;resultView=false;save();render();$('.question-title')?.focus({preventScroll:true});
 }
 function formatTime(seconds) {
   const s=Math.max(0,Math.floor(seconds));return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
@@ -876,31 +847,34 @@ function formatTime(seconds) {
 function timerValue() {const s=state.session;return formatTime((s.mode==='exam'?(s.done?s.deadline-s.finished:s.deadline-Date.now()):(s.done?s.finished:Date.now())-s.started)/1000);}
 function tick() {
   const s=state.session;if(!s)return;
-  if(s.mode==='exam'&&!s.done&&Date.now()>=s.deadline) {finish(true);toast('제한 시간이 끝나 답안을 자동 제출했어요.');}
+  if(s.mode==='exam'&&!s.done&&Date.now()>=s.deadline) {finish(true);toast(C.timeExpired);}
   const timer=$('#timer');if(timer){timer.textContent=timerValue();timer.classList.toggle('urgent',s.mode==='exam'&&!s.done&&s.deadline-Date.now()<300000);}
 }
-function codeBlock(sql,label='SQL') {
+function codeBlock(sql) {
   let html=esc(sql).replace(/\b(SELECT|COUNT|AVG|SUM|FROM|WHERE|AS|NULL|LEFT|JOIN|ON|GROUP|BY|ORDER|HAVING|OVER|PARTITION|CASE|WHEN|THEN|ELSE|END|WITH|DESC|ASC)\b/g,'<span class="sql-keyword">$1</span>');
   html=html.replace(/(--[^\n]*)/g,'<span class="sql-comment">$1</span>');
-  return `<div class="code-block"><div class="code-label"><span>${label}</span><span>읽고, 결과를 떠올려 보세요</span></div><pre>${html}</pre></div>`;
+  return `<pre class="sql-block" tabindex="0">${html}</pre>`;
+}
+function questionMap(s) {
+  const answered=s.ids.filter(id=>Number.isInteger(s.answers[id])).length;
+  return `<aside class="question-navigator" aria-label="${C.answerMap}"><div class="navigator-head"><span>${C.answerMap}</span><span class="count">${answered}<span> / ${s.ids.length}</span></span></div><div class="question-grid">${s.ids.map((id,i)=>{
+    const graded=s.graded[id],correct=s.answers[id]===lookup(id).answer,chosen=Number.isInteger(s.answers[id]);
+    const status=graded?(correct?C.correct:C.incorrect):(chosen?C.answered:C.unanswered);
+    return `<button class="q-dot ${i===s.index?'current':''} ${graded?(correct?'good':'bad'):chosen?'answered':''}" data-index="${i}" aria-label="${i+1}. ${status}${state.bookmarks.includes(id)?`, ${C.saveQuestion}`:''}" title="${i+1}. ${status}" ${i===s.index?'aria-current="step"':''}><span>${String(i+1).padStart(2,'0')}</span>${graded?`<span class="q-state">${icon(correct?'check':'close')}</span>`:chosen?'<i class="answer-dot"></i>':''}${state.bookmarks.includes(id)?`<span class="q-saved">${icon('bookmark')}</span>`:''}</button>`;
+  }).join('')}</div><button class="submit-link" data-action="${s.done?'results':'finish'}">${s.done?C.results:C.submit}${icon('arrow')}</button></aside>`;
 }
 function renderQuiz() {
-  const s=state.session, answered=s.ids.filter(id=>Number.isInteger(s.answers[id])).length;
-  if(resultView&&s.done)return renderResults();
-  const q=lookup(s.ids[s.index]),selected=s.answers[q.id],revealed=!!s.graded[q.id],correct=selected===q.answer;
-  const modeLabel=s.mode==='exam'?'실전 모의고사':s.mode==='review'?'오답 집중 복습':'10문제 벼락치기';
-  return `<div class="hero"><div><h1>합격까지, 한 문제씩.</h1><p>아는 건 확실하게, 헷갈리는 건 지금 잡고 가요.</p></div></div>
-  <div class="modebar"><div class="segmented" aria-label="학습 모드"><button class="segment ${s.mode!=='exam'?'active':''}" data-action="quick">벼락치기 <small>10문제</small></button><button class="segment ${s.mode==='exam'?'active':''}" data-action="exam">실전 모의고사 <small>50문제 · 90분</small></button></div><span class="mode-info">${s.mode==='exam'?'제출 후 정답과 해설을 확인해요':'바로 채점하고, 해설로 한 번 더 기억해요'}</span></div>
-  <div class="quiz-layout"><div><section class="panel question-panel" aria-label="문제 풀이"><div class="question-top"><span class="tag">${modeLabel}</span><span class="muted">${q.subject}과목 · ${q.subject===1?'데이터 모델링':'SQL 기본 및 활용'}</span><span class="timer" title="${s.mode==='exam'?'남은 시간':'학습 경과 시간'}">${icon('clock')} <span id="timer">${timerValue()}</span></span></div><div class="question-body">
-  <div class="question-meta"><span class="question-number">QUESTION ${String(s.index+1).padStart(2,'0')} <small>/ ${s.ids.length}</small></span><button class="bookmark ${state.bookmarks.includes(q.id)?'on':''}" data-action="bookmark" aria-pressed="${state.bookmarks.includes(q.id)}">${icon('bookmark')} 다시 볼 문제</button></div><h2 class="question-title">${esc(q.title)}</h2>
-  ${q.sql?codeBlock(q.sql):''}<div class="choices" role="radiogroup" aria-label="정답 선택">${q.choices.map((choice,i)=>`<button role="radio" aria-checked="${selected===i}" class="choice ${selected===i?'selected':''} ${revealed&&i===q.answer?'correct':''} ${revealed&&selected===i&&!correct?'incorrect':''}" data-choice="${i}" ${revealed?'disabled':''}><span class="choice-letter">${i+1}</span><span class="choice-text">${esc(choice)}</span>${revealed&&i===q.answer?`<span class="choice-check" aria-label="정답">${icon('check')}</span>`:revealed&&selected===i?`<span class="choice-check" aria-label="선택한 오답">${icon('close')}</span>`:''}</button>`).join('')}</div>
-  ${revealed?`<div class="feedback ${correct?'':'bad'}" role="status"><h3>${correct?'정답이에요. 이 개념은 기억해 두세요.':`정답은 ${q.answer+1}번이에요. ${selected===undefined?'미응답으로 처리했어요.':'여기서 한 번 짚고 갈게요.'}`}</h3><p>${esc(q.explanation)}</p><div style="margin-top:10px"><span class="tag">${esc(q.topic)}</span></div></div>`:''}</div>
-  <div class="question-bottom"><span class="keyboard-hint"><span class="kbd">1</span> ~ <span class="kbd">4</span> 답 선택 <span style="margin-left:8px" class="kbd">Enter</span> ${s.mode==='exam'?'다음 문제':'정답 확인'}</span><div class="button-row"><button class="ghost" data-action="prev" ${s.index===0?'disabled':''}>← 이전</button>${!revealed&&s.mode!=='exam'?`<button class="primary" data-action="grade" ${!Number.isInteger(selected)?'disabled':''}>정답 확인 <span>→</span></button>`:`<button class="primary" data-action="next">${s.index===s.ids.length-1?'결과 보기':'다음 문제'} <span>→</span></button>`}</div></div></section>
-  <div class="subfooter"><span>직접 만든 연습문제 · 공식 기출문제가 아닙니다</span><button class="ghost" data-action="${s.done?'results':'finish'}">${s.done?'채점 결과 보기':'학습 마치고 채점'} ↗</button></div></div>
-  <aside class="right-rail"><section class="panel rail-card"><div class="spread"><h3 class="rail-title">나의 풀이 현황</h3><span class="mini-muted">${answered} / ${s.ids.length}</span></div><div class="progress"><span style="width:${answered/s.ids.length*100}%"></span></div><div class="question-grid">${s.ids.map((id,i)=>`<button class="q-dot ${i===s.index?'current':''} ${s.graded[id]?(s.answers[id]===lookup(id).answer?'good':'bad'):Number.isInteger(s.answers[id])?'answered':''} ${state.bookmarks.includes(id)?'flagged':''}" data-index="${i}" aria-label="${i+1}번 문제${s.graded[id]?(s.answers[id]===lookup(id).answer?' 정답':' 오답'):Number.isInteger(s.answers[id])?' 답변함':' 미응답'}" ${i===s.index?'aria-current="step"':''}>${String(i+1).padStart(2,'0')}</button>`).join('')}</div><div class="legend"><span><i></i>미응답</span><span><i class="filled"></i>답변</span><span><i class="flag"></i>다시 보기</span></div><hr class="rail-separator"><button class="secondary finish-btn" data-action="${s.done?'results':'finish'}">${s.done?'채점 결과 보기':'답안 제출하기'} →</button></section>
-  <section class="panel rail-card tip-card"><div class="tip-heading">오늘의 학습 팁</div><h3>${s.mode==='exam'?'시간도 연습의 일부니까.':'틀려도 괜찮아요.'}</h3><p>${s.mode==='exam'?'막히는 문제는 표시하고 넘어가세요. 남은 시간에 다시 돌아올 수 있어요.':'헷갈리는 문제를 발견한 지금이 기회예요. 해설을 읽고, 내 말로 한 번 설명해 보세요.'}</p></section>
-  <button class="panel lab-link" data-view="lab"><span class="lab-symbol">${icon('terminal')}</span><span><b>눈으로만 읽었다면?</b><small>직접 쿼리 실행해 보기</small></span><span>${icon('arrow')}</span></button></aside></div>`;
+  const s=state.session;
+  if(s.done&&resultView)return renderResults();
+  const q=lookup(s.ids[s.index]),selected=s.answers[q.id],revealed=s.done||s.graded[q.id],correct=selected===q.answer,saved=state.bookmarks.includes(q.id);
+  return `<div class="view-toolbar">${s.mode==='review'?`<button class="text-button" data-view="review">${icon('arrow-left')}${C.navReview}</button>`:`<div class="segmented" aria-label="${C.navQuiz}"><button class="segment ${s.mode!=='exam'?'active':''}" data-action="quick" aria-pressed="${s.mode!=='exam'}">${C.quick}<span class="segment-count">10</span></button><button class="segment ${s.mode==='exam'?'active':''}" data-action="exam" aria-pressed="${s.mode==='exam'}">${C.exam}<span class="segment-count">50</span></button></div>`}${s.mode==='exam'?`<div class="timer" title="${C.remaining}">${icon('clock')}<span id="timer">${timerValue()}</span></div>`:''}</div>
+  <div class="quiz-layout"><section class="question-sheet" aria-label="${C.navQuiz}"><div class="question-meta"><div class="question-context"><span class="question-number">${String(s.index+1).padStart(2,'0')}<span> / ${s.ids.length}</span></span><span class="question-topic">${esc(q.topic)}</span></div><button class="icon-button bookmark ${saved?'on':''}" data-action="bookmark" aria-label="${saved?C.unsaveQuestion:C.saveQuestion}" title="${saved?C.unsaveQuestion:C.saveQuestion}" aria-pressed="${saved}">${icon('bookmark')}</button></div>
+  <h1 class="question-title" tabindex="-1">${esc(q.title)}</h1>${q.sql?codeBlock(q.sql):''}
+  <div class="choices" role="radiogroup" aria-label="${C.checkAnswer}">${q.choices.map((choice,i)=>`<button role="radio" aria-checked="${selected===i}" class="choice ${selected===i?'selected':''} ${revealed&&i===q.answer?'correct':''} ${revealed&&selected===i&&!correct?'incorrect':''}" data-choice="${i}" ${revealed?'disabled':''}><span class="choice-letter">${i+1}</span><span class="choice-text">${esc(choice)}</span><span class="choice-indicator">${revealed&&i===q.answer?icon('check'):revealed&&selected===i?icon('close'):selected===i?'<span class="selection-dot"></span>':''}</span></button>`).join('')}</div>
+  ${revealed?`<section class="feedback ${correct?'':'bad'}" role="status"><h2>${icon(correct?'check':'close')}<span>${correct?C.correct:copy('correctAnswer',{number:q.answer+1})}</span></h2><p>${esc(q.explanation)}</p></section>`:''}
+  <div class="question-actions"><button class="icon-button" data-action="prev" ${s.index===0?'disabled':''} aria-label="${C.previous}" title="${C.previous}">${icon('arrow-left')}</button>${!revealed&&s.mode!=='exam'?`<button class="primary" data-action="grade" ${!Number.isInteger(selected)?'disabled':''}>${C.checkAnswer}${icon('check')}</button>`:`<button class="primary" data-action="next">${s.index===s.ids.length-1?C.results:C.next}${icon('arrow')}</button>`}</div></section>${questionMap(s)}</div>`;
 }
+
 function scoreSession(s) {
   const correct=s.ids.filter(id=>s.answers[id]===lookup(id).answer).length;
   const subjects=[1,2].map(subject=>{const ids=s.ids.filter(id=>lookup(id).subject===subject);return {total:ids.length,correct:ids.filter(id=>s.answers[id]===lookup(id).answer).length};});
@@ -909,28 +883,36 @@ function scoreSession(s) {
 }
 function renderResults() {
   const s=state.session,score=scoreSession(s),wrong=s.ids.filter(id=>s.answers[id]!==lookup(id).answer);
-  return `<div class="view-intro"><h1>오늘의 연습이 쌓였어요.</h1><p>맞힌 개념은 굳히고, 놓친 개념은 한 번 더.</p></div><div class="quiz-layout"><section class="panel result-summary"><span class="tag">${s.mode==='exam'?'실전 모의고사':s.mode==='review'?'오답 복습':'벼락치기'} 결과</span><div class="score-layout"><div class="score-ring"><div><b>${score.percent}<small>점</small></b><small>${score.correct} / ${s.ids.length} 정답</small></div></div><div class="score-copy"><h2>${s.mode==='exam'?(score.passed?'연습 합격 기준을 넘었어요!':'보완할 개념이 보여요.'):(score.percent>=80?'좋은 흐름이에요.':'이제, 빈틈을 채울 시간.')}</h2><p>${wrong.length?`${wrong.length}문제를 오답 노트에 담았어요.<br>틀린 이유를 짚으면 다음에는 달라져요.`:'이번 세트는 모두 맞혔어요.<br>SQL 실습으로 이해한 내용을 확인해 보세요.'}</p><div class="history-line">학습 시간 ${formatTime(((s.finished||Date.now())-s.started)/1000)}</div></div></div><div class="subject-scores">${score.subjects.map((r,i)=>`<div class="subject-score ${s.mode==='exam'&&r.correct/r.total<.4?'bad':''}">${i+1}과목 · ${i===0?'데이터 모델링':'SQL 기본 및 활용'}<b>${r.correct}<small> / ${r.total}문제</small></b>${s.mode==='exam'&&r.correct/r.total<.4?'<small>과락 기준 미달</small>':''}</div>`).join('')}</div><div class="button-row">${wrong.length?'<button class="primary" data-action="retry-session">틀린 문제 다시 풀기 ↺</button>':'<button class="primary" data-view="lab">SQL 실습으로 이동 →</button>'}<button class="secondary" data-action="new-quick">새 10문제 풀기</button></div><p class="disclaimer">${s.mode==='exam'?'연습 판정: 총점 60점 이상 + 각 과목 40% 이상. 실제 시험 합격을 예측하는 결과가 아닙니다.':'점수는 이번 세트의 정답률입니다. 실전 시험의 합격 판정과는 구별해 주세요.'}</p><div class="session-review"><h3>문제별 해설 다시 보기</h3>${s.ids.map((id,i)=>`<div class="review-row"><span class="review-index" style="color:${s.answers[id]===lookup(id).answer?'var(--green)':'var(--red)'}">${s.answers[id]===lookup(id).answer?'✓':'×'} ${String(i+1).padStart(2,'0')}</span><div class="review-content"><small>${esc(lookup(id).topic)}</small><h3>${esc(lookup(id).title)}</h3></div><button class="secondary" data-index="${i}">해설</button></div>`).join('')}</div></section><aside class="right-rail"><section class="panel rail-card tip-card"><div class="tip-heading">다음 학습</div><h3>해설은, 이유까지.</h3><p>정답 번호보다 중요한 건 다른 선택지가 틀린 이유예요. 개념이 막히면 핵심 요약을 펼쳐 보세요.</p><button class="text-button" data-view="notes">핵심 요약 열기 →</button></section></aside></div>`;
+  return `<section class="results-view"><div class="result-overview"><div><h1>${C.resultTitle}</h1><div class="score-value">${score.percent}<small>/ 100</small></div><div class="score-counts"><span><span class="sr-only">${C.correct}</span>${icon('check')}${score.correct}</span><span><span class="sr-only">${C.incorrect}</span>${icon('close')}${wrong.length}</span><span><span class="sr-only">${C.elapsed}</span>${icon('clock')}${formatTime(((s.finished||Date.now())-s.started)/1000)}</span></div></div><div class="subject-scores">${score.subjects.map((r,i)=>{const percent=r.total?r.correct/r.total*100:0;return `<div class="subject-score ${s.mode==='exam'&&percent<40?'bad':''}"><div class="spread"><span>${i===0?C.modeling:C.sqlSubject}</span><span class="count">${r.correct}<span> / ${r.total}</span></span></div><div class="score-bar" role="meter" aria-label="${i===0?C.modeling:C.sqlSubject}" aria-valuemin="0" aria-valuemax="${r.total||1}" aria-valuenow="${r.correct}"><span style="width:${percent}%"></span>${s.mode==='exam'?'<i class="pass-mark"></i>':''}</div></div>`;}).join('')}${s.mode==='exam'?`<p class="exam-verdict ${score.passed?'':'bad'}">${icon(score.passed?'check':'close')}${score.passed?C.pass:C.fail}</p>`:''}</div></div><div class="result-actions"><button class="primary" ${wrong.length?'data-action="retry-session"':'data-view="lab"'}>${wrong.length?C.retryWrong:C.navLab}${icon('arrow')}</button><button class="secondary" data-action="new-quick">${C.newSet}${icon('refresh')}</button><details class="score-help"><summary>${icon('info')}<span>${C.scoreHelp}</span></summary><p>${s.mode==='exam'?C.scoreCriteria:C.quickScoreNote}</p></details></div><div class="session-review">${s.ids.map((id,i)=>`<article class="review-row"><span class="review-status ${s.answers[id]===lookup(id).answer?'':'bad'}" aria-label="${s.answers[id]===lookup(id).answer?C.correct:C.incorrect}">${icon(s.answers[id]===lookup(id).answer?'check':'close')}</span><div class="review-content"><small>${String(i+1).padStart(2,'0')}<span class="meta-separator"></span>${esc(lookup(id).topic)}</small><h2>${esc(lookup(id).title)}</h2></div><button class="icon-button" data-index="${i}" aria-label="${i+1}. ${C.explanation}" title="${C.explanation}">${icon('arrow')}</button></article>`).join('')}</div></section>`;
+}
+function schemaTable(name,columns,rows) {
+  return `<section class="schema-table"><header><span>${icon('table')}<b>${name}</b></span><button class="icon-button" data-action="preview-${name}" aria-label="${name} ${C.viewData}" title="${C.viewData}">${icon('eye')}</button></header><div class="schema-columns">${columns.map(([col,type,key])=>`<div class="schema-col ${key?'is-key':''}"><span>${key?`<span class="sr-only">${key}</span>${icon(key==='PK'?'key':'link')}`:'<i></i>'}<code>${col}</code></span><small>${type}</small></div>`).join('')}</div><span class="sr-only">${rows}</span></section>`;
 }
 function renderLab() {
-  const lab=LABS.find(l=>l.id===state.labId);
-  const draft=state.drafts[lab.id]??lab.starter;
-  return `<div class="view-intro"><h1>쿼리는, 직접 쳐봐야 아니까.</h1><p>SQL을 실행하고 결과를 확인해 보세요. 조회 결과로 답안을 채점합니다.</p></div><div class="lab-toolbar"><label class="select-wrap">오늘의 실습<select id="lab-select">${LABS.map(l=>`<option value="${l.id}" ${l.id===lab.id?'selected':''}>${String(l.id).padStart(2,'0')}. ${esc(l.title)}${state.solved.includes(l.id)?' ✓':''}</option>`).join('')}</select></label><span class="mini-muted">직접 해결 ${state.solved.length} / ${LABS.length} · SQLite 실행 환경</span></div><div class="lab-layout"><aside class="panel schema-panel"><div class="schema-title">실습 데이터 구조</div><div class="schema-table"><details open><summary>employees <span class="mini-muted">8행</span></summary>${[['emp_id','PK · INTEGER'],['name','TEXT'],['dept_id','INTEGER'],['salary','INTEGER'],['bonus','NULL 가능'],['manager_id','NULL 가능']].map(([col,type])=>`<div class="schema-col"><span>${col}</span><small>${type}</small></div>`).join('')}<button class="text-button" data-action="preview-employees">데이터 미리 보기 ↗</button></details></div><div class="schema-table"><details open><summary>departments <span class="mini-muted">4행</span></summary><div class="schema-col"><span>dept_id</span><small>PK · INTEGER</small></div><div class="schema-col"><span>dept_name</span><small>TEXT</small></div><button class="text-button" data-action="preview-departments">데이터 미리 보기 ↗</button></details></div><div class="engine-note">employees.dept_id → departments.dept_id<br><br>조회 전용 · 매 실행마다 원본 데이터로 시작합니다.<br>Oracle의 NVL·ROLLUP·CONNECT BY 등은 지원하지 않아요.<button class="text-button" data-action="dialects">DBMS 차이 보기 ↗</button></div></aside><div><section class="panel lab-task"><div class="spread"><span class="tag">MISSION ${String(lab.id).padStart(2,'0')} · ${esc(lab.tag)}</span>${state.solved.includes(lab.id)?'<span class="badge-success">✓ 해결 완료</span>':''}</div><h2>${esc(lab.title)}</h2><p>${esc(lab.description)}</p><div class="button-row" style="margin-top:10px"><button class="text-button" data-action="hint">${hintOpen?'힌트 접기':'힌트 살짝 보기'}</button><button class="ghost" data-action="solution">모범 답안</button></div>${hintOpen?`<div class="feedback"><p>${esc(lab.hint)}</p></div>`:''}</section><section class="panel editor-panel"><div class="editor-header"><span>query.sql</span><button class="text-button" data-action="reset-query">처음 코드로</button></div><div class="editor"><div class="line-numbers" id="line-numbers" aria-hidden="true">${draft.split('\n').map((_,i)=>i+1).join('\n')}</div><textarea id="sql-editor" aria-label="SQL 쿼리 편집기" aria-describedby="sql-editor-hint" spellcheck="false" autocomplete="off" autocapitalize="off" wrap="off">${esc(draft)}</textarea></div><p class="editor-hint" id="sql-editor-hint">Tab: 들여쓰기 · Shift+Tab: 편집기에서 나가기</p><div class="editor-footer"><span class="keyboard-hint"><span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> 실행</span><div class="button-row"><button class="secondary" data-action="run" ${running?'disabled':''}>실행</button><button class="primary" data-action="check-sql" ${running?'disabled':''}>${running?'실행 중…':'답안 채점'} →</button></div></div></section><section class="panel result-panel" aria-label="SQL 실행 결과" aria-live="polite"><div class="result-header"><b>실행 결과</b><span class="mini-muted">${resultData?.result?`${resultData.result.values.length}행 · ${resultData.ms} ms`:'RESULT'}</span></div>${renderSQLResult()}</section><div class="subfooter"><span>별칭은 자유 · 열 순서와 값은 문제 조건에 맞게</span><button class="ghost" data-action="next-lab">다음 실습 →</button></div></div></div>`;
+  const lab=LABS.find(l=>l.id===state.labId),draft=state.drafts[lab.id]??lab.starter;
+  return `<div class="view-toolbar lab-toolbar"><label class="mission-picker"><span class="sr-only">${C.navLab}</span><select id="lab-select">${LABS.map(l=>`<option value="${l.id}" ${l.id===lab.id?'selected':''}>${String(l.id).padStart(2,'0')}. ${esc(l.title)}</option>`).join('')}</select></label><div class="lab-progress" title="${C.selfSolved}">${icon('check')}<span class="count">${state.solved.length}<span> / ${LABS.length}</span></span></div></div><div class="lab-layout"><div class="lab-main"><section class="lab-task"><div class="spread"><h1>${esc(lab.title)}</h1>${state.solved.includes(lab.id)?`<span class="solved-mark" aria-label="${C.solved}" title="${C.solved}">${icon('check')}</span>`:''}</div><p>${esc(lab.description)}</p><div class="task-tools"><button class="text-button" data-action="hint" aria-expanded="${hintOpen}">${icon('bulb')}${hintOpen?C.hideHint:C.hint}</button><button class="text-button" data-action="solution">${icon('code')}${C.solution}</button></div>${hintOpen?`<div class="hint-body">${esc(lab.hint)}</div>`:''}</section>
+  <section class="editor-panel"><div class="editor-header"><span>query.sql</span><button class="icon-button" data-action="reset-query" aria-label="${C.reset}" title="${C.reset}">${icon('refresh')}</button></div><div class="editor"><div class="line-numbers" id="line-numbers" aria-hidden="true">${draft.split('\n').map((_,i)=>i+1).join('\n')}</div><textarea id="sql-editor" aria-label="${C.sqlEditor}" aria-describedby="sql-editor-hint" spellcheck="false" autocomplete="off" autocapitalize="off" wrap="off">${esc(draft)}</textarea></div><p class="sr-only" id="sql-editor-hint">${C.editorHelp}</p><div class="editor-footer"><button class="secondary" data-action="run" ${running?'disabled':''} title="Ctrl + Enter">${icon('play')}${C.run}</button><button class="primary" data-action="check-sql" ${running?'disabled':''}>${running?C.running:C.grade}${icon('check')}</button></div></section>
+  <section class="result-panel" aria-label="${C.queryResult}" aria-live="polite" aria-busy="${running}"><div class="result-header"><h2>${C.queryResult}</h2>${resultData?.result?`<span class="result-metrics"><span>${resultData.result.values.length} ${C.rows}</span><span>${resultData.ms} ms</span></span>`:''}</div>${renderSQLResult()}</section><div class="lab-next"><button class="text-button" data-action="next-lab">${C.nextLab}${icon('arrow')}</button></div></div>
+  <aside class="schema-panel" aria-label="${C.database}">${schemaTable('employees',[['emp_id','INTEGER','PK'],['name','TEXT'],['dept_id','INTEGER','FK'],['salary','INTEGER'],['bonus','NULL'],['manager_id','NULL']],8)}<div class="relation-line" role="img" aria-label="${C.relatedKey}: employees.dept_id, departments.dept_id"><svg viewBox="0 0 64 52" aria-hidden="true"><path d="M32 0v52M24 0l8 12 8-12M24 43h16"/></svg><code>dept_id</code></div>${schemaTable('departments',[['dept_id','INTEGER','PK'],['dept_name','TEXT']],4)}<details class="environment"><summary>${icon('info')}<span>SQLite</span>${icon('chevron')}</summary><p>${C.environmentDescription}</p><button class="text-button" data-action="dialects">${C.dbmsDifference}${icon('arrow')}</button></details></aside></div>`;
 }
-function resultTable(result) {return `<div class="table-wrap"><table><thead><tr>${result.columns.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${result.values.map(row=>`<tr>${row.map(value=>`<td class="${value===null?'null':''}">${value===null?'NULL':esc(value)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>${result.values.length===0?'<div class="result-empty">조회 결과가 0행입니다.</div>':''}`;}
+function resultTable(result) {
+  return `<div class="table-wrap" tabindex="0"><table><thead><tr>${result.columns.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${result.values.map(row=>`<tr>${row.map(value=>`<td class="${value===null?'null':''}">${value===null?'NULL':esc(value)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>${result.values.length===0?`<div class="result-empty">${C.queryZero}</div>`:''}`;
+}
 function renderSQLResult() {
-  if(running)return '<div class="result-empty">쿼리를 실행하고 있어요…</div>';
-  if(!resultData)return '<div class="result-empty"><span class="empty-symbol">&gt;_</span>실행 버튼을 누르면 결과가 여기에 나타나요.</div>';
-  if(resultData.error)return `<div class="result-message error"><strong>SQL을 다시 확인해 주세요.</strong><br>${esc(resultData.error)}</div>`;
+  if(running)return `<div class="result-empty">${icon('clock')}<span>${C.running}</span></div>`;
+  if(!resultData)return `<div class="result-empty"><svg class="empty-table" viewBox="0 0 160 70" role="img" aria-label="${C.queryEmpty}"><rect x="1" y="1" width="158" height="68" rx="6"/><path d="M1 23h158M1 46h158M54 1v68M107 1v68"/></svg></div>`;
+  if(resultData.error)return `<div class="result-message error">${icon('close')}<div><strong>${C.queryError}</strong><p>${esc(resultData.error)}</p></div></div>`;
   let message='';
-  if(resultData.passed===true)message=`<div class="result-message">✓ ${resultData.assisted?'정답 결과예요. 모범 답안을 본 연습으로 기록했어요.':'정답이에요! 예제와 추가 데이터에서도 결과가 일치해요.'}</div>`;
-  if(resultData.passed===false)message='<div class="result-message bad">아직 결과가 달라요. 열 순서·NULL 처리·정렬 조건을 확인해 보세요. 예제와 추가 데이터 모두 검사합니다.</div>';
-  if(resultData.stale) message='<div class="result-message bad">코드가 변경되었어요. 다시 실행하거나 채점해 주세요.</div>';
+  if(resultData.passed===true)message=`<div class="result-message">${icon('check')}<span>${resultData.assisted?C.assistedCorrect:C.matched}</span></div>`;
+  if(resultData.passed===false)message=`<div class="result-message bad">${icon('close')}<span>${C.mismatched}</span></div>`;
+  if(resultData.stale)message=`<div class="result-message bad">${icon('refresh')}<span>${C.queryStale}</span></div>`;
   return message+resultTable(resultData.result);
 }
+
 function runSQL(check=false,sqlOverride=null,previewName=null) {
   if(running)return;
   const lab=LABS.find(l=>l.id===state.labId),sql=sqlOverride??state.drafts[lab.id]??lab.starter;
-  if(!sql.trim()){toast('SQL을 입력해 주세요.');return;}
+  if(!sql.trim()){toast(C.enterSQL);return;}
   running=true;resultData=null;const started=performance.now();
   const url=URL.createObjectURL(new Blob([$('#sql-engine').textContent],{type:'text/javascript'}));
   const worker=new Worker(url);sqlWorker=worker;URL.revokeObjectURL(url);
@@ -943,39 +925,39 @@ function runSQL(check=false,sqlOverride=null,previewName=null) {
       save();
     }
     data.ms=Math.round(performance.now()-started);
-    if(previewName){if(data.error)toast(data.error);else openModal(`<h2>${esc(previewName)}</h2><p>연습에 사용하는 원본 데이터예요. NULL과 0을 구분해 보세요.</p>${resultTable(data.result)}<div class="button-row"><button class="primary" data-action="close">확인</button></div>`);}
+    if(previewName){if(data.error)toast(data.error);else openModal(`<h2>${esc(previewName)}</h2>${resultTable(data.result)}<div class="button-row"><button class="primary" data-action="close">${C.close}</button></div>`);}
     else resultData=data;
     if(view==='lab')render();
   };
   worker.onmessage=event=>done(event.data);
-  worker.onerror=event=>{event.preventDefault();done({error:'SQL 엔진을 실행하지 못했어요. 최신 Chrome 또는 Edge에서 다시 시도해 주세요.'});};
-  runTimer=setTimeout(()=>done({error:'실행 제한 시간(8초)을 넘었어요. 조인 조건이나 재귀 쿼리를 확인해 주세요.'}),8000);
+  worker.onerror=event=>{event.preventDefault();done({error:C.engineError});};
+  runTimer=setTimeout(()=>done({error:C.timeout}),8000);
   worker.postMessage({schema:COURSE.schema,variant:COURSE.variant,sql,solution:check?lab.solution:null,ordered:lab.ordered||false});
   if(view==='lab')render();
 }
 function cancelSQL(){if(sqlWorker)sqlWorker.terminate();sqlWorker=null;clearTimeout(runTimer);running=false;}
 function renderNotes() {
   const matches=NOTES.filter(note=>note.join(' ').toLowerCase().includes(search.toLowerCase()));
-  return `<div class="view-intro"><h1>시험장 가기 전, 이것만은.</h1><p>헷갈리기 쉬운 개념을 짧게 정리했어요. 쿼리를 직접 실행하면 더 오래 남습니다.</p></div><div class="lab-toolbar"><span class="mini-muted">핵심 개념 ${NOTES.length}개</span><input class="search-field" id="note-search" aria-label="핵심 요약 검색" type="search" value="${esc(search)}" placeholder="개념 찾기 · NULL, JOIN, 정규화…"></div><div class="note-grid">${matches.length?matches.map(([title,body,sql,tag])=>`<article class="panel note-card"><span class="tag">${tag}</span><h2>${title}</h2><p>${body}</p><pre>${esc(sql)}</pre></article>`).join(''):'<p class="search-empty">일치하는 개념이 없어요. 다른 검색어로 찾아보세요.</p>'}</div><div class="source-links">참고: <a href="https://www.dataq.or.kr/www/sub/a_04.do" target="_blank" rel="noopener">DataQ SQL 자격 안내</a> · <a href="https://www.sqlite.org/lang_select.html" target="_blank" rel="noopener">SQLite SELECT 문서</a> · <a href="https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/" target="_blank" rel="noopener">Oracle SQL 문서</a><br>직접 작성한 학습 요약과 연습문제입니다. 실제 시험 공지·범위는 DataQ에서 확인하세요.</div>`;
+  return `<h1 class="sr-only">${C.navNotes}</h1><div class="view-toolbar"><label class="search-wrap">${icon('search')}<input id="note-search" aria-label="${C.searchPlaceholder}" type="search" value="${esc(search)}" placeholder="${C.searchPlaceholder}"></label></div><div class="note-list">${matches.length?matches.map(([title,body,sql])=>`<article class="note-row"><div><h2>${esc(title)}</h2><p>${esc(body)}</p></div>${codeBlock(sql)}</article>`).join(''):`<div class="empty-state">${icon('search')}<p>${C.noMatches}</p></div>`}</div><details class="sources"><summary>${C.sources}${icon('chevron')}</summary><p>${C.sourcesDescription}</p><div><a href="https://www.dataq.or.kr/www/sub/a_04.do" target="_blank" rel="noopener">DataQ</a><a href="https://www.sqlite.org/lang_select.html" target="_blank" rel="noopener">SQLite</a><a href="https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/" target="_blank" rel="noopener">Oracle</a></div></details>`;
 }
 function renderReview() {
   const ids=reviewFilter==='wrong'?wrongIds():state.bookmarks.filter(id=>lookup(id));
-  return `<div class="view-intro"><h1>틀렸던 문제가, 내 것이 되도록.</h1><p>마지막 풀이가 오답인 문제를 모았어요. 다시 맞히면 오답 노트에서 빠집니다.</p></div><div class="lab-toolbar"><div class="segmented"><button class="segment ${reviewFilter==='wrong'?'active':''}" data-filter="wrong">오답 노트 <small>${wrongIds().length}</small></button><button class="segment ${reviewFilter==='saved'?'active':''}" data-filter="saved">다시 볼 문제 <small>${state.bookmarks.length}</small></button></div>${ids.length?'<button class="primary" data-action="review-all">모아서 다시 풀기 ↺</button>':''}</div>${ids.length?`<div class="review-list">${ids.map(id=>{const q=lookup(id);return `<article class="panel review-row"><span class="review-index">${String(id).padStart(2,'0')}</span><div class="review-content"><small>${q.subject}과목 · ${esc(q.topic)}${state.latest[id]?.correct===true?' · 마지막 풀이 정답':''}</small><h3>${esc(q.title)}</h3></div><button class="secondary" data-review-id="${id}">다시 풀기</button>${reviewFilter==='saved'?`<button class="ghost" data-remove-bookmark="${id}" aria-label="${id}번 문제 저장 해제">×</button>`:''}</article>`;}).join('')}</div>`:`<section class="panel empty-state"><div class="empty-symbol">${icon(reviewFilter==='wrong'?'check':'bookmark')}</div><h2>${reviewFilter==='wrong'?'아직 남아 있는 오답이 없어요.':'다시 보고 싶은 문제를 담아보세요.'}</h2><p>${reviewFilter==='wrong'?'문제를 풀고 채점하면, 틀린 문제를 여기에 모아둘게요.':'문제 위의 ‘다시 볼 문제’를 누르면 이곳에 저장됩니다.'}</p><button class="primary" data-view="quiz">문제 풀러 가기 →</button></section>`}<p class="history-line">누적 채점 ${state.history.length}회 · 기록은 현재 브라우저에 저장돼요.</p>`;
+  return `<h1 class="sr-only">${C.navReview}</h1><div class="view-toolbar"><div class="segmented"><button class="segment ${reviewFilter==='wrong'?'active':''}" data-filter="wrong" aria-pressed="${reviewFilter==='wrong'}">${C.reviewWrong}<span class="segment-count">${wrongIds().length}</span></button><button class="segment ${reviewFilter==='saved'?'active':''}" data-filter="saved" aria-pressed="${reviewFilter==='saved'}">${icon('bookmark')}${C.reviewSaved}<span class="segment-count">${state.bookmarks.length}</span></button></div>${ids.length?`<button class="primary" data-action="review-all">${C.retry}${icon('play')}</button>`:''}</div>${ids.length?`<div class="review-list">${ids.map(id=>{const q=lookup(id);return `<article class="review-row"><span class="review-index">${String(id).padStart(2,'0')}</span><div class="review-content"><small>${esc(q.topic)}</small><h2>${esc(q.title)}</h2></div><button class="icon-button" data-review-id="${id}" aria-label="${id}. ${C.retry}" title="${C.retry}">${icon('arrow')}</button>${reviewFilter==='saved'?`<button class="icon-button" data-remove-bookmark="${id}" aria-label="${id}. ${C.unsaveQuestion}" title="${C.unsaveQuestion}">${icon('close')}</button>`:''}</article>`;}).join('')}</div>`:`<section class="empty-state">${icon(reviewFilter==='wrong'?'check':'bookmark')}<h2>${reviewFilter==='wrong'?C.noWrong:C.noSaved}</h2><p>${reviewFilter==='wrong'?C.emptyReviewHelp:C.emptySavedHelp}</p><button class="primary" data-view="quiz">${C.navQuiz}${icon('arrow')}</button></section>`}`;
 }
+
 function render() {
   applyReadingSize();
-  const names={quiz:'문제 풀기',lab:'SQL 실습',review:'오답 노트',notes:'핵심 요약'};
   document.querySelectorAll('[data-view]').forEach(button=>{if(button.classList.contains('nav-item')){button.classList.toggle('active',button.dataset.view===view);if(button.dataset.view===view)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}});
-  $('#breadcrumb').textContent=names[view];
   $('#main').innerHTML=({quiz:renderQuiz,lab:renderLab,review:renderReview,notes:renderNotes})[view]();
   updateSidebar();
 }
-function navigate(nextView){if(!['quiz','lab','review','notes'].includes(nextView))return;if(view==='lab'&&nextView!=='lab')cancelSQL();view=nextView;render();}
+function navigate(nextView){if(!['quiz','lab','review','notes'].includes(nextView))return;if(view==='lab'&&nextView!=='lab')cancelSQL();view=nextView;render();globalThis.scrollTo?.({top:0,behavior:'auto'});}
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3200);}
 function openModal(html,after){$('#modal-content').innerHTML=html;if(!$('#modal').open)$('#modal').showModal();after?.();}
 function closeModal() {if($('#modal').open)$('#modal').close();}
-function about(){openModal(`<h2>나만의 SQLD 스터디룸</h2><p>공식 기출문제를 복제하지 않고 만든 연습용 화면입니다. 모델링 10문제, SQL 40문제와 쿼리 미션 12개를 담았습니다. 모의고사 형식은 50문제·90분, 연습 판정은 총점 60점 및 과목별 40% 기준입니다.</p><p>SQL 실습은 SQLite(sql.js 1.14.1)로 실제 실행됩니다. Oracle 전용 문법은 개념 문제에서 다룹니다. HTML 파일에 엔진이 포함되어 있어 파일을 내려받으면 인터넷 없이도 사용할 수 있습니다.</p><p>답안·오답·작성 중인 쿼리는 이 브라우저에만 저장됩니다. 다른 기기와 동기화되지 않으며, 브라우저 데이터 삭제 또는 파일 경로 변경 시 기록이 사라질 수 있습니다.</p><p><a href="https://www.dataq.or.kr/www/sub/a_04.do" target="_blank" rel="noopener">DataQ 시험 안내 ↗</a> · <a href="https://github.com/sql-js/sql.js" target="_blank" rel="noopener">sql.js / MIT 라이선스 ↗</a></p><div class="button-row"><a class="secondary" href="./index.html" download="sqld-sprint.html">HTML 내려받기 ↓</a><button class="primary" data-action="close">좋아요</button></div>`);}
+function about(){openModal(`<h2>${C.aboutTitle}</h2><p>${C.aboutQuestions}</p><p>${C.aboutExam}</p><p>${C.aboutEngine}</p><p>${C.engineLimits}</p><p>${C.aboutStorage}</p><div class="source-links"><a href="https://www.dataq.or.kr/www/sub/a_04.do" target="_blank" rel="noopener">${C.examInfo}</a><a href="https://github.com/sql-js/sql.js" target="_blank" rel="noopener">${C.license}</a></div><div class="button-row"><a class="secondary" href="./index.html" download="sqld-sprint.html">${C.downloadHtml}</a><button class="primary" data-action="close">${C.close}</button></div>`);}
 document.addEventListener('click',event=>{
+  if(!event.target.closest('.reading-menu'))document.querySelectorAll('.reading-menu[open]').forEach(menu=>{menu.open=false;});
   const button=event.target.closest('button,a');if(!button||button.disabled)return;
   if(button.dataset.view){navigate(button.dataset.view);return;}
   if(button.classList.contains('brand')){event.preventDefault();navigate('quiz');return;}
@@ -986,9 +968,9 @@ document.addEventListener('click',event=>{
   if(button.dataset.removeBookmark){state.bookmarks=state.bookmarks.filter(id=>id!==Number(button.dataset.removeBookmark));save();render();return;}
   const s=state.session,action=button.dataset.action;if(!action)return;
   switch(action){
-    case 'quick':if(s.mode!=='quick')requestStart('quick');else if(s.done)requestStart('quick');else toast('지금 10문제 벼락치기를 풀고 있어요.');break;
+    case 'quick':if(s.mode!=='quick')requestStart('quick');else if(s.done)requestStart('quick');else toast(C.quickInProgress);break;
     case 'new-quick':requestStart('quick');break;
-    case 'exam':if(s.mode==='exam'&&!s.done)toast('모의고사가 진행 중이에요.');else requestStart('exam');break;
+    case 'exam':if(s.mode==='exam'&&!s.done)toast(C.examInProgress);else requestStart('exam');break;
     case 'grade':gradeCurrent();break;
     case 'prev':moveQuestion(s.index-1);break;
     case 'next':if(s.index<s.ids.length-1)moveQuestion(s.index+1);else finish();break;
@@ -999,15 +981,15 @@ document.addEventListener('click',event=>{
     case 'retry-session':requestStart('review',s.ids.filter(id=>s.answers[id]!==lookup(id).answer));break;
     case 'review-all':requestStart('review',reviewFilter==='wrong'?wrongIds():state.bookmarks.filter(id=>lookup(id)));break;
     case 'close':closeModal();break;
-    case 'help':openModal('<h2>손이 기억하는 단축키</h2><ul><li><span class="kbd">1</span> ~ <span class="kbd">4</span> 보기 선택</li><li><span class="kbd">Enter</span> 정답 확인 / 다음 문제</li><li><span class="kbd">←</span> <span class="kbd">→</span> 문제 이동</li><li><span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> SQL 실행 (Mac: ⌘ + Enter)</li><li><span class="kbd">Tab</span> SQL 편집기에서 두 칸 들여쓰기</li><li><span class="kbd">Shift</span> + <span class="kbd">Tab</span> 편집기에서 나가기</li><li><span class="kbd">Esc</span> 팝업 닫기</li></ul><div class="button-row"><button class="primary" data-action="close">확인</button></div>');break;
+    case 'help':openModal(`<h2>${C.shortcuts}</h2><ul>${['shortcutChoose','shortcutEnter','shortcutMove','shortcutRun','shortcutIndent','shortcutLeave','shortcutClose'].map(key=>`<li>${esc(C[key])}</li>`).join('')}</ul><div class="button-row"><button class="primary" data-action="close">${C.close}</button></div>`);break;
     case 'about':about();break;
     case 'run':runSQL(false);break;
     case 'check-sql':runSQL(true);break;
     case 'hint':hintOpen=!hintOpen;render();break;
-    case 'reset-query':openModal('<h2>작성한 쿼리를 초기화할까요?</h2><p>이 실습의 작성 중인 코드가 처음 코드로 돌아갑니다.</p><div class="button-row"><button class="secondary" data-action="close">취소</button><button class="primary" data-action="reset-query-confirm">초기화</button></div>');break;
+    case 'reset-query':openModal(`<h2>${C.resetTitle}</h2><p>${C.resetDescription}</p><div class="button-row"><button class="secondary" data-action="close">${C.cancel}</button><button class="primary" data-action="reset-query-confirm">${C.reset}</button></div>`);break;
     case 'reset-query-confirm':cancelSQL();delete state.drafts[state.labId];resultData=null;save();closeModal();render();break;
-    case 'solution':{const lab=LABS.find(l=>l.id===state.labId);openModal('<h2>모범 답안을 확인할까요?</h2><p>답안을 확인하면 이번 미션은 도움을 받은 연습으로 표시되며, 이후 정답을 제출해도 ‘직접 해결’ 수에는 추가되지 않습니다. 이미 직접 해결한 기록은 유지됩니다.</p><div class="button-row"><button class="secondary" data-action="close">더 생각해 보기</button><button class="primary" data-action="show-solution">답안 보기</button></div>');break;}
-    case 'show-solution':{const lab=LABS.find(l=>l.id===state.labId);if(!state.assisted.includes(lab.id))state.assisted.push(lab.id);save();openModal(`<h2>${esc(lab.title)} · 모범 답안</h2>${codeBlock(lab.solution)}<p>${esc(lab.hint)}</p><div class="button-row"><button class="secondary" data-action="use-solution">편집기에 넣기</button><button class="primary" data-action="close">확인</button></div>`);break;}
+    case 'solution':openModal(`<h2>${C.solutionTitle}</h2><p>${C.solutionDescription}</p><div class="button-row"><button class="secondary" data-action="close">${C.cancel}</button><button class="primary" data-action="show-solution">${C.showSolution}</button></div>`);break;
+    case 'show-solution':{const lab=LABS.find(l=>l.id===state.labId);if(!state.assisted.includes(lab.id))state.assisted.push(lab.id);save();openModal(`<h2>${C.solution}</h2>${codeBlock(lab.solution)}<p>${esc(lab.hint)}</p><div class="button-row"><button class="secondary" data-action="use-solution">${C.useSolution}</button><button class="primary" data-action="close">${C.close}</button></div>`);break;}
     case 'use-solution':cancelSQL();state.drafts[state.labId]=LABS.find(l=>l.id===state.labId).solution;resultData=null;save();closeModal();render();break;
     case 'preview-employees':runSQL(false,'SELECT * FROM employees ORDER BY emp_id;','employees');break;
     case 'preview-departments':runSQL(false,'SELECT * FROM departments ORDER BY dept_id;','departments');break;
@@ -1019,7 +1001,7 @@ document.addEventListener('input',event=>{
   if(event.target.id==='sql-editor'){
     state.drafts[state.labId]=event.target.value;
     $('#line-numbers').textContent=event.target.value.split('\n').map((_,i)=>i+1).join('\n');
-    if(resultData&&!resultData.stale){resultData.stale=true;const panel=$('.result-panel');panel.innerHTML='<div class="result-header"><b>실행 결과</b><span class="mini-muted">이전 코드의 결과</span></div>'+renderSQLResult();}
+    if(resultData&&!resultData.stale){resultData.stale=true;const panel=$('.result-panel');panel.innerHTML=`<div class="result-header"><h2>${C.queryResult}</h2><span class="result-metrics">${C.oldQueryResult}</span></div>`+renderSQLResult();}
     save();
   }
   if(event.target.id==='note-search'){
@@ -1028,6 +1010,7 @@ document.addEventListener('input',event=>{
 });
 document.addEventListener('change',event=>{if(event.target.id==='reading-size'){setReadingSize(event.target.value);return;}if(event.target.id==='lab-select'){cancelSQL();state.labId=Number(event.target.value);resultData=null;hintOpen=false;save();render();}});
 document.addEventListener('keydown',event=>{
+  if(event.key==='Escape')document.querySelectorAll('.reading-menu[open]').forEach(menu=>{menu.open=false;});
   if($('#modal').open)return;
   if(event.target.id==='sql-editor'){
     if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){event.preventDefault();runSQL(false);}

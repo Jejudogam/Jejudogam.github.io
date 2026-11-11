@@ -23,7 +23,7 @@ function appContext(saved=null){
   const elements=new Map(),storage=new Map(saved?[['sqld-sprint-v1',saved]]:[]),listeners=new Map();
   const get=key=>{if(!elements.has(key))elements.set(key,element());return elements.get(key);};
   const context=vm.createContext({document:{documentElement:get('html'),querySelector:get,querySelectorAll:()=>[],addEventListener(type,listener){listeners.set(type,listener);}},localStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value)},Event,setInterval(){},setTimeout(){},clearTimeout(){},performance:{now:()=>0},console});
-  vm.runInContext(source('src/course.js'),context);vm.runInContext(source('src/app.js'),context);
+  vm.runInContext(source('src/course.js'),context);vm.runInContext('const COPY='+source('src/ui.json')+';',context);vm.runInContext(source('src/app.js'),context);
   return {context,storage,elements,listeners,eval:code=>vm.runInContext(code,context)};
 }
 const app=appContext();
