@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#245b48">
+  <meta name="description" content="SQLD 벼락치기 스터디룸. 50문제 모의고사, 실제 SQL 실행 실습, 해설과 오답 복습을 한 화면에서.">
+  <title>SQLD Sprint · 한 문제씩, 합격에 가까이</title>
+  <style>/* STYLES */</style>
+</head>
+<body>
+<a class="skip" href="#main">본문으로 이동</a>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a href="#quiz" class="brand" aria-label="SQLD Sprint 홈"><span class="brand-mark">S<span>↗</span></span><span>SQLD <b>sprint</b><small>나의 벼락치기 스터디룸</small></span></a>
+    <div class="nav-label">LEARN & PRACTICE</div>
+    <nav aria-label="학습 메뉴">
+      <button data-view="quiz" class="nav-item active"><span class="nav-icon">▤</span> 문제 풀기 <span class="nav-arrow">↗</span></button>
+      <button data-view="lab" class="nav-item"><span class="nav-icon">⌘</span> SQL 플레이그라운드</button>
+      <button data-view="review" class="nav-item"><span class="nav-icon">↺</span> 오답 노트 <span class="nav-count" id="wrong-count">0</span></button>
+      <button data-view="notes" class="nav-item"><span class="nav-icon">▥</span> 핵심 요약</button>
+    </nav>
+    <section class="sidebar-progress"><div class="nav-label">MY PROGRESS</div><div class="spread"><span>개념 문제 정복</span><b id="mastery-count">0 / 50</b></div><div class="progress"><span id="mastery-bar"></span></div><p>마지막으로 맞힌 문제를 기준으로<br>차근차근 쌓이고 있어요.</p></section>
+    <div class="sidebar-bottom"><div class="study-card"><span class="tiny-label">SMALL STEPS, BIG RESULTS</span><p>한 문제 더 풀면,<br>한 걸음 더 가까이.</p><span class="study-line"></span></div><div class="save-status"><span class="dot"></span><span id="save-label">이 브라우저에 자동 저장</span></div><button class="text-button muted" data-action="about">이 스터디룸에 대해 ↗</button></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><div class="breadcrumb">나의 스터디룸 <span>/</span> <b id="breadcrumb">문제 풀기</b></div><div class="top-actions"><span class="local-badge"><span class="dot"></span> 혼자서도, 꾸준히</span><button class="key-help" data-action="help" aria-label="키보드 단축키 안내">⌨ <span>단축키</span></button><span class="avatar" aria-label="학습자">나</span></div></header>
+    <main id="main" tabindex="-1"></main>
+    <footer>매일 조금씩, SQL에 익숙해지는 시간. <span>SQLD SPRINT · 개인 학습용</span></footer>
+  </div>
+</div>
+<dialog id="modal"><div id="modal-content"></div></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<noscript>이 학습 화면을 사용하려면 브라우저에서 JavaScript를 허용해 주세요.</noscript>
+<!-- LICENSE -->
+<script id="sql-engine" type="text/plain">/* ENGINE */</script>
+<script>/* COURSE */</script>
+<script>/* APP */</script>
+</body>
+</html>
