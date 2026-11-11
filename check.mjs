@@ -18,8 +18,14 @@ test('ranking ties and cumulative sums',()=>{assert.equal(JSON.stringify(run(lab
 test('multiset comparison preserves duplicate counts, order is conditional',()=>{const a={values:[[1],[2],[2]]},b={values:[[2],[1],[2]]},d={values:[[1],[2]]};assert.equal(c.comparable(a,false),c.comparable(b,false));assert.notEqual(c.comparable(a,true),c.comparable(b,true));assert.notEqual(c.comparable(a,false),c.comparable(d,false));});
 test('variant fixture rejects a hard-coded output matching only example data',()=>{const hardcoded="SELECT '민서',5000 UNION ALL SELECT '도윤',4500 UNION ALL SELECT '지훈',4000 UNION ALL SELECT '서연',4000;";assert.equal(c.comparable(run(hardcoded),true),c.comparable(run(labs[0].solution),true));assert.notEqual(c.comparable(c.execute(SQL,schema+variant,hardcoded),true),c.comparable(c.execute(SQL,schema+variant,labs[0].solution),true));});
 test('SQL errors, empty SQL, mutation, multi-statement and result limit',()=>{assert.throws(()=>run('SELECT missing FROM employees'));assert.throws(()=>run(''));assert.throws(()=>run('DELETE FROM employees RETURNING *'));assert.throws(()=>run('SELECT 1; SELECT 2;'));assert.throws(()=>run('WITH RECURSIVE n(x) AS (SELECT 1 UNION ALL SELECT x+1 FROM n WHERE x<501) SELECT x FROM n;'));assert.equal(run('SELECT * FROM employees').values.length,8);});
-const element=()=>({innerHTML:'',textContent:'',style:{},open:false,classList:{add(){},remove(){},toggle(){}},focus(){},showModal(){this.open=true;},close(){this.open=false;}});
-function appContext(saved=null){const elements=new Map(),storage=new Map(saved?[['sqld-sprint-v1',saved]]:[]);const get=key=>{if(!elements.has(key))elements.set(key,element());return elements.get(key);};const context=vm.createContext({document:{querySelector:get,querySelectorAll:()=>[],addEventListener(){}},localStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value)},setInterval(){},setTimeout(){},clearTimeout(){},performance:{now:()=>0},console});vm.runInContext(source('src/course.js'),context);vm.runInContext(source('src/app.js'),context);return {context,storage,elements,eval:code=>vm.runInContext(code,context)};}
+const element=()=>({innerHTML:'',textContent:'',style:{},attributes:{},open:false,classList:{add(){},remove(){},toggle(){}},setAttribute(key,value){this.attributes[key]=value;},focus(){},showModal(){this.open=true;},close(){this.open=false;}});
+function appContext(saved=null){
+  const elements=new Map(),storage=new Map(saved?[['sqld-sprint-v1',saved]]:[]),listeners=new Map();
+  const get=key=>{if(!elements.has(key))elements.set(key,element());return elements.get(key);};
+  const context=vm.createContext({document:{documentElement:get('html'),querySelector:get,querySelectorAll:()=>[],addEventListener(type,listener){listeners.set(type,listener);}},localStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value)},Event,setInterval(){},setTimeout(){},clearTimeout(){},performance:{now:()=>0},console});
+  vm.runInContext(source('src/course.js'),context);vm.runInContext(source('src/app.js'),context);
+  return {context,storage,elements,listeners,eval:code=>vm.runInContext(code,context)};
+}
 const app=appContext();
 test('quick quiz starts with 10 unique questions, no answer revealed',()=>{assert.equal(app.eval('state.session.ids.length'),10);assert.equal(app.eval('new Set(state.session.ids).size'),10);assert.ok(!app.eval('renderQuiz()').includes('정답이에요.'));});
 test('answer grading records a wrong answer only once',()=>{app.eval('selectAnswer(0);gradeCurrent();gradeCurrent();');assert.equal(app.eval('state.history.length'),1);assert.equal(app.eval('wrongIds().length'),1);assert.ok(app.eval('renderQuiz()').includes('정답은 2번'));});
@@ -31,6 +37,39 @@ test('unfinished exam preserves deadline, selections, drafts and bookmarks',()=>
 test('expired exam automatically grades once and locks answers',()=>{app.eval('state.session.deadline=Date.now()-1;tick();tick();');assert.equal(app.eval('state.session.done'),true);assert.equal(app.eval('Object.keys(state.session.graded).length'),50);assert.equal(app.eval('state.history.length'),52);const before=app.eval('JSON.stringify(state.session.answers)');app.eval('selectAnswer(3);');assert.equal(app.eval('JSON.stringify(state.session.answers)'),before);});
 test('partial submission treats unanswered questions as incorrect',()=>{const partial=appContext();partial.eval('selectAnswer(1);finish(true);');assert.equal(partial.eval('scoreSession(state.session).percent'),10);assert.equal(partial.eval('wrongIds().length'),9);});
 test('bad stored JSON safely starts a new session',()=>{assert.equal(appContext('{broken').eval('state.session.ids.length'),10);});
+test('reading preference persists across reload without replacing the active exam or SQL draft',()=>{
+  const reader=appContext();reader.eval('startSession("exam");selectAnswer(2);state.drafts[1]="SELECT 1;";save();');
+  const session=reader.eval('JSON.stringify(state.session)');
+  for(const size of ['large','extra','comfortable']){
+    reader.listeners.get('change')({target:{id:'reading-size',value:size}});
+    const restored=appContext(reader.storage.get('sqld-sprint-v1'));
+    assert.equal(restored.eval('state.readingSize'),size);
+    assert.equal(restored.elements.get('html').attributes['data-reading'],size);
+    assert.equal(restored.elements.get('#reading-size').value,size);
+    assert.equal(restored.eval('JSON.stringify(state.session)'),session);
+    assert.equal(restored.eval('state.drafts[1]'),'SELECT 1;');
+  }
+});
+test('older and invalid reading preferences fall back while preserving existing progress',()=>{
+  const saved=JSON.parse(app.storage.get('sqld-sprint-v1'));
+  for(const value of [undefined,'tiny',null]){
+    saved.readingSize=value;
+    const restored=appContext(JSON.stringify(saved));
+    assert.equal(restored.eval('state.readingSize'),'comfortable');
+    assert.equal(restored.eval('state.history.length'),saved.history.length);
+    restored.eval('setReadingSize("unknown")');
+    assert.equal(restored.eval('state.readingSize'),'comfortable');
+  }
+});
+test('SQL Tab inserts two spaces; Shift+Tab retains native focus escape',()=>{
+  const editorApp=appContext();let prevented=0,inserted='',dispatched=0;
+  const editor={id:'sql-editor',selectionStart:0,selectionEnd:0,setRangeText(text){inserted+=text;},dispatchEvent(){dispatched++;}};
+  const keydown=editorApp.listeners.get('keydown');
+  keydown({key:'Tab',shiftKey:true,target:editor,preventDefault(){prevented++;}});
+  assert.equal(prevented,0);assert.equal(inserted,'');
+  keydown({key:'Tab',shiftKey:false,target:editor,preventDefault(){prevented++;}});
+  assert.equal(prevented,1);assert.equal(inserted,'  ');assert.equal(dispatched,1);
+});
 test('all views render with HTML-escaped query drafts',()=>{app.eval('state.drafts[1]="</textarea><script>alert(1)</script>";');for(const name of ['quiz','lab','review','notes'])assert.ok(app.eval(`view=${JSON.stringify(name)};render();document.querySelector('#main').innerHTML`).length>500);assert.ok(app.eval('renderLab()').includes('&lt;/textarea&gt;'));});
 test('standalone output embeds engine and has no external runtime dependencies',()=>{const html=source('dist/index.html');assert.ok(html.includes('initSqlJs'));assert.ok(html.includes('sql.js MIT license'));assert.ok(!/<script[^>]+src=|<link[^>]+href=/i.test(html));assert.equal((html.match(/<script(?:\s|>)/g)||[]).length,3);assert.equal((html.match(/<\/script>/g)||[]).length,3);});
 test('built HTML scripts compile without template replacement corruption',()=>{const scripts=[...source('dist/index.html').matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(match=>match[1]);assert.equal(scripts.length,3);scripts.forEach(script=>new vm.Script(script));assert.ok(scripts[1].includes("^[0-9]{3}$"));});
