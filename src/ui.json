@@ -24,7 +24,7 @@
   "newSet": "새 10문제",
   "run": "쿼리 실행",
   "grade": "답안 채점",
-  "solution": "모범 답안",
+  "solution": "정답과 해설 보기",
   "hint": "힌트",
   "hideHint": "힌트 접기",
   "reset": "초기화",
@@ -150,5 +150,10 @@
   "pageTitle": "SQLD Sprint",
   "pageDescription": "SQLD 연습문제 50개와 SQL 실습 12개, 해설과 오답 복습을 제공합니다.",
   "rows": "행",
-  "scoreHelp": "합격 기준"
+  "scoreHelp": "합격 기준",
+  "choiceExplanations": "선택지별 해설",
+  "selectedAnswer": "내가 고른 답",
+  "correctChoice": "정답 선택지",
+  "labWalkthrough": "SQL 풀이",
+  "solutionHeading": "정답과 해설"
 }

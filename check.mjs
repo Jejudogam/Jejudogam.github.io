@@ -23,10 +23,59 @@ function appContext(saved=null){
   const elements=new Map(),storage=new Map(saved?[['sqld-sprint-v1',saved]]:[]),listeners=new Map();
   const get=key=>{if(!elements.has(key))elements.set(key,element());return elements.get(key);};
   const context=vm.createContext({document:{documentElement:get('html'),querySelector:get,querySelectorAll:()=>[],addEventListener(type,listener){listeners.set(type,listener);}},localStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value)},Event,setInterval(){},setTimeout(){},clearTimeout(){},performance:{now:()=>0},console});
-  vm.runInContext(source('src/course.js'),context);vm.runInContext('const COPY='+source('src/ui.json')+';',context);vm.runInContext(source('src/app.js'),context);
+  vm.runInContext(source('src/course.js'),context);vm.runInContext('const COPY='+source('src/ui.json')+';',context);vm.runInContext('const EXPLANATIONS='+source('src/explanations.json')+';',context);vm.runInContext(source('src/app.js'),context);
   return {context,storage,elements,listeners,eval:code=>vm.runInContext(code,context)};
 }
 const app=appContext();
+const explanations=JSON.parse(source('src/explanations.json'));
+test('every question has reasoning and a reason for each immutable choice',()=>{
+  assert.equal(Object.keys(explanations.questions).length,questions.length);
+  for(const q of questions){const entry=explanations.questions[q.id];assert.equal(entry.paragraphs.length,2);assert.equal(entry.choices.length,q.choices.length);for(const text of [...entry.paragraphs,...entry.choices]){assert.ok(typeof text==='string'&&text.trim().length>10);assert.ok(/[가-힣]/.test(text));assert.ok(!/\?{2,}/.test(text));}}
+});
+test('each lab walkthrough uses the original solution and produces identical results',()=>{
+  assert.equal(Object.keys(explanations.labs).length,labs.length);
+  for(const lab of labs){const entry=explanations.labs[lab.id];assert.ok(entry.steps.length>=2&&entry.steps.length<=5);assert.equal(entry.formattedSql.replace(/\s/g,''),lab.solution.replace(/\s/g,''));assert.equal(c.comparable(run(entry.formattedSql),true),c.comparable(run(lab.solution),true));assert.ok(entry.note.length>10);for(const step of entry.steps){assert.ok(lab.solution.replace(/\s/g,'').includes(step.sql.replace(/\s/g,'')),`Lab ${lab.id}: ${step.sql}`);assert.ok(step.body.length>10);}}
+});
+test('explanation formatting supports inline code and escapes all HTML',()=>{
+  assert.equal(app.eval('explanationText("Use `<script>` & <img>")'),'Use <code>&lt;script&gt;</code> &amp; &lt;img&gt;');
+});
+test('explanations stay hidden until grading, and exam explanations wait for submission',()=>{
+  const learning=appContext();
+  assert.ok(!learning.eval('renderQuiz()').includes('choice-explanations'));
+  learning.eval('selectAnswer(0);gradeCurrent();');
+  assert.ok(learning.eval('renderQuiz()').includes('choice-explanations'));
+  assert.ok(learning.eval('renderQuiz()').includes('answer-selected'));
+  learning.eval('startSession("exam");selectAnswer(0);gradeCurrent();');
+  assert.ok(!learning.eval('renderQuiz()').includes('choice-explanations'));
+  learning.eval('finish(true);resultView=false;');
+  assert.ok(learning.eval('renderQuiz()').includes('choice-explanations'));
+});
+test('lab walkthrough is revealed only after solving or choosing to see the solution',()=>{
+  const learning=appContext();
+  assert.ok(!learning.eval('renderLab()').includes('lab-explanation'));
+  learning.eval('state.assisted.push(1);');
+  assert.ok(learning.eval('renderLab()').includes('lab-explanation'));
+  assert.equal(learning.eval('state.solved.length'),0);
+  learning.eval('state.assisted=[];state.solved.push(1);');
+  assert.ok(learning.eval('renderLab()').includes('lab-explanation'));
+  learning.eval('state.labId=2;');
+  assert.ok(!learning.eval('renderLab()').includes('lab-explanation'));
+});
+test('Enter on explanation disclosure keeps native expansion instead of advancing the quiz',()=>{
+  const learning=appContext();learning.eval('selectAnswer(0);gradeCurrent();');let prevented=false;
+  learning.listeners.get('keydown')({key:'Enter',target:{tagName:'SUMMARY',closest:selector=>selector==='button,a,summary'?{}:null},preventDefault(){prevented=true;}});
+  assert.equal(prevented,false);assert.equal(learning.eval('state.session.index'),0);
+});
+test('every question renders choice reasoning and lab solution modal uses the complete walkthrough',()=>{
+  const learning=appContext();
+  for(const q of questions){const html=learning.eval(`renderExplanation(lookup(${q.id}),${q.answer})`);assert.equal((html.match(/explanation-number/g)||[]).length,4);assert.ok(!html.includes('undefined'));}
+  const click=learning.listeners.get('click');
+  click({target:{closest:selector=>selector==='.reading-menu'?null:{dataset:{action:'show-solution'},classList:{contains:()=>false}}}});
+  assert.ok(learning.elements.get('#modal-content').innerHTML.includes('walkthrough-steps'));
+  assert.equal(learning.eval('state.assisted.includes(1)'),true);
+  click({target:{closest:selector=>selector==='.reading-menu'?null:{dataset:{action:'use-solution'},classList:{contains:()=>false}}}});
+  assert.equal(learning.eval('state.drafts[1]'),explanations.labs[1].formattedSql);
+});
 test('quick quiz starts with 10 unique questions, no answer revealed',()=>{assert.equal(app.eval('state.session.ids.length'),10);assert.equal(app.eval('new Set(state.session.ids).size'),10);assert.ok(!app.eval('renderQuiz()').includes('정답이에요.'));});
 test('answer grading records a wrong answer only once',()=>{app.eval('selectAnswer(0);gradeCurrent();gradeCurrent();');assert.equal(app.eval('state.history.length'),1);assert.equal(app.eval('wrongIds().length'),1);assert.ok(app.eval('renderQuiz()').includes('정답은 2번'));});
 test('correct retry clears wrong list and accumulates attempt history',()=>{app.eval('startSession("review",[11]);selectAnswer(1);gradeCurrent();');assert.equal(app.eval('wrongIds().length'),0);assert.equal(app.eval('state.history.length'),2);});

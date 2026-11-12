@@ -1,0 +1,854 @@
+{
+  "questions": {
+    "1": {
+      "paragraphs": [
+        "엔터티는 업무에서 관리할 대상의 집합이에요.",
+        "사원 엔터티의 개별 사원은 인스턴스예요. 엔터티에는 그 대상을 설명하는 속성이 있어요."
+      ],
+      "choices": [
+        "업무에서 관리할 대상을 묶어 정의하므로 맞아요.",
+        "모든 엔터티 관계가 1:1인 것은 아니에요.",
+        "모든 속성이 식별자일 필요는 없어요.",
+        "한 엔터티에 여러 인스턴스가 있을 수 있어요."
+      ]
+    },
+    "2": {
+      "paragraphs": [
+        "주식별자는 유일성, 최소성, 불변성, 존재성을 만족해요.",
+        "값이 자주 바뀌면 참조 관계를 유지하기 어려워서 가변성은 맞지 않아요."
+      ],
+      "choices": [
+        "유일성은 인스턴스를 서로 구별하는 조건이에요.",
+        "최소성은 식별에 불필요한 속성을 넣지 않는 조건이에요.",
+        "불변성은 식별자 값이 바뀌지 않아야 한다는 조건이에요.",
+        "가변성은 값이 바뀐다는 뜻이라 주식별자에 맞지 않아요."
+      ]
+    },
+    "3": {
+      "paragraphs": [
+        "상품번호만으로 상품명이 정해지므로 부분 함수 종속이에요.",
+        "상품번호는 복합 기본키의 일부라서 상품 정보를 분리하는 제2정규화 대상이에요."
+      ],
+      "choices": [
+        "이행 함수 종속은 키가 아닌 속성을 거쳐 값이 정해질 때예요.",
+        "상품명이 복합키 일부인 상품번호에만 의존하므로 맞아요.",
+        "이 사례는 한 속성이 여러 독립적인 값 집합을 결정하는 경우가 아니에요.",
+        "이 사례는 관계를 재결합하는 조인 종속을 다루지 않아요."
+      ]
+    },
+    "4": {
+      "paragraphs": [
+        "사원번호에서 부서번호를 거쳐 부서명이 정해지는 이행 함수 종속이에요.",
+        "부서명을 분리하는 제3정규화로 부서 정보 변경 때 여러 사원 행을 고치는 일을 줄여요."
+      ],
+      "choices": [
+        "제1정규화는 이행 함수 종속을 제거하는 단계가 아니에요.",
+        "제2정규화는 복합키 일부에 대한 의존을 제거해요.",
+        "다른 속성을 거쳐 부서명이 정해지는 종속을 제거하므로 맞아요.",
+        "역정규화는 부서 정보를 분리하는 방향과 달라요."
+      ]
+    },
+    "5": {
+      "paragraphs": [
+        "비식별 관계에서는 부모 식별자가 자식의 일반 속성인 외래키로 들어가요.",
+        "부모 식별자를 자식 주식별자에 포함하면 식별 관계예요."
+      ],
+      "choices": [
+        "부모 키를 자식의 일반 속성으로 받으므로 맞아요.",
+        "부모 키가 자식 주식별자에 들어가면 식별 관계예요.",
+        "비식별 관계에서도 외래키를 쓸 수 있어요.",
+        "비식별 관계라고 부모와 자식의 생명주기가 항상 같지는 않아요."
+      ]
+    },
+    "6": {
+      "paragraphs": [
+        "수량과 단가로 계산한 주문금액은 파생 속성이에요.",
+        "주문금액을 따로 저장한다면 수량이나 단가가 바뀔 때 금액도 맞춰야 해요."
+      ],
+      "choices": [
+        "다른 값으로 계산하므로 기본 속성으로 보기 어려워요.",
+        "설계 과정에서 부여한 값이 아니라 계산한 값이에요.",
+        "기존 속성을 곱해 얻으므로 파생 속성이에요.",
+        "주문금액은 행을 식별하는 값으로 제시되지 않았어요."
+      ]
+    },
+    "7": {
+      "paragraphs": [
+        "모델링은 보통 개념, 논리, 물리 순서로 진행해요.",
+        "업무 대상을 파악하고 상세 구조를 정의한 뒤 특정 DBMS의 저장 구조를 설계해요."
+      ],
+      "choices": [
+        "논리 모델보다 개념 모델이 먼저예요.",
+        "물리 모델은 논리 구조를 정한 뒤 설계해요.",
+        "물리 구조에서 개념 모델로 거슬러 올라가지 않아요.",
+        "개념에서 논리로 구체화하고 마지막에 물리 구조를 정해요."
+      ]
+    },
+    "8": {
+      "paragraphs": [
+        "부서 하나에 사원이 여럿인 관계에서는 사원이 N쪽이에요.",
+        "따라서 사원 테이블의 부서번호가 부서 테이블의 부서번호를 참조해요."
+      ],
+      "choices": [
+        "부서에 사원번호 한 칸을 두면 여러 사원을 일반적으로 나타낼 수 없어요.",
+        "N쪽 사원 테이블에 부서번호 외래키를 두므로 맞아요.",
+        "관계 연결에 상대방의 모든 속성이 필요하지 않아요.",
+        "사원이 소속 부서를 참조해야 하므로 외래키가 필요해요."
+      ]
+    },
+    "9": {
+      "paragraphs": [
+        "NULL은 값이 없거나 알려지지 않은 상태를 나타내요.",
+        "숫자 0이나 공백과 구별하고 `IS NULL`로 확인해요."
+      ],
+      "choices": [
+        "0은 알려진 숫자이고 NULL은 값이 없는 상태예요.",
+        "NULL을 허용한다면 NULL 자체가 반드시 오류는 아니에요.",
+        "값을 모르거나 해당 사항이 없을 때 NULL로 표현해요.",
+        "NULL끼리 `=`로 비교해도 TRUE가 되지 않아요."
+      ]
+    },
+    "10": {
+      "paragraphs": [
+        "인조식별자는 업무와 관계없이 부여한 일련번호 같은 값이에요.",
+        "별도 기본키가 있어도 업무상 중복을 막으려면 UNIQUE 제약이 필요할 수 있어요."
+      ],
+      "choices": [
+        "인조식별자에는 업무 의미가 없는 값도 쓸 수 있어요.",
+        "업무와 무관하게 부여한 번호를 식별자로 쓸 수 있어요.",
+        "인조식별자만으로 업무상 중복이 언제나 막히지는 않아요.",
+        "인조식별자를 반드시 숫자형으로 만들어야 하는 것은 아니에요."
+      ]
+    },
+    "11": {
+      "paragraphs": [
+        "주어진 네 보너스에서 `COUNT(*)`는 4이고 `COUNT(bonus)`는 2예요.",
+        "`AVG(bonus)`도 NULL을 빼므로 (100 + 300) / 2 = 200이에요."
+      ],
+      "choices": [
+        "NULL 보너스 두 건을 PAID에 세었고 평균도 잘못 구했어요.",
+        "전체 4행과 값이 있는 보너스 2개를 구분해 평균 200을 구했어요.",
+        "`COUNT(*)`는 NULL 보너스가 있는 행도 세므로 TOTAL은 2가 아니에요.",
+        "합계 400을 값이 있는 2행으로 나누므로 평균은 100이 아니에요."
+      ]
+    },
+    "12": {
+      "paragraphs": [
+        "NULL인 보너스를 찾을 때는 `WHERE bonus IS NULL`을 써요.",
+        "NULL을 `=`나 `<>`로 비교하면 UNKNOWN이 되고 WHERE는 TRUE인 행만 남겨요."
+      ],
+      "choices": [
+        "`= NULL`은 TRUE가 되지 않아 NULL 행을 찾지 못해요.",
+        "`<> NULL`도 UNKNOWN을 만들어 조건을 통과시키지 못해요.",
+        "NULL 여부를 직접 검사하므로 맞아요.",
+        "0은 알려진 숫자 값이라 NULL과 달라요."
+      ]
+    },
+    "13": {
+      "paragraphs": [
+        "`COALESCE`는 왼쪽부터 처음 만나는 NULL이 아닌 값을 반환해요.",
+        "`COALESCE(NULL, 0, 100)`은 0에서 멈추므로 100까지 가지 않아요."
+      ],
+      "choices": [
+        "두 번째 인자 0이 NULL이 아니므로 결과가 NULL은 아니에요.",
+        "0은 NULL이 아닌 첫 값이라 결과예요.",
+        "100보다 앞에 있는 0이 이미 선택돼요.",
+        "주어진 식은 정상적으로 0을 반환해요."
+      ]
+    },
+    "14": {
+      "paragraphs": [
+        "`TRUE OR UNKNOWN`은 한쪽이 TRUE이므로 TRUE예요.",
+        "UNKNOWN이 섞였다고 늘 UNKNOWN은 아니며 `FALSE AND UNKNOWN`은 FALSE예요."
+      ],
+      "choices": [
+        "OR의 한쪽이 TRUE라서 전체가 TRUE예요.",
+        "TRUE가 있는 OR 식은 FALSE가 될 수 없어요.",
+        "다른 쪽이 TRUE라서 UNKNOWN으로 남지 않아요.",
+        "UNKNOWN은 비교 오류가 아니에요."
+      ]
+    },
+    "15": {
+      "paragraphs": [
+        "부서별 평균 급여는 그룹을 만든 뒤 `HAVING`으로 걸러요.",
+        "`WHERE`는 개별 사원 행에 먼저 적용하므로 평균 조건에는 `HAVING AVG(salary) >= 4000`을 써요."
+      ],
+      "choices": [
+        "WHERE에서 그룹 평균을 검사할 수 없어요.",
+        "부서별로 묶고 HAVING에서 평균 4000 이상을 골라요.",
+        "부서별 그룹도 없고 개별 급여는 부서 평균과 달라요.",
+        "WHERE 위치가 잘못됐고 개별 급여 조건도 평균 조건이 아니에요."
+      ]
+    },
+    "16": {
+      "paragraphs": [
+        "논리적 처리 순서는 `FROM`, `WHERE`, `GROUP BY`, `HAVING`, `SELECT`, `ORDER BY`예요.",
+        "행을 가져와 걸러 낸 다음 그룹과 출력 열을 정해요. 실제 물리 실행 계획과는 달라요."
+      ],
+      "choices": [
+        "FROM에서 대상 행을 정한 뒤 WHERE와 SELECT를 처리해요.",
+        "대상 행부터 정렬까지 제시한 논리적 순서가 맞아요.",
+        "대상 행을 정하기 전에 WHERE와 SELECT를 처리하지 않아요.",
+        "HAVING은 그룹화 뒤에 적용하며 WHERE보다 앞서지 않아요."
+      ]
+    },
+    "17": {
+      "paragraphs": [
+        "이 문항의 가상 데이터에서 개발부 사원 2명은 각각 한 행씩 매칭돼요.",
+        "사원이 없는 나머지 두 부서도 LEFT JOIN에서 한 행씩 남아 총 4행이에요."
+      ],
+      "choices": [
+        "개발부의 두 행만 세고 다른 두 부서를 빠뜨렸어요.",
+        "개발부는 두 행이라 부서마다 한 행씩인 결과가 아니에요.",
+        "개발부 2행에 다른 부서 1행씩을 더해 4행이에요.",
+        "모든 부서에 사원 2명이 있는 상황이 아니에요."
+      ]
+    },
+    "18": {
+      "paragraphs": [
+        "매칭되지 않은 부서의 `e.salary`는 NULL이라 `NULL > 4000`은 UNKNOWN이에요.",
+        "WHERE는 TRUE만 남기므로 부서 행이 제외돼요. 오른쪽 매칭만 제한하려면 조건을 ON에 둘 수 있어요."
+      ],
+      "choices": [
+        "LEFT JOIN 뒤의 WHERE까지 통과해야 하므로 항상 남지는 않아요.",
+        "급여 비교가 TRUE가 아니어서 매칭 없는 부서는 제외돼요.",
+        "매칭되지 않은 급여는 0이 아니라 NULL이에요.",
+        "LEFT JOIN은 매칭 실패를 두 행으로 늘리지 않아요."
+      ]
+    },
+    "19": {
+      "paragraphs": [
+        "조건 없는 CROSS JOIN은 양쪽 행의 모든 조합을 만들어요.",
+        "A가 3행이고 B가 4행이므로 3 × 4 = 12행이에요."
+      ],
+      "choices": [
+        "A의 행 수만 남기지 않고 B의 각 행과 조합해요.",
+        "B의 행 수만 남기지 않고 A의 각 행과 조합해요.",
+        "행 수를 더하지 않고 곱해요.",
+        "3행과 4행의 모든 쌍이 생겨 12행이에요."
+      ]
+    },
+    "20": {
+      "paragraphs": [
+        "UNION은 두 결과를 합친 뒤 중복 행을 제거해요.",
+        "1, 2, 3의 3행이 남고 ORDER BY가 없으면 출력 순서는 정해지지 않아요."
+      ],
+      "choices": [
+        "중복을 빼면 1, 2, 3의 세 행이 남아요.",
+        "중복된 값을 하나 더 센 결과예요.",
+        "다섯 입력 행을 그대로 세면 UNION ALL의 방식이에요.",
+        "입력은 다섯 행이어서 중복 제거 후 여섯 행이 될 수 없어요."
+      ]
+    },
+    "21": {
+      "paragraphs": [
+        "UNION ALL은 중복을 지우지 않고 두 결과를 이어 붙여요.",
+        "A의 3행과 B의 2행이 모두 남아 결과는 5행이에요."
+      ],
+      "choices": [
+        "입력 다섯 행을 모두 남기므로 2행이 아니에요.",
+        "중복을 지우는 UNION의 결과를 센 값이에요.",
+        "중복된 값 일부를 빼서는 안 돼요.",
+        "A의 3행과 B의 2행을 합친 5행이에요."
+      ]
+    },
+    "22": {
+      "paragraphs": [
+        "EXISTS는 서브쿼리가 한 행이라도 반환하는지만 확인해요.",
+        "반환된 열 값이 1이나 NULL이어도 행이 있으면 TRUE예요."
+      ],
+      "choices": [
+        "`SELECT 1`의 1은 판단 대상이 아니에요.",
+        "결과 행이 한 개 이상 있는지 검사해요.",
+        "한 행만 나와도 EXISTS는 TRUE예요.",
+        "반환 열에 NULL이 있어도 행이 있으면 TRUE예요."
+      ]
+    },
+    "23": {
+      "paragraphs": [
+        "`id NOT IN (1, NULL)`에서 id가 1이면 조건이 FALSE예요.",
+        "2와 3은 NULL과 비교한 결과가 UNKNOWN이라 WHERE를 통과하지 못해 결과는 0행이에요."
+      ],
+      "choices": [
+        "1은 FALSE이고 2와 3도 UNKNOWN이라 0행이에요.",
+        "2나 3 중 하나만 남는 게 아니라 둘 다 제외돼요.",
+        "2와 3은 NULL 비교 때문에 TRUE가 아니에요.",
+        "세 id 모두 조건이 TRUE가 아니에요."
+      ]
+    },
+    "24": {
+      "paragraphs": [
+        "Oracle의 스칼라 서브쿼리는 한 열에서 최대 한 행만 반환하므로 2행이면 오류가 나요.",
+        "0행이면 NULL이에요. 여러 행에서 첫 행을 쓰는 SQLite와 동작이 달라요."
+      ],
+      "choices": [
+        "첫 행만 쓰는 것은 SQLite 쪽 동작이에요.",
+        "Oracle은 두 값을 쉼표로 이어 주지 않아요.",
+        "허용된 한 행을 넘으므로 Oracle에서 오류가 나요.",
+        "Oracle에서 0행일 때 NULL을 반환해요."
+      ]
+    },
+    "25": {
+      "paragraphs": [
+        "`e2.dept_id = e.dept_id`로 서브쿼리 사원과 바깥 사원의 부서를 연결해요.",
+        "그래야 각 사원의 급여를 자기 부서 평균과 비교할 수 있어요."
+      ],
+      "choices": [
+        "사원번호를 맞추면 같은 사원 한 명의 급여가 기준이에요.",
+        "부서번호를 맞춰 자기 부서 평균을 계산해요.",
+        "급여가 같은 사원만 골라서는 부서 평균을 구할 수 없어요.",
+        "부서번호가 NULL인 행만 골라서는 자기 부서 평균이 아니에요."
+      ]
+    },
+    "26": {
+      "paragraphs": [
+        "RANK는 동점에 같은 순위를 주고 다음 순위를 건너뛰어요.",
+        "급여 5000 두 행이 공동 1위이므로 급여 4000은 3위예요."
+      ],
+      "choices": [
+        "급여 5000 두 행에 서로 다른 순위를 주면 동점을 반영하지 못해요.",
+        "1, 1, 2는 순위를 건너뛰지 않는 DENSE_RANK의 결과예요.",
+        "두 행이 공동 1위이고 다음이 3위라 맞아요.",
+        "RANK의 첫 순위는 0이 아니라 1이에요."
+      ]
+    },
+    "27": {
+      "paragraphs": [
+        "DENSE_RANK는 동점에 같은 순위를 주면서 다음 순위를 건너뛰지 않아요.",
+        "급여 5000 두 행은 1위이고 급여 4000은 2위예요."
+      ],
+      "choices": [
+        "동점 다음을 바로 2위로 매기므로 맞아요.",
+        "1, 1, 3은 중간 순위를 건너뛰는 RANK의 결과예요.",
+        "같은 급여 5000에 서로 다른 순위를 주지 않아요.",
+        "가장 높은 급여의 순위는 1부터 시작해요."
+      ]
+    },
+    "28": {
+      "paragraphs": [
+        "`SUM(salary) OVER (PARTITION BY dept_id)`는 사원 행을 유지하며 부서 급여 합계를 붙여요.",
+        "PARTITION BY는 계산 범위를 부서별로 나누지만 결과를 그룹당 한 행으로 줄이지 않아요."
+      ],
+      "choices": [
+        "GROUP BY 집계처럼 행을 부서당 하나로 줄이지 않아요.",
+        "각 사원 행에 소속 부서의 합계를 표시해요.",
+        "부서별로 계산하므로 전체 합계 하나를 반복하지 않아요.",
+        "PARTITION BY는 출력 순서를 지정하지 않아요."
+      ]
+    },
+    "29": {
+      "paragraphs": [
+        "`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`는 첫 행부터 현재 행까지 합쳐요.",
+        "세 번째 행에는 급여 100, 200, 300이 들어와 누적 합계가 600이에요."
+      ],
+      "choices": [
+        "300은 세 번째 행의 급여만 본 값이에요.",
+        "두 번째 행의 200을 빠뜨린 합계예요.",
+        "세 행을 모두 더하면 500이 아니에요.",
+        "100 + 200 + 300을 더해 600이에요."
+      ]
+    },
+    "30": {
+      "paragraphs": [
+        "LAG는 정렬 순서에서 앞 행의 값을 가져와요.",
+        "첫 행에는 앞 행이 없어 `LAG(salary, 1, 0)`의 기본값 0을 반환해요."
+      ],
+      "choices": [
+        "LAG는 현재 행 급여를 가져오는 함수가 아니에요.",
+        "기본값 0을 지정했으므로 NULL로 남지 않아요.",
+        "앞 행이 없을 때 지정한 기본값 0이 나와요.",
+        "첫 행에서 마지막 행으로 돌아가지 않아요."
+      ]
+    },
+    "31": {
+      "paragraphs": [
+        "CASE는 위에서부터 WHEN을 검사해 처음 TRUE인 결과를 반환해요.",
+        "85는 `85 >= 80`이 먼저 참이므로 A가 나와요."
+      ],
+      "choices": [
+        "첫 번째 WHEN이 참이라 A를 반환해요.",
+        "두 번째 WHEN도 참이지만 첫 번째에서 이미 결정돼요.",
+        "첫 번째 조건이 참이므로 ELSE의 C까지 가지 않아요.",
+        "TRUE인 WHEN이 있어 NULL로 남지 않아요."
+      ]
+    },
+    "32": {
+      "paragraphs": [
+        "`BETWEEN 3000 AND 5000`은 양쪽 경계를 모두 포함해요.",
+        "같은 조건은 `salary >= 3000 AND salary <= 5000`이며 날짜와 시간을 비교할 때도 종료 경계를 확인해요."
+      ],
+      "choices": [
+        "경계값 3000과 5000을 빼서 BETWEEN과 달라요.",
+        "양쪽 경계를 포함하고 두 조건을 모두 만족해요.",
+        "OR로 연결하면 범위 밖 값도 통과할 수 있어요.",
+        "한 급여가 3000이면서 5000일 수는 없어요."
+      ]
+    },
+    "33": {
+      "paragraphs": [
+        "`LIKE 'A_%'`에서 밑줄은 A 뒤의 한 글자를 꼭 요구해요.",
+        "%는 뒤에 0글자도 허용하므로 AB와 A_는 맞지만 A만으로는 부족해요."
+      ],
+      "choices": [
+        "AB의 B가 밑줄 한 글자에 해당해요.",
+        "A1Z에서 1은 밑줄에, Z는 %에 해당해요.",
+        "A_의 밑줄 문자 자체가 패턴의 밑줄에 해당해요.",
+        "A 뒤에 필요한 한 글자가 없어서 매칭되지 않아요."
+      ]
+    },
+    "34": {
+      "paragraphs": [
+        "DISTINCT는 `dept_id, job` 조합 전체를 비교해 중복을 없애요.",
+        "(10, 개발) 두 건이 하나로 합쳐져 남는 조합은 세 개예요."
+      ],
+      "choices": [
+        "서로 다른 조합이 세 개라 한 행만 남지 않아요.",
+        "dept_id만 보면 두 종류지만 job까지 비교해야 해요.",
+        "중복된 (10, 개발)을 하나로 합치면 3행이에요.",
+        "같은 조합 두 행을 모두 남기면 DISTINCT를 적용하지 않은 결과예요."
+      ]
+    },
+    "35": {
+      "paragraphs": [
+        "`COUNT(DISTINCT x)`는 NULL을 빼고 서로 다른 값만 세요.",
+        "10이 두 번, 20이 한 번 나오므로 고유 값은 두 개예요."
+      ],
+      "choices": [
+        "10 외에 20도 있어 한 개가 아니에요.",
+        "NULL을 제외하면 서로 다른 값은 10과 20, 두 개예요.",
+        "DISTINCT가 중복된 10을 하나로 세므로 세 개가 아니에요.",
+        "입력 네 건을 전부 세는 `COUNT(*)`와 달라요."
+      ]
+    },
+    "36": {
+      "paragraphs": [
+        "Oracle 기준 `SUBSTR('DATABASE', 2, 3)`은 두 번째 문자부터 세 글자를 잘라요.",
+        "DATABASE의 두 번째 문자는 A라서 결과는 ATA예요."
+      ],
+      "choices": [
+        "DAT는 첫 번째 문자부터 세 글자를 자른 값이에요.",
+        "두 번째 문자부터 세면 ATA가 나와요.",
+        "두 번째 문자 A부터 세 글자는 ATA이므로 TAB이 아니에요.",
+        "ASE는 더 뒤쪽에서 자른 문자열이에요."
+      ]
+    },
+    "37": {
+      "paragraphs": [
+        "Oracle의 `NVL2(expr, a, b)`는 expr이 NULL이면 세 번째 인자 b를 반환해요.",
+        "`NVL2(NULL, 100, 200)`의 결과는 200이에요. 인자가 두 개인 NVL과 달라요."
+      ],
+      "choices": [
+        "NULL일 때는 NULL 자체가 아니라 세 번째 인자를 골라요.",
+        "100은 첫 인자가 NULL이 아닐 때 선택해요.",
+        "첫 인자가 NULL이라 세 번째 인자 200이 나와요.",
+        "0은 세 인자 어디에도 지정되지 않았어요."
+      ]
+    },
+    "38": {
+      "paragraphs": [
+        "`ROUND(123.456, 2)`는 소수점 둘째 자리까지 남기도록 반올림해요.",
+        "셋째 자리 6 때문에 둘째 자리 5가 6으로 올라가 123.46이에요."
+      ],
+      "choices": [
+        "123은 소수점 아래를 남기지 않은 값이에요.",
+        "123.45는 셋째 자리 6을 반올림하지 않은 값이에요.",
+        "셋째 자리 6을 반올림해 123.46이에요.",
+        "120은 십의 자리까지 남긴 값이라 소수점 둘째 자리까지 구한 결과와 달라요."
+      ]
+    },
+    "39": {
+      "paragraphs": [
+        "`ROLLUP(dept_id, job)`은 두 열 조합, 부서별 소계, 전체 총계를 만들어요.",
+        "중간 소계는 dept_id 기준이에요. SQLite 실습 엔진은 ROLLUP을 지원하지 않아요."
+      ],
+      "choices": [
+        "(dept_id, job), (dept_id), 전체 순으로 집계해요.",
+        "job만의 소계는 이 인자 순서에서 만들지 않아요.",
+        "두 열 조합과 전체 총계가 빠져 있어요.",
+        "ROLLUP에는 부서 소계와 전체 총계도 포함돼요."
+      ]
+    },
+    "40": {
+      "paragraphs": [
+        "`CUBE(a, b)`는 두 열의 모든 부분집합인 네 집계 수준을 만들어요.",
+        "수준은 (a, b), (a), (b), ()이며 실제 결과 행 수와는 달라요."
+      ],
+      "choices": [
+        "두 열의 부분집합은 두 개보다 많아요.",
+        "네 집계 수준 중 하나가 빠진 개수예요.",
+        "두 열로 만드는 집계 수준 네 개가 맞아요.",
+        "8개는 두 열의 부분집합 개수가 아니에요."
+      ]
+    },
+    "41": {
+      "paragraphs": [
+        "`GROUPING(dept_id)`가 1이면 dept_id를 묶어서 만든 소계나 총계 행이에요.",
+        "집계 때문에 나타난 NULL과 원래 데이터에 있던 NULL을 구분할 수 있어요."
+      ],
+      "choices": [
+        "실제 dept_id가 NULL이라는 뜻만으로 1이 되지 않아요.",
+        "집계로 만든 소계나 총계임을 나타내요.",
+        "1은 dept_id의 실제 값이 아니에요.",
+        "집계 행이 항상 첫 번째라는 뜻이 아니에요."
+      ]
+    },
+    "42": {
+      "paragraphs": [
+        "Oracle 계층형 쿼리에서 PRIOR는 부모 행의 값을 가리켜요.",
+        "부모 emp_id와 자식 manager_id를 맞추므로 `CONNECT BY PRIOR emp_id = manager_id`를 쓰고 루트는 START WITH로 정해요."
+      ],
+      "choices": [
+        "부모 emp_id와 자식 manager_id를 연결해요.",
+        "부모 manager_id를 자식 emp_id에 맞추면 방향이 달라요.",
+        "PRIOR가 없어 부모 값을 지정하지 않았어요.",
+        "부모와 자식의 emp_id를 같게 해 상하 관계를 연결하지 못해요."
+      ]
+    },
+    "43": {
+      "paragraphs": [
+        "PIVOT은 행의 범주 값을 열로 펼쳐 집계해요.",
+        "반대 방향은 UNPIVOT이고 SQLite에서는 CASE를 이용한 조건부 집계로 연습할 수 있어요."
+      ],
+      "choices": [
+        "PIVOT은 행 삭제 명령이 아니에요.",
+        "범주 값을 열로 바꿔 집계하는 목적에 맞아요.",
+        "NULL을 모두 0으로 바꾸는 기능이 아니에요.",
+        "기본키를 만드는 기능이 아니에요."
+      ]
+    },
+    "44": {
+      "paragraphs": [
+        "Oracle의 `REGEXP_LIKE(code, '^[0-9]{3}$')`는 숫자 세 글자만 찾아요.",
+        "^와 $가 시작과 끝을 고정해 123만 매칭돼요."
+      ],
+      "choices": [
+        "12는 숫자가 두 자리라 부족해요.",
+        "1234는 숫자가 네 자리라 끝 조건에 걸려요.",
+        "A12의 A는 숫자 범위에 들지 않아요.",
+        "123은 처음부터 끝까지 숫자 세 자리예요."
+      ]
+    },
+    "45": {
+      "paragraphs": [
+        "ALTER는 기존 테이블 구조를 변경하는 DDL이에요.",
+        "INSERT와 UPDATE는 데이터 행을 다루고 GRANT는 권한을 부여해요."
+      ],
+      "choices": [
+        "INSERT는 구조가 아니라 데이터 행을 추가해요.",
+        "UPDATE는 구조가 아니라 기존 데이터 값을 바꿔요.",
+        "ALTER는 테이블 구조를 바꾸는 데이터 정의어예요.",
+        "GRANT는 사용자 권한을 부여해요."
+      ]
+    },
+    "46": {
+      "paragraphs": [
+        "원자성은 트랜잭션 작업을 모두 반영하거나 모두 취소한다는 뜻이에요.",
+        "일부만 반영한 채 끝내지 않아요. ACID의 다른 성질은 일관성, 격리성, 지속성이에요."
+      ],
+      "choices": [
+        "같은 실행 계획을 쓰는지는 원자성과 무관해요.",
+        "전부 반영하거나 전부 취소하는 설명이에요.",
+        "동시 수정 여부는 트랜잭션 작업을 모두 반영하거나 취소하는 원자성과 달라요.",
+        "저장 위치는 트랜잭션 작업을 모두 반영하거나 취소하는 원자성의 기준이 아니에요."
+      ]
+    },
+    "47": {
+      "paragraphs": [
+        "관계형 모델의 PRIMARY KEY는 NULL과 중복을 모두 허용하지 않아요.",
+        "복합키는 열 조합의 유일성을 봐요. SQLite 일부 레거시 일반 테이블의 NULL 예외 때문에 실습 스키마에 NOT NULL을 명시해요."
+      ],
+      "choices": [
+        "기본키는 NULL과 중복을 모두 허용하지 않아요.",
+        "중복을 허용하면 행을 유일하게 구별하지 못해요.",
+        "NULL을 허용하는 설명은 관계형 기본키 원칙과 달라요.",
+        "NULL을 금지하고 중복도 막아 행을 식별해요."
+      ]
+    },
+    "48": {
+      "paragraphs": [
+        "`GRANT SELECT ON employees TO user_a;`는 user_a에게 employees 조회 권한을 줘요.",
+        "REVOKE는 권한을 회수하며 SQLite에는 같은 형태의 사용자 권한 관리 명령이 없어 실습 엔진에서 실행하지 않아요."
+      ],
+      "choices": [
+        "GRANT가 SELECT 권한을 부여해요.",
+        "REVOKE는 권한을 주지 않고 회수해요.",
+        "COMMIT은 조회 권한을 부여하는 명령이 아니에요.",
+        "ALTER USER의 제시한 형태로는 테이블 조회 권한을 줄 수 없어요."
+      ]
+    },
+    "49": {
+      "paragraphs": [
+        "Oracle에서 `ORDER BY salary ASC`는 기본적으로 NULL을 맨 뒤에 둬요.",
+        "DESC에서는 앞에 오고 SQLite의 기본 정렬은 달라요. NULLS FIRST나 NULLS LAST로 위치를 명시할 수 있어요."
+      ],
+      "choices": [
+        "Oracle의 ASC 기본값에서는 NULL이 맨 앞이 아니에요.",
+        "Oracle에서 ASC로 정렬하면 NULL이 맨 뒤예요.",
+        "NULL을 항상 중간에 두는 규칙은 없어요.",
+        "기본 규칙이 있어 매번 무작위가 아니에요."
+      ]
+    },
+    "50": {
+      "paragraphs": [
+        "INTERSECT는 A와 B 양쪽에 있는 값만 남겨요.",
+        "A가 (1, 2, 3), B가 (2, 3, 4)이므로 결과는 2와 3이며 차집합에는 Oracle의 MINUS나 SQLite의 EXCEPT를 써요."
+      ],
+      "choices": [
+        "1은 A에만 있고 4는 B에만 있어요.",
+        "두 집합을 합치는 결과는 공통 값만 남기는 INTERSECT와 달라요.",
+        "양쪽에 모두 있는 2와 3이 결과예요.",
+        "1은 B에 없고 공통 값 2와 3도 빠졌어요."
+      ]
+    }
+  },
+  "labs": {
+    "1": {
+      "steps": [
+        {
+          "sql": "WHERE salary >= 4000",
+          "body": "급여가 4000 이상인 사원만 남겨요."
+        },
+        {
+          "sql": "SELECT name, salary",
+          "body": "남은 사원의 이름과 급여를 표시해요."
+        },
+        {
+          "sql": "ORDER BY salary DESC, emp_id ASC",
+          "body": "급여를 높은 순으로 정렬하고 동점이면 사원번호가 작은 순으로 놓아요."
+        }
+      ],
+      "note": "실제 결과는 민서 5000, 도윤 4500, 지훈 4000, 서연 4000 순이에요. 두 4000 행의 순서는 emp_id가 정해요.",
+      "formattedSql": "SELECT name, salary\nFROM employees\nWHERE salary >= 4000\nORDER BY salary DESC, emp_id ASC;"
+    },
+    "2": {
+      "steps": [
+        {
+          "sql": "FROM employees",
+          "body": "employees의 사원 행을 대상으로 집계해요."
+        },
+        {
+          "sql": "COUNT(*)",
+          "body": "보너스가 NULL인 사원도 포함해 전체 8행을 세요."
+        },
+        {
+          "sql": "COUNT(bonus), AVG(bonus)",
+          "body": "NULL이 아닌 보너스 5개만 세고 그 값들의 평균 220을 구해요."
+        }
+      ],
+      "note": "COUNT(bonus)는 8이 아니라 5예요. 보너스가 0인 행이 있다면 NULL과 달리 집계에 들어가요.",
+      "formattedSql": "SELECT COUNT(*),\n       COUNT(bonus),\n       AVG(bonus)\nFROM employees;"
+    },
+    "3": {
+      "steps": [
+        {
+          "sql": "WHERE dept_id IS NOT NULL",
+          "body": "부서번호가 없는 사원 행을 먼저 제외해요."
+        },
+        {
+          "sql": "GROUP BY dept_id",
+          "body": "남은 사원을 부서번호별로 묶어 평균을 계산해요."
+        },
+        {
+          "sql": "HAVING AVG(salary) >= 4000",
+          "body": "평균 급여가 4000 이상인 부서만 남겨요."
+        },
+        {
+          "sql": "ORDER BY dept_id",
+          "body": "결과를 부서번호 오름차순으로 정렬해요."
+        }
+      ],
+      "note": "WHERE에 평균 조건을 넣으면 그룹 평균을 검사할 수 없어요. 결과에는 부서 10의 평균 4333.333333333333과 부서 20의 평균 4000이 나와요.",
+      "formattedSql": "SELECT dept_id, AVG(salary)\nFROM employees\nWHERE dept_id IS NOT NULL\nGROUP BY dept_id\nHAVING AVG(salary) >= 4000\nORDER BY dept_id;"
+    },
+    "4": {
+      "steps": [
+        {
+          "sql": "LEFT JOIN employees e ON d.dept_id = e.dept_id",
+          "body": "사원이 없는 부서도 남도록 부서와 사원을 연결해요."
+        },
+        {
+          "sql": "COUNT(e.emp_id)",
+          "body": "매칭된 사원번호만 세므로 사원이 없는 부서의 인원은 0이에요."
+        },
+        {
+          "sql": "GROUP BY d.dept_id, d.dept_name",
+          "body": "부서별로 행을 묶어 인원 수를 계산해요."
+        },
+        {
+          "sql": "ORDER BY d.dept_id",
+          "body": "부서번호가 작은 순서로 결과를 보여 줘요."
+        }
+      ],
+      "note": "COUNT(*)를 쓰면 사원이 없는 인사 부서도 LEFT JOIN에서 남은 한 행을 세게 돼요. 실제 결과에서 인사는 0명이에요.",
+      "formattedSql": "SELECT d.dept_name, COUNT(e.emp_id)\nFROM departments d\nLEFT JOIN employees e\n  ON d.dept_id = e.dept_id\nGROUP BY d.dept_id, d.dept_name\nORDER BY d.dept_id;"
+    },
+    "5": {
+      "steps": [
+        {
+          "sql": "SELECT AVG(salary) FROM employees",
+          "body": "서브쿼리가 전체 사원의 평균 급여를 구해요."
+        },
+        {
+          "sql": "WHERE salary > (SELECT AVG(salary) FROM employees)",
+          "body": "각 사원의 급여가 전체 평균보다 큰 경우만 남겨요."
+        },
+        {
+          "sql": "ORDER BY emp_id",
+          "body": "남은 사원을 사원번호 오름차순으로 정렬해요."
+        }
+      ],
+      "note": "결과는 사원번호 순으로 민서 다음 지훈과 서연이 나오고 도윤이 마지막이에요. 급여만 보고 높은 순으로 다시 정렬하면 문제의 emp_id 순서와 달라져요.",
+      "formattedSql": "SELECT name, salary\nFROM employees\nWHERE salary > (\n  SELECT AVG(salary)\n  FROM employees\n)\nORDER BY emp_id;"
+    },
+    "6": {
+      "steps": [
+        {
+          "sql": "WHERE e.dept_id = d.dept_id",
+          "body": "서브쿼리의 사원을 현재 부서와 같은 부서로 한정해요."
+        },
+        {
+          "sql": "WHERE NOT EXISTS (SELECT 1 FROM employees e WHERE e.dept_id = d.dept_id)",
+          "body": "연결된 사원 행이 하나도 없는 부서만 남겨요."
+        },
+        {
+          "sql": "SELECT d.dept_name",
+          "body": "조건에 맞는 부서의 이름을 보여 줘요."
+        }
+      ],
+      "note": "실제 결과는 인사예요. 서브쿼리에 NULL이 섞일 수 있는 NOT IN으로 바꾸면 기대한 부서가 빠질 수 있어요.",
+      "formattedSql": "SELECT d.dept_name\nFROM departments d\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM employees e\n  WHERE e.dept_id = d.dept_id\n);"
+    },
+    "7": {
+      "steps": [
+        {
+          "sql": "WHERE dept_id IS NOT NULL",
+          "body": "부서번호가 없는 사원을 결과에서 빼요."
+        },
+        {
+          "sql": "PARTITION BY dept_id",
+          "body": "순위를 계산할 범위를 부서별로 나눠요."
+        },
+        {
+          "sql": "ORDER BY salary DESC",
+          "body": "각 부서 안에서 급여가 높은 사원부터 순위를 매겨요."
+        },
+        {
+          "sql": "DENSE_RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC)",
+          "body": "동점에 같은 순위를 주고 다음 순위를 건너뛰지 않아요."
+        },
+        {
+          "sql": "ORDER BY emp_id",
+          "body": "출력 결과는 사원번호 오름차순으로 놓아요."
+        }
+      ],
+      "note": "개발 부서에서는 지훈과 서연이 함께 2위이고 마케팅 부서에서는 시우와 유준이 함께 1위예요. 출력 순서와 순위 계산 순서를 혼동하지 마세요.",
+      "formattedSql": "SELECT name, dept_id,\n       DENSE_RANK() OVER (\n         PARTITION BY dept_id\n         ORDER BY salary DESC\n       )\nFROM employees\nWHERE dept_id IS NOT NULL\nORDER BY emp_id;"
+    },
+    "8": {
+      "steps": [
+        {
+          "sql": "WHERE dept_id IS NOT NULL",
+          "body": "부서번호가 NULL인 사원을 제외해요."
+        },
+        {
+          "sql": "CASE WHEN salary >= 4000 THEN 1 ELSE 0 END",
+          "body": "급여가 4000 이상이면 1, 아니면 0을 줘요."
+        },
+        {
+          "sql": "SUM(CASE WHEN salary >= 4000 THEN 1 ELSE 0 END)",
+          "body": "조건에 맞는 사원의 1을 부서별로 더해요."
+        },
+        {
+          "sql": "GROUP BY dept_id",
+          "body": "사원을 부서번호별로 묶어요."
+        },
+        {
+          "sql": "ORDER BY dept_id",
+          "body": "부서번호 오름차순으로 출력해요."
+        }
+      ],
+      "note": "실제 인원은 부서 10이 3명, 20이 1명, 30이 0명이에요. ELSE 0을 빼면 조건에 맞는 사람이 없는 그룹에서 합계가 NULL이 될 수 있어요.",
+      "formattedSql": "SELECT dept_id,\n       SUM(CASE WHEN salary >= 4000\n                THEN 1 ELSE 0 END)\nFROM employees\nWHERE dept_id IS NOT NULL\nGROUP BY dept_id\nORDER BY dept_id;"
+    },
+    "9": {
+      "steps": [
+        {
+          "sql": "ORDER BY emp_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW",
+          "body": "사원번호 순서로 첫 행부터 현재 행까지를 합계 범위로 잡아요."
+        },
+        {
+          "sql": "SUM(salary) OVER (ORDER BY emp_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)",
+          "body": "각 사원 행에 그때까지의 급여 합계를 표시해요."
+        },
+        {
+          "sql": "ORDER BY emp_id",
+          "body": "최종 결과도 사원번호 순서로 보여 줘요."
+        }
+      ],
+      "note": "첫 행의 누적 합계는 5000이고 마지막 행은 29800이에요. 윈도 안의 정렬과 결과 정렬은 역할이 달라요.",
+      "formattedSql": "SELECT emp_id, name,\n       SUM(salary) OVER (\n         ORDER BY emp_id\n         ROWS BETWEEN UNBOUNDED PRECEDING\n                  AND CURRENT ROW\n       )\nFROM employees\nORDER BY emp_id;"
+    },
+    "10": {
+      "steps": [
+        {
+          "sql": "FROM employees e LEFT JOIN employees m",
+          "body": "같은 사원 테이블을 사원 e와 상사 m으로 나눠 연결하고 상사가 없어도 사원은 남겨요."
+        },
+        {
+          "sql": "ON e.manager_id = m.emp_id",
+          "body": "사원의 상사번호를 상사의 사원번호와 맞춰요."
+        },
+        {
+          "sql": "SELECT e.name, m.name",
+          "body": "사원 이름과 연결된 상사 이름을 표시해요."
+        },
+        {
+          "sql": "ORDER BY e.emp_id",
+          "body": "사원번호 오름차순으로 출력해요."
+        }
+      ],
+      "note": "민서는 상사가 없어 상사 이름이 NULL이고 지훈과 서연의 상사는 민서예요. INNER JOIN으로 바꾸면 상사가 없는 사원이 빠져요.",
+      "formattedSql": "SELECT e.name, m.name\nFROM employees e\nLEFT JOIN employees m\n  ON e.manager_id = m.emp_id\nORDER BY e.emp_id;"
+    },
+    "11": {
+      "steps": [
+        {
+          "sql": "COALESCE(bonus,0)",
+          "body": "보너스가 NULL이면 계산할 때 0으로 바꿔요."
+        },
+        {
+          "sql": "salary + COALESCE(bonus,0)",
+          "body": "급여와 변환한 보너스를 더해 총액을 구해요."
+        },
+        {
+          "sql": "ORDER BY emp_id",
+          "body": "모든 사원을 사원번호 순서로 출력해요."
+        }
+      ],
+      "note": "실제 결과에서 지훈은 4000이고 민서는 5500이에요. NULL을 그대로 더하면 보너스가 없는 사원의 합계도 NULL이 돼요.",
+      "formattedSql": "SELECT name, salary + COALESCE(bonus,0)\nFROM employees\nORDER BY emp_id;"
+    },
+    "12": {
+      "steps": [
+        {
+          "sql": "WHERE e2.dept_id = e.dept_id",
+          "body": "서브쿼리에서 현재 사원과 같은 부서의 사원만 남겨요."
+        },
+        {
+          "sql": "SELECT AVG(e2.salary) FROM employees e2 WHERE e2.dept_id = e.dept_id",
+          "body": "현재 사원이 속한 부서의 평균 급여를 구해요."
+        },
+        {
+          "sql": "WHERE e.salary > (SELECT AVG(e2.salary) FROM employees e2 WHERE e2.dept_id = e.dept_id)",
+          "body": "자기 부서 평균보다 급여가 높은 사원만 남겨요."
+        },
+        {
+          "sql": "ORDER BY e.emp_id",
+          "body": "결과를 사원번호 순서로 정렬해요."
+        }
+      ],
+      "note": "실제 결과는 민서 5000과 도윤 4500이에요. 부서 연결 조건을 빼면 자기 부서가 아니라 전체 사원 평균과 비교하게 돼요.",
+      "formattedSql": "SELECT e.name, e.salary\nFROM employees e\nWHERE e.salary > (\n  SELECT AVG(e2.salary)\n  FROM employees e2\n  WHERE e2.dept_id = e.dept_id\n)\nORDER BY e.emp_id;"
+    }
+  }
+}
