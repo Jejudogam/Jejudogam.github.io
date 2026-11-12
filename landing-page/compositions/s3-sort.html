@@ -1,0 +1,228 @@
+<template>
+  <style>
+    /* s3 구분. (host 15~38 s, scene time 0~23 s). Warm Grey, title block left, official top-display photo right,
+       eight ring segments light one per second with their chips, a red stamp ring, then a dark disc hands #0A0A0A to s4.
+       The photo is only moved, scaled and tilted as a whole; nothing is drawn over it. */
+    #root { position: absolute; inset: 0; overflow: hidden; container-type: size; font-family: var(--font-text); }
+    #s3-sort-scene { position: absolute; inset: 0; }
+    #s3-sort-bg { position: absolute; inset: 0; background: var(--c-warm-grey); }
+    /* Light and dots stay inside the frame so every edge is flat Warm Grey next to the shell's side bands. */
+    #s3-sort-light { position: absolute; inset: 0;
+      background: radial-gradient(ellipse 760px 520px at 1190px 520px, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 72%); }
+    #s3-sort-grid { position: absolute; inset: 0;
+      background: radial-gradient(circle, rgba(0, 0, 0, 0.06) 1.5px, transparent 1.75px) 0 0 / 24px 24px;
+      -webkit-mask-image: radial-gradient(closest-side, #000 45%, transparent 100%);
+      mask-image: radial-gradient(closest-side, #000 45%, transparent 100%); }
+
+    /* World: the camera push after the stamp. GSAP tweens only --s3-push (0..1); the geometry per canvas is below. */
+    #s3-sort-world { position: absolute; inset: 0; --s3-push: 0;
+      --cx: 1320px; --cy: 540px; --push-x: -220px; --push-y: 0px; --push-s: 0.22;
+      transform-origin: var(--cx) var(--cy);
+      transform: translate(calc(var(--s3-push) * var(--push-x)), calc(var(--s3-push) * var(--push-y))) scale(calc(1 + var(--s3-push) * var(--push-s))); }
+
+    /* Rig: a 900 px box centred on the photo. --s3-u (0..1) moves the portrait photo from the hand-off slot to its own slot. */
+    #s3-sort-rig { position: absolute; left: calc(var(--cx) - 450px); top: calc(var(--cy) - 450px); width: 900px; height: 900px;
+      --s3-u: 0; --pre-dy: 0px; --rig-s: 1;
+      transform: translateY(calc((1 - var(--s3-u)) * var(--pre-dy))) scale(var(--rig-s)); }
+    #s3-sort-card { position: absolute; inset: 0; transform-origin: 50% 50%; }
+    #s3-sort-shadow { position: absolute; left: 105px; top: 105px; width: 690px; height: 690px; border-radius: 50%;
+      box-shadow: 0 34px 70px -18px rgba(0, 0, 0, 0.3), 0 10px 22px -6px rgba(0, 0, 0, 0.16); }
+    #s3-sort-ring, #s3-sort-fx, #s3-sort-stamp { position: absolute; left: 0; top: 0; width: 900px; height: 900px; overflow: visible; }
+    #s3-sort-ring path { fill: none; stroke-dasharray: 1 2; stroke-dashoffset: 1; }
+    #s3-sort-track path { stroke: rgba(0, 0, 0, 0.08); stroke-width: 12px; }
+    #s3-sort-glow path { stroke: var(--c-accent); stroke-width: 18px; opacity: 0; }
+    #s3-sort-lit path { stroke: var(--c-accent); stroke-width: 12px; }
+    /* Official cut (1409 px, circle centre 703.8/704.1, radius 683.8) scaled so the photo circle is 700 px wide at the box centre. */
+    #s3-sort-photo { position: absolute; left: 89.76px; top: 89.61px; width: 721.19px; height: 721.19px; display: block; }
+    #s3-sort-stamp { opacity: 0; transform-origin: 50% 50%; }
+    #s3-sort-stamp circle { fill: none; stroke: var(--c-accent); stroke-width: 9px; }
+    #s3-sort-fx circle { fill: none; stroke: var(--c-accent); opacity: 0; }
+
+    /* Chips: text only, no icons. Landscape: outside each segment, the corner nearest the photo on a 404 px circle. */
+    #s3-sort-chips-ring { position: absolute; inset: 0; }
+    .s3-sort-chip { position: absolute; display: inline-flex; align-items: center; justify-content: center; height: 1.8em; padding: 0 0.8em;
+      border-radius: 999px; background: var(--c-white); color: var(--c-ink); font: 600 28px/1 var(--font-text); white-space: nowrap; opacity: 0;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.05), 0 12px 28px -6px rgba(0, 0, 0, 0.14); }
+    #s3-sort-chips-grid { position: absolute; left: 0; right: 0; top: 1372px; display: none; grid-template-columns: repeat(4, auto);
+      justify-content: center; gap: 16px; }
+    #s3-sort-chips-grid .s3-sort-chip { position: relative; font-size: 42px; padding: 0 0.7em; }
+
+    /* Title block: eyebrow, title (period in Active Red), subtitle. */
+    #s3-sort-block { position: absolute; left: 144px; top: 330px; display: flex; flex-direction: column; align-items: flex-start; color: var(--c-ink); }
+    #s3-sort-eyebrow { display: inline-flex; align-items: center; gap: 0.45em; margin: 0 0 12px; font: 600 30px/1 var(--font-text);
+      letter-spacing: 0.08em; color: var(--c-accent); white-space: nowrap; }
+    #s3-sort-eyebrow-dot { display: inline-block; flex: none; width: 0.36em; height: 0.36em; border-radius: 50%; background: var(--c-accent); }
+    .s3-sort-mask { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.14em 0.02em; margin: -0.14em -0.02em; }
+    .s3-sort-rise { display: inline-block; }
+    #s3-sort-title { margin: 0; font: 700 128px/1.08 var(--font-text); letter-spacing: -0.02em; white-space: nowrap; }
+    #s3-sort-title .s3-sort-dot { color: var(--c-accent); }
+    #s3-sort-sub { margin: 40px 0 0; font: 400 34px/1.35 var(--font-text); color: var(--c-ink-sub); white-space: nowrap; }
+    #s3-sort-sub-text { display: inline-block; }
+    /* Condition note, visible through the whole reading spot (30.5~35 s). */
+    #s3-sort-note { position: absolute; left: 144px; top: 650px; width: 620px; margin: 0; font: 400 28px/1.45 var(--font-text);
+      color: var(--c-ink-sub); word-break: keep-all; }
+    #s3-sort-note-text { display: inline-block; }
+
+    /* Hand-off to s4: a #0A0A0A disc grows from the pushed photo centre (landscape 1100,540 / portrait 540,960). */
+    #s3-sort-cover { position: absolute; left: -250px; top: -810px; width: 2700px; height: 2700px; border-radius: 50%;
+      background: var(--c-dark); opacity: 0; transform-origin: 50% 50%; }
+    #s3-sort-cover-full { position: absolute; inset: 0; background: var(--c-dark); opacity: 0; }
+
+    @container (aspect-ratio < 1) {
+      #s3-sort-light { background: radial-gradient(ellipse 560px 760px at 540px 900px, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 72%); }
+      #s3-sort-world { --cx: 540px; --cy: 916px; --push-x: 0px; --push-y: 44px; --push-s: 0.1; }
+      /* Hand-off slot is centre 540,960 at 720 px; the photo settles 44 px higher so the chip grid and note fit below. */
+      #s3-sort-rig { --pre-dy: 44px; --rig-s: 1.0285714; }
+      #s3-sort-block { left: 72px; top: 170px; }
+      #s3-sort-eyebrow { font-size: 42px; }
+      #s3-sort-title { font-size: 150px; }
+      #s3-sort-sub { margin-top: 28px; font-size: 48px; }
+      #s3-sort-chips-ring { display: none; }
+      #s3-sort-chips-grid { display: grid; }
+      #s3-sort-note { left: 200px; top: 1580px; width: 680px; font-size: 36px; text-align: center; text-wrap: balance; }
+      #s3-sort-cover { left: -810px; top: -390px; }
+    }
+  </style>
+  <div id="root" data-composition-id="s3-sort" data-width="1920" data-height="1080">
+    <div id="s3-sort-scene" class="clip" data-start="0" data-duration="23">
+      <div id="s3-sort-bg"></div>
+      <div id="s3-sort-light"></div>
+      <div id="s3-sort-grid"></div>
+      <div id="s3-sort-world">
+        <div id="s3-sort-block">
+          <p id="s3-sort-eyebrow"><span id="s3-sort-eyebrow-dot"></span><span class="s3-sort-mask" data-layout-allow-overflow><span id="s3-sort-eyebrow-text" class="s3-sort-rise">공기가 달라졌다면</span></span></p>
+          <h2 id="s3-sort-title"><span class="s3-sort-mask" data-layout-allow-overflow><span class="s3-sort-rise">구</span></span><span class="s3-sort-mask" data-layout-allow-overflow><span class="s3-sort-rise">분</span></span><span class="s3-sort-mask" data-layout-allow-overflow><span class="s3-sort-rise s3-sort-dot">.</span></span></h2>
+          <p id="s3-sort-sub"><span id="s3-sort-sub-text">무엇이 달라졌는지 나눠서 보여 줘요.</span></p>
+        </div>
+        <p id="s3-sort-note"><span id="s3-sort-note-text">8종 감지 항목은 필터가 제거하는 물질 목록과 다릅니다.</span></p>
+        <div id="s3-sort-rig">
+          <div id="s3-sort-card">
+            <div id="s3-sort-shadow"></div>
+            <svg id="s3-sort-ring" width="900" height="900" viewBox="0 0 900 900" aria-hidden="true">
+              <defs>
+                <filter id="s3-sort-glow-blur" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7" /></filter>
+              </defs>
+              <g id="s3-sort-track">
+                <path d="M 463.40 66.23 A 384 384 0 0 1 711.89 169.16" pathLength="1" />
+                <path d="M 730.84 188.11 A 384 384 0 0 1 833.77 436.60" pathLength="1" />
+                <path d="M 833.77 463.40 A 384 384 0 0 1 730.84 711.89" pathLength="1" />
+                <path d="M 711.89 730.84 A 384 384 0 0 1 463.40 833.77" pathLength="1" />
+                <path d="M 436.60 833.77 A 384 384 0 0 1 188.11 730.84" pathLength="1" />
+                <path d="M 169.16 711.89 A 384 384 0 0 1 66.23 463.40" pathLength="1" />
+                <path d="M 66.23 436.60 A 384 384 0 0 1 169.16 188.11" pathLength="1" />
+                <path d="M 188.11 169.16 A 384 384 0 0 1 436.60 66.23" pathLength="1" />
+              </g>
+              <g id="s3-sort-glow" filter="url(#s3-sort-glow-blur)">
+                <path d="M 463.40 66.23 A 384 384 0 0 1 711.89 169.16" pathLength="1" />
+                <path d="M 730.84 188.11 A 384 384 0 0 1 833.77 436.60" pathLength="1" />
+                <path d="M 833.77 463.40 A 384 384 0 0 1 730.84 711.89" pathLength="1" />
+                <path d="M 711.89 730.84 A 384 384 0 0 1 463.40 833.77" pathLength="1" />
+                <path d="M 436.60 833.77 A 384 384 0 0 1 188.11 730.84" pathLength="1" />
+                <path d="M 169.16 711.89 A 384 384 0 0 1 66.23 463.40" pathLength="1" />
+                <path d="M 66.23 436.60 A 384 384 0 0 1 169.16 188.11" pathLength="1" />
+                <path d="M 188.11 169.16 A 384 384 0 0 1 436.60 66.23" pathLength="1" />
+              </g>
+              <g id="s3-sort-lit">
+                <path d="M 463.40 66.23 A 384 384 0 0 1 711.89 169.16" pathLength="1" />
+                <path d="M 730.84 188.11 A 384 384 0 0 1 833.77 436.60" pathLength="1" />
+                <path d="M 833.77 463.40 A 384 384 0 0 1 730.84 711.89" pathLength="1" />
+                <path d="M 711.89 730.84 A 384 384 0 0 1 463.40 833.77" pathLength="1" />
+                <path d="M 436.60 833.77 A 384 384 0 0 1 188.11 730.84" pathLength="1" />
+                <path d="M 169.16 711.89 A 384 384 0 0 1 66.23 463.40" pathLength="1" />
+                <path d="M 66.23 436.60 A 384 384 0 0 1 169.16 188.11" pathLength="1" />
+                <path d="M 188.11 169.16 A 384 384 0 0 1 436.60 66.23" pathLength="1" />
+              </g>
+            </svg>
+            <img id="s3-sort-photo" src="assets/img/cut-display.png" alt="" />
+            <svg id="s3-sort-stamp" width="900" height="900" viewBox="0 0 900 900" aria-hidden="true"><circle cx="450" cy="450" r="364" /></svg>
+            <svg id="s3-sort-fx" width="900" height="900" viewBox="0 0 900 900" aria-hidden="true">
+              <circle id="s3-sort-wave-a" cx="450" cy="450" r="368" stroke-width="8" />
+              <circle id="s3-sort-wave-b" cx="450" cy="450" r="368" stroke-width="5" />
+            </svg>
+          </div>
+          <div id="s3-sort-chips-ring">
+            <div id="s3-sort-ring-0" class="s3-sort-chip" style="left: 604.6px; bottom: 823.25px; transform-origin: 0% 100%">PM1.0</div>
+            <div id="s3-sort-ring-1" class="s3-sort-chip" style="left: 823.25px; bottom: 604.6px; transform-origin: 0% 100%">PM2.5</div>
+            <div id="s3-sort-ring-2" class="s3-sort-chip" style="left: 823.25px; top: 604.6px; transform-origin: 0% 0%">PM10</div>
+            <div id="s3-sort-ring-3" class="s3-sort-chip" style="left: 604.6px; top: 823.25px; transform-origin: 0% 0%">유증기</div>
+            <div id="s3-sort-ring-4" class="s3-sort-chip" style="right: 604.6px; top: 823.25px; transform-origin: 100% 0%">냄새</div>
+            <div id="s3-sort-ring-5" class="s3-sort-chip" style="right: 823.25px; top: 604.6px; transform-origin: 100% 0%">TVOC</div>
+            <div id="s3-sort-ring-6" class="s3-sort-chip" style="right: 823.25px; bottom: 604.6px; transform-origin: 100% 100%">포름알데히드</div>
+            <div id="s3-sort-ring-7" class="s3-sort-chip" style="right: 604.6px; bottom: 823.25px; transform-origin: 100% 100%">암모니아</div>
+          </div>
+        </div>
+        <div id="s3-sort-chips-grid">
+          <div id="s3-sort-grid-0" class="s3-sort-chip">PM1.0</div>
+          <div id="s3-sort-grid-1" class="s3-sort-chip">PM2.5</div>
+          <div id="s3-sort-grid-2" class="s3-sort-chip">PM10</div>
+          <div id="s3-sort-grid-3" class="s3-sort-chip">유증기</div>
+          <div id="s3-sort-grid-4" class="s3-sort-chip">냄새</div>
+          <div id="s3-sort-grid-5" class="s3-sort-chip">TVOC</div>
+          <div id="s3-sort-grid-6" class="s3-sort-chip">포름알데히드</div>
+          <div id="s3-sort-grid-7" class="s3-sort-chip">암모니아</div>
+        </div>
+      </div>
+      <div id="s3-sort-cover" data-layout-allow-overflow></div>
+      <div id="s3-sort-cover-full"></div>
+    </div>
+  </div>
+  <script>
+    // Scene time = timeline time - 15. Tweens sit at absolute seconds; a later tween on a property already tweened
+    // starts from the previous end value with immediateRender: false, so seeking either way gives the same frame.
+    const tl = gsap.timeline({ paused: true });
+
+    // 0~5 s: first state under s2's letter holes. Photo only, 1.15x and rotateY 14deg; no title, ring or chips.
+    // 5~7.5 s: the photo unfolds to flat (portrait: also rises to its slot), the title block rises, the ring track draws in.
+    tl.fromTo("#s3-sort-card", { scale: 1.15, rotationY: 14, transformPerspective: 1800 }, { scale: 1, rotationY: 0, transformPerspective: 1800, duration: 0.9, ease: "power3.out" }, 5.0);
+    tl.fromTo("#s3-sort-rig", { "--s3-u": 0 }, { "--s3-u": 1, duration: 0.9, ease: "power3.out" }, 5.0);
+    tl.fromTo("#s3-sort-eyebrow-dot", { scale: 0 }, { scale: 1, duration: 0.45, ease: "back.out(3)" }, 5.25);
+    tl.fromTo("#s3-sort-eyebrow-text", { yPercent: 120 }, { yPercent: 0, duration: 0.55, ease: "power4.out" }, 5.3);
+    tl.fromTo("#s3-sort-title .s3-sort-rise", { yPercent: 115 }, { yPercent: 0, duration: 0.6, ease: "power4.out", stagger: 0.07 }, 5.45);
+    tl.fromTo("#s3-sort-sub-text", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 6.0);
+    tl.fromTo("#s3-sort-track path", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.45, ease: "power2.out", stagger: 0.06 }, 5.6);
+
+    // 7.5~15.5 s: one segment per second turns Active Red from 12 o'clock clockwise, and its chip springs out.
+    // One staggered tween per property (1 s apart in document order) keeps every element's tweens of one property apart.
+    const glow = gsap.utils.toArray("#s3-sort-glow path");
+    const dir = [[0.383, -0.924], [0.924, -0.383], [0.924, 0.383], [0.383, 0.924], [-0.383, 0.924], [-0.924, 0.383], [-0.924, -0.383], [-0.383, -0.924]];
+    const seg = 7.5;
+    tl.fromTo("#s3-sort-lit path", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.3, ease: "power2.out", stagger: 1 }, seg);
+    tl.fromTo("#s3-sort-lit path", { strokeWidth: 12 }, { strokeWidth: 17, duration: 0.06, ease: "none", stagger: 1 }, seg);
+    tl.fromTo("#s3-sort-lit path", { strokeWidth: 17 }, { strokeWidth: 12, duration: 0.35, ease: "power2.out", stagger: 1, immediateRender: false }, seg + 0.06);
+    tl.fromTo("#s3-sort-glow path", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.3, ease: "power2.out", stagger: 1 }, seg);
+    tl.fromTo("#s3-sort-glow path", { opacity: 0 }, { opacity: 0.85, duration: 0.08, ease: "none", stagger: 1 }, seg);
+    tl.fromTo("#s3-sort-glow path", { opacity: 0.85 }, { opacity: 0.25, duration: 0.5, ease: "power2.out", stagger: 1, immediateRender: false }, seg + 0.08);
+    tl.fromTo("#s3-sort-chips-ring .s3-sort-chip", { opacity: 0 }, { opacity: 1, duration: 0.1, ease: "none", stagger: 1 }, seg + 0.05);
+    tl.fromTo("#s3-sort-chips-ring .s3-sort-chip", { scale: 0.6, x: (i) => -dir[i][0] * 18, y: (i) => -dir[i][1] * 18 },
+      { scale: 1, x: 0, y: 0, duration: 0.55, ease: "back.out(2.2)", stagger: 1 }, seg + 0.05);
+    tl.fromTo("#s3-sort-chips-grid .s3-sort-chip", { opacity: 0 }, { opacity: 1, duration: 0.1, ease: "none", stagger: 1 }, seg + 0.05);
+    tl.fromTo("#s3-sort-chips-grid .s3-sort-chip", { scale: 0.6, y: 14 }, { scale: 1, y: 0, duration: 0.55, ease: "back.out(2.2)", stagger: 1 }, seg + 0.05);
+    // The condition note is in place before the reading spot (15.5~20 s) and stays still through it.
+    tl.fromTo("#s3-sort-note-text", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 14.85);
+
+    // 20~21.5 s: the stamp ring falls and lands, two waves spread, the photo and ring push toward the centre and grow,
+    // title, note and chips fade (blur only while they move).
+    const hit = 20.3;
+    tl.fromTo("#s3-sort-stamp", { opacity: 0 }, { opacity: 1, duration: 0.06, ease: "none" }, 20.0);
+    tl.fromTo("#s3-sort-stamp", { scale: 1.4, rotationX: 24, transformPerspective: 1600, filter: "blur(4px)" }, { scale: 1, rotationX: 0, transformPerspective: 1600, filter: "blur(0px)", duration: hit - 20.0, ease: "power3.in" }, 20.0);
+    tl.fromTo("#s3-sort-card", { scale: 1 }, { scale: 0.975, duration: 0.07, ease: "power2.out", immediateRender: false }, hit);
+    tl.fromTo("#s3-sort-card", { scale: 0.975 }, { scale: 1, duration: 0.45, ease: "back.out(3)", immediateRender: false }, hit + 0.07);
+    tl.fromTo("#s3-sort-wave-a", { attr: { r: 368, "stroke-width": 8 } }, { attr: { r: 600, "stroke-width": 1 }, duration: 0.7, ease: "expo.out" }, hit);
+    tl.fromTo("#s3-sort-wave-a", { opacity: 0 }, { opacity: 0.8, duration: 0.02, ease: "none" }, hit);
+    tl.fromTo("#s3-sort-wave-a", { opacity: 0.8 }, { opacity: 0, duration: 0.68, ease: "none", immediateRender: false }, hit + 0.02);
+    tl.fromTo("#s3-sort-wave-b", { attr: { r: 368, "stroke-width": 5 } }, { attr: { r: 710, "stroke-width": 1 }, duration: 0.85, ease: "expo.out" }, hit + 0.11);
+    tl.fromTo("#s3-sort-wave-b", { opacity: 0 }, { opacity: 0.55, duration: 0.02, ease: "none" }, hit + 0.11);
+    tl.fromTo("#s3-sort-wave-b", { opacity: 0.55 }, { opacity: 0, duration: 0.83, ease: "none", immediateRender: false }, hit + 0.13);
+    tl.fromTo(glow, { opacity: 0.25 }, { opacity: 0.75, duration: 0.06, ease: "none", immediateRender: false }, hit);
+    tl.fromTo(glow, { opacity: 0.75 }, { opacity: 0.3, duration: 0.8, ease: "power2.out", immediateRender: false }, hit + 0.06);
+    tl.fromTo("#s3-sort-world", { "--s3-push": 0 }, { "--s3-push": 1, duration: 1.1, ease: "power3.out" }, hit);
+    tl.fromTo(["#s3-sort-block", "#s3-sort-note", "#s3-sort-chips-ring", "#s3-sort-chips-grid"], { opacity: 1, filter: "blur(0px)" }, { opacity: 0.1, filter: "blur(8px)", duration: 0.7, ease: "power2.out" }, hit);
+
+    // 21.5~23 s: a #0A0A0A disc grows from the photo centre and covers the whole frame just before 23 s (38 s).
+    tl.fromTo("#s3-sort-cover", { opacity: 0 }, { opacity: 1, duration: 0.08, ease: "none" }, 21.5);
+    tl.fromTo("#s3-sort-cover", { scale: 0.2222 }, { scale: 1, duration: 1.35, ease: "power2.in" }, 21.5);
+    tl.fromTo("#s3-sort-cover-full", { opacity: 0 }, { opacity: 1, duration: 0.03, ease: "none" }, 22.86);
+
+    window.__timelines["s3-sort"] = tl;
+  </script>
+</template>

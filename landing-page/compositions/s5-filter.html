@@ -1,0 +1,131 @@
+<template>
+  <style>
+    /* Scene 5, M5 filter (host 55-68 s, times below are scene time = host time - 55).
+       0-3: the empty glass card left by s4 (centre 1380,540, 426x259, radius 24) grows to 852x518 (radius 32) and the official filter photo appears inside.
+       1.5-3.8: eyebrow, two title lines, body, note rise. 4-10: reading spot, nothing moves.
+       10-12.9: text leaves (10-10.8), the card shrinks toward the body slot of s6 (960,640, about 300x180) over 10-12.6 and fades over 12-12.9,
+       the ground turns Warm Grey (flat by 12.7). */
+    #root { position: absolute; inset: 0; overflow: hidden; container-type: size; font-family: var(--font-text); }
+    #s5-filter-bg { position: absolute; inset: 0; background: var(--c-dark); }
+    /* Flat Warm Grey layer; its fade (65.9-67.7, sine) matches the shell's band blend in landing/ui.js so the canvas edge and the bands stay one colour. */
+    #s5-filter-warm { position: absolute; inset: 0; background: var(--c-warm-grey); opacity: 0; }
+
+    /* Card: laid out at its final size; the entry is a scale (0.5 -> 1) so the same tween fits both canvases.
+       The exit move and size come from CSS variables per canvas and one unitless progress (--s5-filter-exit). */
+    #s5-filter-card { position: absolute; left: 954px; top: 281px; width: 852px; height: 518px; }
+    /* GSAP tweens only the variable on the outer wrapper: it resets translate/scale on any element it tweens, so the CSS move sits on the child. */
+    #s5-filter-exit { position: absolute; inset: 0; --s5-filter-exit: 0; }
+    #s5-filter-mover { position: absolute; inset: 0; --s5-filter-dx: -420px; --s5-filter-dy: 100px; --s5-filter-end: 0.35;
+      translate: calc(var(--s5-filter-exit) * var(--s5-filter-dx)) calc(var(--s5-filter-exit) * var(--s5-filter-dy));
+      scale: calc(1 - var(--s5-filter-exit) * (1 - var(--s5-filter-end))); }
+    #s5-filter-glass { position: absolute; inset: 0; box-sizing: border-box; overflow: hidden; border-radius: 32px;
+      background: rgba(31, 29, 28, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); }
+    #s5-filter-photo { position: absolute; inset: 0; opacity: 0; }
+    #s5-filter-photo-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* Text block, left column (x 144). */
+    .s5-filter-mask { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.14em 0; margin: -0.14em 0; }
+    .s5-filter-ch { display: inline-block; }
+    #s5-filter-eyebrow { position: absolute; left: var(--x-title); top: 318px; margin: 0; white-space: nowrap;
+      font: 600 var(--fs-eyebrow)/1 var(--font-text); letter-spacing: 0.08em; color: var(--c-accent); }
+    #s5-filter-eyebrow-in { display: inline-flex; align-items: center; gap: 0.45em; }
+    #s5-filter-eyebrow-dot { display: inline-block; flex: none; width: 0.36em; height: 0.36em; border-radius: 50%; background: var(--c-accent); }
+    #s5-filter-title { position: absolute; left: var(--x-title); top: 368px; margin: 0; color: var(--c-white);
+      font: 700 75px/1.16 var(--font-text); letter-spacing: -0.02em; white-space: nowrap; }
+    .s5-filter-line { display: block; }
+    .s5-filter-period { color: var(--c-accent); }
+    #s5-filter-body { position: absolute; left: var(--x-title); top: 578px; margin: 0; white-space: nowrap;
+      font: 400 var(--fs-sub)/1.35 var(--font-text); color: var(--c-paper-sub); }
+    #s5-filter-body-in { display: inline-block; }
+    /* Width breaks the note after the three gases (keep-all). */
+    #s5-filter-note { position: absolute; left: var(--x-title); top: 712px; width: 540px; margin: 0;
+      font: 400 22px/1.45 var(--font-text); color: #8A8580; word-break: keep-all; }
+    #s5-filter-note-in { display: inline-block; }
+    .s5-filter-nobr { white-space: nowrap; }
+
+    /* Portrait canvas (1080x1920): text on top, card in the middle, note under the card, the shell's link at 540,1560.
+       Text starts at x 72, not 60, because the shell's cover fit crops up to 3% off each side of the canvas. */
+    @container (aspect-ratio < 1) {
+      #s5-filter-card { left: 44px; top: 699px; width: 992px; height: 602px; }
+      #s5-filter-mover { --s5-filter-dx: 0px; --s5-filter-dy: 150px; --s5-filter-end: 0.3; }
+      #s5-filter-eyebrow { left: 72px; top: 236px; font-size: 42px; }
+      #s5-filter-title { left: 72px; top: 296px; font-size: 84px; }
+      #s5-filter-body { left: 72px; top: 528px; font-size: 48px; }
+      #s5-filter-note { left: 72px; top: 1352px; width: 860px; font-size: 36px; }
+    }
+  </style>
+  <div id="root" data-composition-id="s5-filter" data-width="1920" data-height="1080">
+    <div id="s5-filter-bg"></div>
+    <div id="s5-filter-warm"></div>
+    <div id="s5-filter-card" class="clip" data-start="0" data-duration="12.95">
+      <div id="s5-filter-exit"><div id="s5-filter-mover">
+        <div id="s5-filter-glass">
+          <div id="s5-filter-photo"><img id="s5-filter-photo-img" src="assets/img/filter.jpg" alt="" /></div>
+        </div>
+      </div></div>
+    </div>
+    <p id="s5-filter-eyebrow" class="clip" data-start="1.4" data-duration="9.4"><span id="s5-filter-eyebrow-in"><span id="s5-filter-eyebrow-dot"></span><span class="s5-filter-mask"><span class="s5-filter-split" id="s5-filter-eyebrow-text">강력탈취청정 M5 필터</span></span></span></p>
+    <h2 id="s5-filter-title" class="clip" data-start="1.6" data-duration="9.3"><span class="s5-filter-line"><span class="s5-filter-mask"><span class="s5-filter-split" id="s5-filter-title-l1">유해 가스와 냄새를</span></span></span><span class="s5-filter-line"><span class="s5-filter-mask"><span class="s5-filter-split" id="s5-filter-title-l2">M5 필터가 관리해요.</span></span></span></h2>
+    <p id="s5-filter-body" class="clip" data-start="2.4" data-duration="8.6"><span id="s5-filter-body-in">MOF 소재를 쓴 필터예요.</span></p>
+    <p id="s5-filter-note" class="clip" data-start="2.9" data-duration="8.2"><span id="s5-filter-note-in"><span class="s5-filter-nobr">AS206N</span> 계열의 CA 인증은 암모니아, 톨루엔, 포름알데히드의 유해가스 정화 성능을 평가합니다.</span></p>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+
+    // Split the eyebrow and title lines into letters (spaces stay text nodes); the final period of the title is Active Red.
+    (function () {
+      ["s5-filter-eyebrow-text", "s5-filter-title-l1", "s5-filter-title-l2"].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el || el.getAttribute("data-split") === "1") return;
+        var text = el.textContent;
+        el.textContent = "";
+        Array.from(text).forEach(function (ch, i, all) {
+          if (ch === " ") { el.appendChild(document.createTextNode(" ")); return; }
+          var s = document.createElement("span");
+          s.className = "s5-filter-ch" + (id === "s5-filter-title-l2" && ch === "." && i === all.length - 1 ? " s5-filter-period" : "");
+          s.textContent = ch;
+          el.appendChild(s);
+        });
+        el.setAttribute("data-split", "1");
+      });
+    })();
+
+    // 2D transforms only, so a frame reached by scrolling back rasterizes exactly like the same frame reached forward.
+    const tl = gsap.timeline({ paused: true, defaults: { force3D: false } });
+    const OUT = { immediateRender: false };
+    tl.set(["#s5-filter-eyebrow-in", "#s5-filter-title .s5-filter-mask"], { y: 0 }, 0);
+
+    // 0-3 s (55-58): the glass card grows from s4's hand-off size; rendered radius 24 -> 32 and a 1 px edge at both ends.
+    tl.fromTo("#s5-filter-glass", { scale: 0.5, borderRadius: "48px", borderWidth: "2px" },
+      { scale: 1, borderRadius: "32px", borderWidth: "1px", duration: 3, ease: "power2.inOut" }, 0);
+    // The official filter photo appears inside the card (1.04 -> 1.0).
+    tl.fromTo("#s5-filter-photo", { opacity: 0 }, { opacity: 1, duration: 1.4, ease: "power1.out" }, 0.45);
+    tl.fromTo("#s5-filter-photo-img", { scale: 1.04 }, { scale: 1, duration: 2.55, ease: "power2.out" }, 0.45);
+
+    // 1.5-3.8 s (56.5-58.8): eyebrow, title lines and body rise in order; the note settles before the reading spot.
+    tl.fromTo("#s5-filter-eyebrow-dot", { scale: 0 }, { scale: 1, duration: 0.32, ease: "back.out(2.4)" }, 1.5);
+    tl.fromTo("#s5-filter-eyebrow-text .s5-filter-ch", { yPercent: 115 }, { yPercent: 0, duration: 0.45, ease: "power3.out", stagger: 0.025 }, 1.55);
+    tl.fromTo("#s5-filter-title-l1 .s5-filter-ch", { yPercent: 115 }, { yPercent: 0, duration: 0.55, ease: "power3.out", stagger: 0.035 }, 1.75);
+    tl.fromTo("#s5-filter-title-l2 .s5-filter-ch", { yPercent: 115 }, { yPercent: 0, duration: 0.55, ease: "power3.out", stagger: 0.035 }, 2.05);
+    tl.fromTo("#s5-filter-body-in", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 2.55);
+    tl.fromTo("#s5-filter-note-in", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, 3.05);
+
+    // 4-10 s (59-65): reading spot. Nothing is tweened here.
+
+    // 10-10.8 s (65-65.8): text leaves (clip opacity, drift up on the inner masks and spans).
+    [["#s5-filter-eyebrow", "#s5-filter-eyebrow-in", 10.0], ["#s5-filter-title", "#s5-filter-title .s5-filter-mask", 10.06],
+     ["#s5-filter-body", "#s5-filter-body-in", 10.12], ["#s5-filter-note", "#s5-filter-note-in", 10.18]].forEach(function (d) {
+      tl.fromTo(d[0], { opacity: 1 }, Object.assign({ opacity: 0, duration: 0.5, ease: "power1.in" }, OUT), d[2]);
+      tl.fromTo(d[1], { y: 0 }, Object.assign({ y: -24, duration: 0.6, ease: "power2.in" }, OUT), d[2]);
+    });
+    // 10-12.6 s (65-67.6): the card's centre and size go to the s6 body slot (position only, no filter effect); 12-12.9 s (67-67.9): it fades out.
+    tl.fromTo("#s5-filter-exit", { "--s5-filter-exit": 0 }, Object.assign({ "--s5-filter-exit": 1, duration: 2.6, ease: "power2.inOut" }, OUT), 10.0);
+    tl.fromTo("#s5-filter-card", { opacity: 1 }, Object.assign({ opacity: 0, duration: 0.9, ease: "power1.inOut" }, OUT), 12.0);
+    // 10.9-12.7 s: the ground turns from #0A0A0A to flat Warm Grey (s6's first frame).
+    tl.fromTo("#s5-filter-warm", { opacity: 0 }, Object.assign({ opacity: 1, duration: 1.8, ease: "sine.inOut" }, OUT), 10.9);
+    // Keep the timeline as long as the host slot (13 s).
+    tl.set("#s5-filter-bg", { opacity: 1 }, 13);
+
+    window.__timelines["s5-filter"] = tl;
+  </script>
+</template>

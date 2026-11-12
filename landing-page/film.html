@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>LG 퓨리케어 공기청정기 | 랜딩 모션 구성</title>
+    <script src="lib/gsap.min.js"></script>
+    <link rel="stylesheet" href="tokens.css" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--c-dark); }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: var(--font-text); }
+      #root > .clip { position: absolute; inset: 0; width: 100%; height: 100%; }
+    </style>
+  </head>
+  <body>
+    <!-- Root composition: scene hosts only. 100 s = 100 % scroll (landing/scroll-driver.js). s2 sits above s3 while s2's title turns into a window (15~20 s). -->
+    <div id="root" data-composition-id="main" data-start="0" data-duration="100" data-width="1920" data-height="1080">
+      <div id="s1-hook" class="clip" data-composition-id="s1-hook" data-composition-src="compositions/s1-hook.html" data-start="0" data-duration="8" data-width="1920" data-height="1080" data-track-index="1" data-track-kind="graphics" style="z-index: 1"></div>
+      <div id="s2-detect" class="clip" data-composition-id="s2-detect" data-composition-src="compositions/s2-detect.html" data-start="8" data-duration="12" data-width="1920" data-height="1080" data-track-index="3" data-track-kind="graphics" style="z-index: 3"></div>
+      <div id="s3-sort" class="clip" data-composition-id="s3-sort" data-composition-src="compositions/s3-sort.html" data-start="15" data-duration="23" data-width="1920" data-height="1080" data-track-index="2" data-track-kind="graphics" style="z-index: 2"></div>
+      <div id="s4-confirm" class="clip" data-composition-id="s4-confirm" data-composition-src="compositions/s4-confirm.html" data-start="38" data-duration="17" data-width="1920" data-height="1080" data-track-index="2" data-track-kind="graphics" style="z-index: 2"></div>
+      <div id="s5-filter" class="clip" data-composition-id="s5-filter" data-composition-src="compositions/s5-filter.html" data-start="55" data-duration="13" data-width="1920" data-height="1080" data-track-index="2" data-track-kind="graphics" style="z-index: 2"></div>
+      <div id="s6-size" class="clip" data-composition-id="s6-size" data-composition-src="compositions/s6-size.html" data-start="68" data-duration="16" data-width="1920" data-height="1080" data-track-index="2" data-track-kind="graphics" style="z-index: 2"></div>
+      <div id="s7-cta" class="clip" data-composition-id="s7-cta" data-composition-src="compositions/s7-cta.html" data-start="84" data-duration="16" data-width="1920" data-height="1080" data-track-index="2" data-track-kind="graphics" style="z-index: 2"></div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

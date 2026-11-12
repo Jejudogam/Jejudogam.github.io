@@ -1,0 +1,227 @@
+<template>
+  <style>
+    /* Scene 6, body size and the room (host 68-84 s; times below are scene time = host time - 68).
+       0-2: closed body rises (landscape centre 960, bottom 936, height 800), eyebrow and title rise.
+       2-6: height line (bottom -> top) and width line (widest body row, under the body) draw linearly; 612mm and 347mm drop in place.
+       6-9: reading spot 1. 9-11.5: text and the width line leave, the height line curls into an Active Red ring (to the right, clear of the body),
+       the ring opens as a window onto the room photo and spreads over the canvas while the body cut shrinks onto the product in the photo and fades.
+       11.5-14.5: reading spot 2 (title and condition note together). 14.5-15.85: a white circle grows from the product head in the photo; white by 15.85.
+       Body geometry is drawn in cut-out pixels (cut-front-closed.png 470x864, product left 18, top 17, right 452, bottom 844, widest row 731).
+       Canvas values per orientation: landscape k = 800/827, portrait k = 950/827. */
+    #root { position: absolute; inset: 0; overflow: hidden; container-type: size; font-family: var(--font-text); }
+    /* Window and ring geometry: k (canvas px per cut-out px) and the ring centre. Set on the users, not on #root (a container query cannot restyle its own container). */
+    #s6-size-win, #s6-size-ring-shape { --s6-size-k: 0.967352; --s6-size-cx: 1269.55px; --s6-size-cy: 136px; }
+    #s6-size-bg { position: absolute; inset: 0; background: var(--c-warm-grey); }
+
+    /* Room window: clip circle centred on the ring, radius in cut-out px times k. */
+    #s6-size-room { position: absolute; inset: 0; }
+    #s6-size-win { position: absolute; inset: 0; overflow: hidden; --s6-size-win: 60;
+      clip-path: circle(calc(var(--s6-size-win) * var(--s6-size-k) * 1px) at var(--s6-size-cx) var(--s6-size-cy)); }
+    #s6-size-room-img { position: absolute; left: 0; top: -538px; width: 1920px; height: 1920px; display: block; }
+
+    /* Closed body: stage box = the whole cut-out image, scaled by k. */
+    #s6-size-stage { position: absolute; left: 732.672px; top: 119.555px; width: 454.655px; height: 835.792px; }
+    #s6-size-move { position: absolute; inset: 0; transform-origin: 50% 97.685%; --s6-size-mv: 0;
+      --s6-size-dx: 47px; --s6-size-dy: 73px; --s6-size-end: 0.8098;
+      translate: calc(var(--s6-size-mv) * var(--s6-size-dx)) calc(var(--s6-size-mv) * var(--s6-size-dy));
+      scale: calc(1 - var(--s6-size-mv) * (1 - var(--s6-size-end))); }
+    #s6-size-rise { position: absolute; inset: 0; transform-origin: 50% 97.685%; }
+    #s6-size-body { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    #s6-size-svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
+
+    /* HTML ring that takes over from the curled SVG line, same centre, radius and width. */
+    #s6-size-ring { position: absolute; inset: 0; }
+    #s6-size-ring-shape { position: absolute; box-sizing: border-box; border-radius: 50%; --s6-size-win: 60; --s6-size-ringw: 14;
+      left: calc(var(--s6-size-cx) - (var(--s6-size-win) + var(--s6-size-ringw) / 2) * var(--s6-size-k) * 1px);
+      top: calc(var(--s6-size-cy) - (var(--s6-size-win) + var(--s6-size-ringw) / 2) * var(--s6-size-k) * 1px);
+      width: calc((var(--s6-size-win) * 2 + var(--s6-size-ringw)) * var(--s6-size-k) * 1px);
+      height: calc((var(--s6-size-win) * 2 + var(--s6-size-ringw)) * var(--s6-size-k) * 1px);
+      border: calc(var(--s6-size-ringw) * var(--s6-size-k) * 1px) solid var(--c-accent); }
+
+    /* Dimension numbers (canvas px). */
+    .s6-size-num { position: absolute; margin: 0; white-space: nowrap; color: var(--c-ink); font: 700 34px/1 var(--font-text); letter-spacing: -0.01em; }
+    .s6-size-ch { display: inline-block; }
+    #s6-size-n612 { left: 1228.9px; top: 519px; }
+    #s6-size-n347 { left: 860px; top: 944px; width: 200px; text-align: center; }
+
+    /* Text block 1 (dimension screen), left column x 144. */
+    #s6-size-a { position: absolute; inset: 0; }
+    #s6-size-a-in { position: absolute; inset: 0; }
+    .s6-size-line { position: absolute; left: var(--x-title); margin: 0; white-space: nowrap; }
+    .s6-size-in { display: inline-block; }
+    #s6-size-eyebrow { top: 540px; font: 600 var(--fs-eyebrow)/1 var(--font-text); letter-spacing: 0.08em; color: var(--c-accent); }
+    #s6-size-eyebrow-in { display: inline-flex; align-items: center; gap: 0.45em; }
+    #s6-size-eyebrow-dot { display: inline-block; flex: none; width: 0.36em; height: 0.36em; border-radius: 50%; background: var(--c-accent); }
+    #s6-size-title { top: 592px; font: 700 100px/1.05 var(--font-text); letter-spacing: -0.02em; color: var(--c-ink); }
+    #s6-size-dims { top: 736px; font: 400 30px/1.3 var(--font-text); color: var(--c-ink); }
+    #s6-size-note { top: 792px; font: 400 24px/1.4 var(--font-text); color: #8A8580; }
+
+    /* Text block 2 (room screen): light panel on the bare wall left of the product. */
+    #s6-size-b { position: absolute; inset: 0; }
+    #s6-size-b-in { position: absolute; inset: 0; }
+    #s6-size-b-title-box { position: absolute; left: 104px; top: 532px; width: 680px; height: 428px; border-radius: 28px;
+      background: rgba(255, 255, 255, 0.82); }
+    #s6-size-b-title { position: absolute; left: var(--x-title); top: 572px; width: 600px; margin: 0; color: var(--c-ink);
+      font: 700 52px/1.24 var(--font-text); letter-spacing: -0.02em; word-break: keep-all; }
+    #s6-size-b-note-box { display: none; }
+    #s6-size-b-note { position: absolute; left: var(--x-title); top: 768px; width: 600px; margin: 0; color: var(--c-ink-sub);
+      font: 400 24px/1.45 var(--font-text); word-break: keep-all; text-wrap: balance; }
+    .s6-size-nobr { white-space: nowrap; }
+    .s6-size-row { display: block; }
+
+    /* White circle from the product head in the photo. */
+    #s6-size-white { position: absolute; inset: 0; }
+    #s6-size-white-dot { position: absolute; left: -392px; top: -1164px; width: 2800px; height: 2800px; border-radius: 50%; background: var(--c-white); }
+
+    @container (aspect-ratio < 1) {
+      #s6-size-win, #s6-size-ring-shape { --s6-size-k: 1.14873; --s6-size-cx: 907.59px; --s6-size-cy: 670px; }
+      #s6-size-room-img { left: -466px; top: 0; }
+      #s6-size-stage { left: 270.048px; top: 650.472px; width: 539.903px; height: 992.503px; }
+      #s6-size-move { --s6-size-dx: 1px; --s6-size-dy: -73px; --s6-size-end: 0.682; }
+      .s6-size-num { font-size: 44px; }
+      #s6-size-n612 { left: 859.3px; top: 1123px; }
+      #s6-size-n347 { left: 440px; top: 1628px; }
+      .s6-size-line { left: 72px; }
+      #s6-size-eyebrow { top: 150px; font-size: 42px; }
+      #s6-size-title { top: 212px; font-size: 104px; }
+      #s6-size-dims { top: 352px; font-size: 48px; }
+      #s6-size-note { top: 434px; font-size: 36px; }
+      #s6-size-b-title-box { display: none; }
+      #s6-size-b-title { left: 72px; top: 150px; width: 936px; font-size: 64px; line-height: 1.22; }
+      #s6-size-b-note-box { display: block; position: absolute; left: 0; top: 1566px; width: 1080px; height: 256px; background: rgba(255, 255, 255, 0.86); }
+      #s6-size-b-note { left: 72px; top: 1588px; width: 936px; font-size: 36px; line-height: 1.35; color: var(--c-ink-sub); }
+      #s6-size-white-dot { left: -858px; top: -626px; }
+    }
+  </style>
+  <div id="root" data-composition-id="s6-size" data-width="1920" data-height="1080">
+    <div id="s6-size-bg"></div>
+
+    <div id="s6-size-room" class="clip" data-start="10.1" data-duration="5.9">
+      <div id="s6-size-win"><img id="s6-size-room-img" src="assets/img/room.jpg" alt="" /></div>
+    </div>
+
+    <div id="s6-size-stage" class="clip" data-start="0" data-duration="11.5">
+      <div id="s6-size-move">
+        <div id="s6-size-rise">
+          <img id="s6-size-body" src="assets/img/cut-front-closed.png" alt="" />
+          <svg id="s6-size-svg" viewBox="0 0 470 864" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="s6-size-bloom" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+            </defs>
+            <g id="s6-size-wgroup">
+              <line class="s6-size-wext" x1="18" y1="760" x2="18" y2="880" stroke="#6B6560" stroke-opacity="0.5" stroke-width="1.8" stroke-dasharray="2 6" stroke-linecap="round"></line>
+              <line class="s6-size-wext" x1="452" y1="760" x2="452" y2="880" stroke="#6B6560" stroke-opacity="0.5" stroke-width="1.8" stroke-dasharray="2 6" stroke-linecap="round"></line>
+              <path class="s6-size-wseg" d="M 155 870 L 18 870" fill="none" stroke="#FD312E" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="0 1000"></path>
+              <path class="s6-size-wseg" d="M 315 870 L 452 870" fill="none" stroke="#FD312E" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="0 1000"></path>
+              <line class="s6-size-wtick" x1="18" y1="858" x2="18" y2="882" stroke="#FD312E" stroke-width="3.2" stroke-linecap="round"></line>
+              <line class="s6-size-wtick" x1="452" y1="858" x2="452" y2="882" stroke="#FD312E" stroke-width="3.2" stroke-linecap="round"></line>
+            </g>
+            <g id="s6-size-hmarks">
+              <line id="s6-size-hext0" x1="479" y1="844" x2="320" y2="844" stroke="#6B6560" stroke-opacity="0.5" stroke-width="1.8" stroke-dasharray="2 6" stroke-linecap="round"></line>
+              <line id="s6-size-hext1" x1="479" y1="17" x2="300" y2="17" stroke="#6B6560" stroke-opacity="0.5" stroke-width="1.8" stroke-dasharray="2 6" stroke-linecap="round"></line>
+              <line id="s6-size-htick0" x1="483" y1="844" x2="507" y2="844" stroke="#FD312E" stroke-width="3.2" stroke-linecap="round"></line>
+              <line id="s6-size-htick1" x1="483" y1="17" x2="507" y2="17" stroke="#FD312E" stroke-width="3.2" stroke-linecap="round"></line>
+            </g>
+            <g id="s6-size-hline-g">
+              <path id="s6-size-hline-bloom" class="s6-size-hline" d="M 495 844 L 495 17 A 60 60 0 0 1 615 17 A 60 60 0 0 1 495 17" fill="none" stroke="#FD312E" stroke-opacity="0.22" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 3000" filter="url(#s6-size-bloom)"></path>
+              <path id="s6-size-hline-core" class="s6-size-hline" d="M 495 844 L 495 17 A 60 60 0 0 1 615 17 A 60 60 0 0 1 495 17" fill="none" stroke="#FD312E" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="0 3000"></path>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div id="s6-size-ring" class="clip" data-start="10.18" data-duration="1.2"><div id="s6-size-ring-shape"></div></div>
+
+    <p id="s6-size-n612" class="clip s6-size-num" data-start="4.2" data-duration="5.3"><span class="s6-size-ch">6</span><span class="s6-size-ch">1</span><span class="s6-size-ch">2</span><span class="s6-size-ch">m</span><span class="s6-size-ch">m</span></p>
+    <p id="s6-size-n347" class="clip s6-size-num" data-start="5.2" data-duration="4.3"><span class="s6-size-ch">3</span><span class="s6-size-ch">4</span><span class="s6-size-ch">7</span><span class="s6-size-ch">m</span><span class="s6-size-ch">m</span></p>
+
+    <div id="s6-size-a" class="clip" data-start="0" data-duration="9.6">
+      <div id="s6-size-a-in">
+        <p id="s6-size-eyebrow" class="s6-size-line"><span id="s6-size-eyebrow-in"><span id="s6-size-eyebrow-dot"></span><span>1단형 원통 본체</span></span></p>
+        <h2 id="s6-size-title" class="s6-size-line"><span id="s6-size-title-in" class="s6-size-in">612mm 높이</span></h2>
+        <p id="s6-size-dims" class="s6-size-line"><span id="s6-size-dims-in" class="s6-size-in">본체 크기 가로 347 × 높이 612 × 깊이 347mm</span></p>
+        <p id="s6-size-note" class="s6-size-line"><span id="s6-size-note-in" class="s6-size-in">본체 치수와 설치 이격거리를 구분해 확인합니다.</span></p>
+      </div>
+    </div>
+
+    <div id="s6-size-b" class="clip" data-start="10.95" data-duration="4.05">
+      <div id="s6-size-b-in">
+        <div id="s6-size-b-title-box"></div>
+        <div id="s6-size-b-note-box"></div>
+        <h2 id="s6-size-b-title"><span id="s6-size-b-title-in" class="s6-size-in"><span class="s6-size-nobr s6-size-row">66㎡ 사용면적,</span> <span class="s6-size-nobr s6-size-row">높이 612mm의 1단형 본체를</span> 확인해 보세요.</span></h2>
+        <p id="s6-size-b-note"><span id="s6-size-b-note-in" class="s6-size-in">66㎡는 판매 사양이며 집 구조와 사용 환경에 따른 실제 효과를 보장하지 않습니다.</span></p>
+      </div>
+    </div>
+
+    <div id="s6-size-white" class="clip" data-start="14.45" data-duration="1.55"><div id="s6-size-white-dot"></div></div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    const S = "#s6-size-";
+
+    // 0-2: body and title block.
+    tl.fromTo(S + "stage", { opacity: 0 }, { opacity: 1, duration: 1.2, ease: "power2.out" }, 0.15);
+    tl.fromTo(S + "rise", { y: 46, scale: 0.97 }, { y: 0, scale: 1, duration: 1.45, ease: "power3.out" }, 0.15);
+    tl.fromTo(S + "eyebrow-in", { opacity: 0, y: 30, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "power3.out" }, 0.5);
+    tl.fromTo(S + "title-in", { opacity: 0, y: 70, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "power4.out" }, 0.7);
+
+    // 2-6: dimension lines, proportional to scroll (linear), numbers drop in place.
+    tl.fromTo(S + "hline-g", { opacity: 0 }, { opacity: 1, duration: 0.15, ease: "none" }, 1.85);
+    tl.fromTo(".s6-size-hline", { attr: { "stroke-dasharray": "0 3000", "stroke-dashoffset": 0 } }, { attr: { "stroke-dasharray": "827 3000", "stroke-dashoffset": 0 }, duration: 2.4, ease: "none" }, 2.0);
+    tl.fromTo(S + "htick0", { opacity: 0 }, { opacity: 1, duration: 0.15, ease: "none" }, 1.95);
+    tl.fromTo(S + "hext0", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 2.1);
+    tl.fromTo(S + "htick1", { opacity: 0 }, { opacity: 1, duration: 0.15, ease: "none" }, 4.4);
+    tl.fromTo(S + "hext1", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 4.45);
+    tl.fromTo(S + "n612", { opacity: 0 }, { opacity: 1, duration: 0.05, ease: "none" }, 4.2);
+    tl.fromTo("#s6-size-n612 .s6-size-ch", { opacity: 0, y: -34 }, { opacity: 1, y: 0, duration: 0.36, ease: "back.out(2)", stagger: 0.05 }, 4.25);
+
+    tl.fromTo(".s6-size-wext", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 3.7);
+    tl.fromTo(".s6-size-wseg", { attr: { "stroke-dasharray": "0 1000" } }, { attr: { "stroke-dasharray": "137 1000" }, duration: 1.8, ease: "none" }, 3.8);
+    tl.fromTo(".s6-size-wtick", { opacity: 0 }, { opacity: 1, duration: 0.15, ease: "none" }, 5.6);
+    tl.fromTo(S + "n347", { opacity: 0 }, { opacity: 1, duration: 0.05, ease: "none" }, 5.25);
+    tl.fromTo("#s6-size-n347 .s6-size-ch", { opacity: 0, y: -34 }, { opacity: 1, y: 0, duration: 0.36, ease: "back.out(2)", stagger: 0.05 }, 5.3);
+
+    tl.fromTo(S + "dims-in", { opacity: 0, y: 24, filter: "blur(5px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "power3.out" }, 4.8);
+    tl.fromTo(S + "note-in", { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "power3.out" }, 5.2);
+
+    // 6-9: reading spot 1 (nothing moves).
+
+    // 9-9.45: text, numbers, width line and height marks leave.
+    tl.fromTo(S + "a-in", { y: 0, filter: "blur(0px)" }, { y: -30, filter: "blur(6px)", duration: 0.45, ease: "power2.in" }, 9.0);
+    tl.fromTo(S + "a", { opacity: 1 }, { opacity: 0, duration: 0.45, ease: "power2.in" }, 9.0);
+    tl.fromTo(S + "n612", { opacity: 1 }, { opacity: 0, duration: 0.3, ease: "power1.in", immediateRender: false }, 9.0);
+    tl.fromTo(S + "n347", { opacity: 1 }, { opacity: 0, duration: 0.3, ease: "power1.in", immediateRender: false }, 9.0);
+    tl.fromTo(S + "wgroup", { opacity: 1 }, { opacity: 0, duration: 0.3, ease: "power1.in" }, 9.0);
+    tl.fromTo(S + "hmarks", { opacity: 1 }, { opacity: 0, duration: 0.3, ease: "power1.in" }, 9.0);
+
+    // 9.2-10.2: the height line thickens, shortens and curls into the ring (centre = line top + r to the right).
+    tl.fromTo(".s6-size-hline", { attr: { "stroke-dasharray": "827 3000", "stroke-dashoffset": 0 } }, { attr: { "stroke-dasharray": "377 3000", "stroke-dashoffset": -827 }, duration: 1.0, ease: "power2.inOut", immediateRender: false }, 9.2);
+    tl.fromTo(S + "hline-core", { attr: { "stroke-width": 3.2 } }, { attr: { "stroke-width": 14 }, duration: 1.0, ease: "sine.inOut" }, 9.2);
+    tl.fromTo(S + "hline-bloom", { opacity: 1 }, { opacity: 0, duration: 0.6, ease: "power1.out" }, 9.3);
+    tl.fromTo(S + "hline-g", { opacity: 1 }, { opacity: 0, duration: 0.02, ease: "none", immediateRender: false }, 10.18);
+
+    // 10.18-11.4: the ring opens as a window onto the room photo and spreads past the canvas.
+    tl.fromTo(S + "ring", { opacity: 0 }, { opacity: 1, duration: 0.02, ease: "none" }, 10.18);
+    tl.fromTo(S + "room", { opacity: 0 }, { opacity: 1, duration: 0.15, ease: "none" }, 10.1);
+    tl.fromTo(S + "win, #s6-size-ring-shape", { "--s6-size-win": 60 }, { "--s6-size-win": 1700, duration: 1.05, ease: "power2.in" }, 10.2);
+    tl.fromTo(S + "ring-shape", { "--s6-size-ringw": 14 }, { "--s6-size-ringw": 3, duration: 0.9, ease: "power1.in" }, 10.2);
+    tl.fromTo(S + "ring", { opacity: 1 }, { opacity: 0, duration: 0.4, ease: "power1.in", immediateRender: false }, 10.75);
+    tl.fromTo(S + "move", { "--s6-size-mv": 0 }, { "--s6-size-mv": 1, duration: 1.0, ease: "power2.inOut" }, 10.2);
+    tl.fromTo(S + "stage", { opacity: 1 }, { opacity: 0, duration: 0.65, ease: "power1.in", immediateRender: false }, 10.7);
+
+    // 10.95-11.5: title and condition note arrive together; 11.5-14.5 reading spot 2.
+    tl.fromTo(S + "b", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.out" }, 11.0);
+    tl.fromTo(S + "b-title-in", { y: 36, filter: "blur(6px)" }, { y: 0, filter: "blur(0px)", duration: 0.45, ease: "power3.out" }, 11.0);
+    tl.fromTo(S + "b-note-in", { y: 24, filter: "blur(4px)" }, { y: 0, filter: "blur(0px)", duration: 0.45, ease: "power3.out" }, 11.0);
+
+    // 14.5-14.9: text leaves; 14.5-15.85: white circle from the product head covers the canvas.
+    tl.fromTo(S + "b", { opacity: 1 }, { opacity: 0, duration: 0.4, ease: "power1.in", immediateRender: false }, 14.5);
+    tl.fromTo(S + "b-in", { y: 0 }, { y: -20, duration: 0.4, ease: "power1.in" }, 14.5);
+    tl.fromTo(S + "white-dot", { scale: 0 }, { scale: 1, duration: 1.35, ease: "power2.in" }, 14.5);
+    tl.fromTo(S + "white", { opacity: 1 }, { opacity: 1, duration: 1.5, ease: "none" }, 14.45);
+
+    window.__timelines["s6-size"] = tl;
+  </script>
+</template>

@@ -1,0 +1,162 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; container-type: size; }
+    #s2-detect-stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1920px; margin: -960px 0 0 -960px; overflow: visible; }
+    #s2-detect-fade-p, #s2-detect-fade-pl, #s2-detect-fade-pr { display: none; }
+    @container (aspect-ratio < 1) {
+      #s2-detect-arcpos { transform: translate(0px, 420px); }
+      #s2-detect-fade-l { display: none; }
+      #s2-detect-fade-p, #s2-detect-fade-pl, #s2-detect-fade-pr { display: inline; }
+    }
+  </style>
+  <div id="root" data-composition-id="s2-detect" data-width="1920" data-height="1080">
+    <svg id="s2-detect-stage" class="clip" data-start="0" data-duration="12" data-layout-ignore aria-hidden="true" viewBox="-960 -960 1920 1920" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="s2-detect-glowgrad" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="520">
+          <stop offset="0" style="stop-color: var(--c-accent-hi); stop-opacity: 0.9;"/>
+          <stop offset="1" style="stop-color: var(--c-accent-hi); stop-opacity: 0;"/>
+        </radialGradient>
+        <linearGradient id="s2-detect-linegrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" style="stop-color: var(--c-white); stop-opacity: 0;"/>
+          <stop offset="1" style="stop-color: var(--c-white); stop-opacity: 1;"/>
+        </linearGradient>
+        <clipPath id="s2-detect-fc0" clipPathUnits="userSpaceOnUse"><rect id="s2-detect-fr0" x="-4000" y="-4000" width="8000" height="4189.62"/></clipPath>
+        <clipPath id="s2-detect-hc0" clipPathUnits="userSpaceOnUse"><rect id="s2-detect-hr0" x="-4000" y="189.62" width="8000" height="4000"/></clipPath>
+        <clipPath id="s2-detect-fc1" clipPathUnits="userSpaceOnUse"><rect id="s2-detect-fr1" x="-4000" y="-4000" width="8000" height="4189.62"/></clipPath>
+        <clipPath id="s2-detect-hc1" clipPathUnits="userSpaceOnUse"><rect id="s2-detect-hr1" x="-4000" y="189.62" width="8000" height="4000"/></clipPath>
+        <clipPath id="s2-detect-fc2" clipPathUnits="userSpaceOnUse"><rect id="s2-detect-fr2" x="-4000" y="-4000" width="8000" height="4189.62"/></clipPath>
+        <mask id="s2-detect-mask" maskUnits="userSpaceOnUse" x="-960" y="-960" width="1920" height="1920">
+          <rect x="-960" y="-960" width="1920" height="1920" fill="#fff"/>
+          <g class="s2-detect-pan" transform="translate(-294.12 93.75)">
+            <g class="s2-detect-zoom" transform="scale(1)">
+              <g transform="translate(294.12 -93.75)">
+              <g clip-path="url(#s2-detect-hc0)"><path d="M-194.09 -165.26L-363.19 -165.26L-363.19 -121.28L-247.89 -121.28L-247.89 -108.04C-247.89 -88.82 -258.57 -72.6 -279.92 -58.5C-301.27 -44.41 -333.3 -29.47 -376 -13.24L-353.37 29.04C-295.29 6.83 -255.58 -11.96 -230.38 -33.74C-204.76 -55.51 -194.09 -79.85 -194.09 -114.02ZM-92.88 21.35L-92.88 -61.92L-43.77 -61.92L-43.77 -106.76L-92.88 -106.76L-92.88 -183.62L-146.26 -183.62L-146.26 21.35ZM-92.88 183.62L-92.88 40.57L-321.34 40.57L-321.34 150.31C-321.34 177.64 -313.23 183.62 -288.03 183.62ZM-146.26 140.07L-260.7 140.07C-267.11 140.07 -268.39 138.78 -268.39 132.38L-268.39 84.12L-146.26 84.12Z" fill="#000"/></g>
+              <g clip-path="url(#s2-detect-hc1)"><path d="M168.04 -117.86L168.04 -161.84L-17.72 -161.84L-17.72 -117.86L50.18 -117.86L50.18 -78.15C50.18 -36.72 15.16 11.1 -41.21 50.39L-7.9 86.69C27.97 63.2 59.14 30.75 77.51 -1.71C94.59 29.04 123.2 61.07 157.79 82.84L191.1 46.12C136.44 8.97 104.41 -38.43 104.41 -78.15L104.41 -117.86ZM210.31 183.62L263.69 183.62L263.69 -183.62L210.31 -183.62Z" fill="#000"/></g>
+              </g>
+            </g>
+          </g>
+        </mask>
+        <!-- The Warm Grey arc dissolves into the red before any canvas edge (landscape: bottom; portrait: bottom and sides), so no straight cut shows against a band. -->
+        <linearGradient id="s2-detect-fadegrad-l" gradientUnits="userSpaceOnUse" x1="0" y1="340" x2="0" y2="530">
+          <stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="0.25" stop-color="#000" stop-opacity="0.16"/><stop offset="0.5" stop-color="#000" stop-opacity="0.5"/><stop offset="0.75" stop-color="#000" stop-opacity="0.84"/><stop offset="1" stop-color="#000" stop-opacity="1"/>
+        </linearGradient>
+        <linearGradient id="s2-detect-fadegrad-p" gradientUnits="userSpaceOnUse" x1="0" y1="820" x2="0" y2="950">
+          <stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="0.25" stop-color="#000" stop-opacity="0.16"/><stop offset="0.5" stop-color="#000" stop-opacity="0.5"/><stop offset="0.75" stop-color="#000" stop-opacity="0.84"/><stop offset="1" stop-color="#000" stop-opacity="1"/>
+        </linearGradient>
+        <linearGradient id="s2-detect-fadegrad-pl" gradientUnits="userSpaceOnUse" x1="-420" y1="0" x2="-530" y2="0">
+          <stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="0.25" stop-color="#000" stop-opacity="0.16"/><stop offset="0.5" stop-color="#000" stop-opacity="0.5"/><stop offset="0.75" stop-color="#000" stop-opacity="0.84"/><stop offset="1" stop-color="#000" stop-opacity="1"/>
+        </linearGradient>
+        <linearGradient id="s2-detect-fadegrad-pr" gradientUnits="userSpaceOnUse" x1="420" y1="0" x2="530" y2="0">
+          <stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="0.25" stop-color="#000" stop-opacity="0.16"/><stop offset="0.5" stop-color="#000" stop-opacity="0.5"/><stop offset="0.75" stop-color="#000" stop-opacity="0.84"/><stop offset="1" stop-color="#000" stop-opacity="1"/>
+        </linearGradient>
+        <mask id="s2-detect-arcmask" maskUnits="userSpaceOnUse" x="-2000" y="-2000" width="4000" height="4000">
+          <rect x="-2000" y="-2000" width="4000" height="4000" fill="#fff"/>
+          <rect id="s2-detect-fade-l" x="-2000" y="340" width="4000" height="1660" fill="url(#s2-detect-fadegrad-l)"/>
+          <rect id="s2-detect-fade-p" x="-2000" y="820" width="4000" height="1180" fill="url(#s2-detect-fadegrad-p)"/>
+          <rect id="s2-detect-fade-pl" x="-2000" y="-2000" width="1580" height="4000" fill="url(#s2-detect-fadegrad-pl)"/>
+          <rect id="s2-detect-fade-pr" x="420" y="-2000" width="1580" height="4000" fill="url(#s2-detect-fadegrad-pr)"/>
+        </mask>
+      </defs>
+      <g id="s2-detect-cover" mask="url(#s2-detect-mask)">
+        <rect x="-960" y="-960" width="1920" height="1920" style="fill: var(--c-accent);"/>
+        <circle id="s2-detect-glow" cx="0" cy="0" r="520" fill="url(#s2-detect-glowgrad)" opacity="0"/>
+        <g class="s2-detect-pan" transform="translate(-294.12 93.75)"><g class="s2-detect-zoom" transform="scale(1)"><g transform="translate(294.12 -93.75)">
+          <rect id="s2-detect-line0" x="-809.89" y="-1657.01" width="3.39" height="697.01" opacity="0" fill="url(#s2-detect-linegrad)"/>
+          <rect id="s2-detect-line1" x="-636.58" y="-1375.13" width="3.39" height="415.13" opacity="0" fill="url(#s2-detect-linegrad)"/>
+          <rect id="s2-detect-line2" x="-299.43" y="-1399.1" width="3.39" height="439.1" opacity="0" fill="url(#s2-detect-linegrad)"/>
+          <rect id="s2-detect-line3" x="-141.43" y="-1646.33" width="3.39" height="686.33" opacity="0" fill="url(#s2-detect-linegrad)"/>
+          <rect id="s2-detect-line4" x="172.47" y="-1421.52" width="3.39" height="461.52" opacity="0" fill="url(#s2-detect-linegrad)"/>
+          <rect id="s2-detect-line5" x="251.18" y="-1341.77" width="3.39" height="381.77" opacity="0" fill="url(#s2-detect-linegrad)"/>
+          <rect id="s2-detect-line6" x="484.08" y="-1352.55" width="3.39" height="392.55" opacity="0" fill="url(#s2-detect-linegrad)"/>
+          <rect id="s2-detect-line7" x="767.37" y="-1291.8600000000001" width="3.39" height="331.86" opacity="0" fill="url(#s2-detect-linegrad)"/>
+          <g id="s2-detect-arcfade" mask="url(#s2-detect-arcmask)"><g id="s2-detect-arcpos"><g id="s2-detect-arc" transform="translate(0 1520)">
+            <circle id="s2-detect-arcband" cx="0" cy="40" r="934" style="fill: var(--c-warm-grey); fill-opacity: 0.32;"/>
+            <circle cx="0" cy="0" r="900" style="fill: var(--c-warm-grey);"/>
+          </g></g></g>
+          <circle id="s2-detect-ring" cx="0" cy="0" r="254.18" opacity="0" style="fill: none; stroke: var(--c-white);" stroke-width="13.56"/>
+          <g id="s2-detect-pulse" transform="scale(1)">
+          <g clip-path="url(#s2-detect-fc0)"><g id="s2-detect-rise0" transform="translate(0 415.97)"><path d="M-194.09 -165.26L-363.19 -165.26L-363.19 -121.28L-247.89 -121.28L-247.89 -108.04C-247.89 -88.82 -258.57 -72.6 -279.92 -58.5C-301.27 -44.41 -333.3 -29.47 -376 -13.24L-353.37 29.04C-295.29 6.83 -255.58 -11.96 -230.38 -33.74C-204.76 -55.51 -194.09 -79.85 -194.09 -114.02ZM-92.88 21.35L-92.88 -61.92L-43.77 -61.92L-43.77 -106.76L-92.88 -106.76L-92.88 -183.62L-146.26 -183.62L-146.26 21.35ZM-92.88 183.62L-92.88 40.57L-321.34 40.57L-321.34 150.31C-321.34 177.64 -313.23 183.62 -288.03 183.62ZM-146.26 140.07L-260.7 140.07C-267.11 140.07 -268.39 138.78 -268.39 132.38L-268.39 84.12L-146.26 84.12Z" style="fill: var(--c-dark);"/></g></g>
+          <g clip-path="url(#s2-detect-fc1)"><g id="s2-detect-rise1" transform="translate(0 415.97)"><path d="M168.04 -117.86L168.04 -161.84L-17.72 -161.84L-17.72 -117.86L50.18 -117.86L50.18 -78.15C50.18 -36.72 15.16 11.1 -41.21 50.39L-7.9 86.69C27.97 63.2 59.14 30.75 77.51 -1.71C94.59 29.04 123.2 61.07 157.79 82.84L191.1 46.12C136.44 8.97 104.41 -38.43 104.41 -78.15L104.41 -117.86ZM210.31 183.62L263.69 183.62L263.69 -183.62L210.31 -183.62Z" style="fill: var(--c-dark);"/></g></g>
+          <g clip-path="url(#s2-detect-fc2)"><g id="s2-detect-rise2" transform="translate(0 415.97)"><path d="M376 151.6L318.35 151.6L318.35 98.22L376 98.22Z" style="fill: var(--c-white);"/></g></g>
+          </g>
+        </g></g></g>
+      </g>
+    </svg>
+  </div>
+  <script>
+    (function () {
+      // Scene clock 0-12 s = page 8-20 %. The red cover is a mask; from 7 s the glyph fills become exact-outline holes onto s3 below.
+      const tl = gsap.timeline({ paused: true });
+      const q = (s) => "#s2-detect-" + s;
+      const LINES = [{"len":697.01,"v":496.42,"phase":0.08773,"alpha":0.34},{"len":415.13,"v":539.46,"phase":0.87748,"alpha":0.39},{"len":439.1,"v":443.47,"phase":0.43816000000000005,"alpha":0.37},{"len":686.33,"v":657.89,"phase":0.50983,"alpha":0.31},{"len":461.52,"v":671,"phase":0.6333099999999999,"alpha":0.37},{"len":381.77,"v":626.92,"phase":0.92536,"alpha":0.39},{"len":392.55,"v":606.72,"phase":0.81356,"alpha":0.32},{"len":331.86,"v":622.75,"phase":0.84373,"alpha":0.33}];
+      const T = { x: -294.12, y: 93.75 };
+      const Z_SLOW = 1.15, PAN_SLOW = 0.12, Z_END = 44.1;
+      const SLOW = [7.0, 8.5], DIVE = [8.5, 11.85];
+
+      tl.fromTo(q("glow"), { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power1.out" }, 0);
+      tl.fromTo(q("glow"), { opacity: 1 }, { opacity: 0, duration: 1.5, ease: "power1.in", immediateRender: false }, 7.0);
+
+      // Warm Grey arc rises from below, then sinks before the title lands.
+      tl.fromTo(q("arc"), { attr: { transform: "translate(0 1520)" } }, { attr: { transform: "translate(0 1160)" }, duration: 0.9, ease: "power3.out" }, 0);
+      tl.fromTo(q("arc"), { attr: { transform: "translate(0 1160)" } }, { attr: { transform: "translate(0 1580)" }, duration: 1.1, ease: "power3.in", immediateRender: false }, 0.9);
+      tl.fromTo(q("arcband"), { attr: { cy: 40 } }, { attr: { cy: 0 }, duration: 0.9, ease: "power3.out" }, 0);
+      tl.fromTo(q("arcband"), { attr: { cy: 0 } }, { attr: { cy: 30 }, duration: 1.1, ease: "power3.in", immediateRender: false }, 0.9);
+
+      // Glyphs rise from below the baseline clip, one by one.
+      [0, 1, 2].forEach((i) => {
+        tl.fromTo(q("rise" + i), { attr: { transform: "translate(0 415.97)" } }, { attr: { transform: "translate(0 0)" }, duration: 0.95, ease: "power4.out" }, 0.25 + i * 0.35);
+      });
+      tl.fromTo(q("pulse"), { attr: { transform: "scale(1)" } }, { attr: { transform: "scale(1.035)" }, duration: 0.08, ease: "power2.out" }, 1.9);
+      tl.fromTo(q("pulse"), { attr: { transform: "scale(1.035)" } }, { attr: { transform: "scale(1)" }, duration: 0.17, ease: "power2.inOut", immediateRender: false }, 1.98);
+
+      // Landing ring spreads from behind the title and is gone by 2.5 s (page 10.5 %).
+      tl.fromTo(q("ring"), { opacity: 0 }, { opacity: 0.9, duration: 0.02, ease: "none" }, 1.75);
+      tl.fromTo(q("ring"), { opacity: 0.9 }, { opacity: 0, duration: 0.73, ease: "power1.in", immediateRender: false }, 1.77);
+      tl.fromTo(q("ring"), { attr: { r: 254.18, "stroke-width": 13.56 } }, { attr: { r: 1186.19, "stroke-width": 1.5 }, duration: 0.73, ease: "power2.out", immediateRender: false }, 1.77);
+
+      // Speed lines fall as a function of scene time only, so they move while scrolling and stop when scrolling stops.
+      const LINE_END = 9.6;
+      LINES.forEach((l, i) => {
+        const id = q("line" + i), top = -960 - l.len, span = 1920 + l.len;
+        let t = 0, p = l.phase * span, first = true;
+        while (t < LINE_END - 1e-6) {
+          const dt = Math.min((span - p) / l.v, LINE_END - t);
+          tl.fromTo(id, { attr: { y: top + p } }, { attr: { y: top + p + l.v * dt }, duration: dt, ease: "none", immediateRender: first }, t);
+          first = false;
+          t += dt;
+          p = 0;
+        }
+        tl.fromTo(id, { opacity: 0 }, { opacity: l.alpha, duration: 0.5, ease: "power1.out" }, 0);
+        tl.fromTo(id, { opacity: l.alpha }, { opacity: 0, duration: 1.0, ease: "power1.in", immediateRender: false }, 8.4);
+      });
+
+      // Fill -> hole, left glyph first: a bottom-to-top wipe moves the boundary between the fill clip and the hole clip.
+      [0, 1].forEach((i) => {
+        const at = 7.0 + i * 0.4;
+        tl.fromTo(q("fr" + i), { attr: { height: 4189.62 } }, { attr: { height: 3810.38 }, duration: 0.6, ease: "power2.inOut" }, at);
+        tl.fromTo(q("hr" + i), { attr: { y: 189.62 } }, { attr: { y: -189.62 }, duration: 0.6, ease: "power2.inOut" }, at);
+      });
+
+      // Camera: slow push, then an accelerating dive into the stroke of the bottom ㅁ in 감 until the hole covers the canvas.
+      // Zoom runs in log space; each phase starts at the speed the previous one ended with.
+      const lnSlow = Math.log(Z_SLOW), slowDur = SLOW[1] - SLOW[0], diveDur = DIVE[1] - DIVE[0];
+      const span = Math.log(Z_END) - lnSlow;
+      const a = Math.min(1, ((2 * lnSlow) / slowDur) * (diveDur / span));
+      const b = Math.min(1, ((2 * PAN_SLOW) / slowDur) * (diveDur / (1 - PAN_SLOW)));
+      const slowZoomEase = (u) => (Math.exp(lnSlow * u * u) - 1) / (Z_SLOW - 1);
+      const diveZoomEase = (p) => (Math.exp(lnSlow + span * (a * p + (1 - a) * p * p * p)) - Z_SLOW) / (Z_END - Z_SLOW);
+      const divePanEase = (p) => b * p + (1 - b) * p * p * (3 - 2 * p);
+      const zooms = ".s2-detect-zoom", pans = ".s2-detect-pan";
+      const pan = (k) => "translate(" + (T.x * (1 - k)).toFixed(3) + " " + (T.y * (1 - k)).toFixed(3) + ")";
+      tl.fromTo(zooms, { attr: { transform: "scale(1)" } }, { attr: { transform: "scale(" + Z_SLOW + ")" }, duration: slowDur, ease: slowZoomEase }, SLOW[0]);
+      tl.fromTo(zooms, { attr: { transform: "scale(" + Z_SLOW + ")" } }, { attr: { transform: "scale(" + Z_END + ")" }, duration: diveDur, ease: diveZoomEase, immediateRender: false }, DIVE[0]);
+      tl.fromTo(pans, { attr: { transform: pan(0) } }, { attr: { transform: pan(PAN_SLOW) }, duration: slowDur, ease: "power2.in" }, SLOW[0]);
+      tl.fromTo(pans, { attr: { transform: pan(PAN_SLOW) } }, { attr: { transform: pan(1) }, duration: diveDur, ease: divePanEase, immediateRender: false }, DIVE[0]);
+
+      // The hole now covers the canvas: drop the cover so only s3 shows until the host ends at 12 s.
+      tl.fromTo(q("stage"), { opacity: 1 }, { opacity: 0, duration: 0.02, ease: "none" }, 11.86);
+
+      window.__timelines["s2-detect"] = tl;
+    })();
+  </script>
+</template>

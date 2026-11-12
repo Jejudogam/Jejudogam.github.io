@@ -1,0 +1,221 @@
+<template>
+  <style>
+    /* s1 hook (host 0-8 s). Port of intro-3 scenes/s1-hook.js: a white line falls and closes into a circle,
+       72 ticks charge white -> Active Red with the scroll (1-6 s), then a red disc covers the canvas (6-7.9 s).
+       The dial lives in a centred square whose SVG viewBox is -400..400, so one timeline fits both canvases:
+       landscape square 800 px (circle diameter 360), portrait square 1466.67 px (circle diameter 660). */
+    #root { position: absolute; inset: 0; overflow: hidden; container-type: size; }
+    #s1-hook-bg { position: absolute; inset: 0; background: var(--c-dark); }
+    /* Soft lift at the centre; it ends well inside the canvas so the edges stay flat #0A0A0A. */
+    #s1-hook-lift { position: absolute; inset: 0; background: radial-gradient(circle 500px at 50% 50%, var(--c-dark-hi) 0%, rgba(10, 10, 10, 0) 100%); }
+    #s1-hook-stage { position: absolute; left: 560px; top: 140px; width: 800px; height: 800px; }
+    .s1-hook-layer { position: absolute; inset: 0; }
+    .s1-hook-svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
+    /* Accent glow behind the circle: radius 280 local units, so it stays inside both canvases. */
+    #s1-hook-redglow { position: absolute; left: 15%; top: 15%; width: 70%; height: 70%; border-radius: 50%; opacity: 0.05;
+      background: radial-gradient(circle closest-side, rgba(253, 49, 46, 1) 0%, rgba(253, 49, 46, 0.42) 42%, rgba(253, 49, 46, 0) 100%); }
+    /* Soft light at the impact point (local 0,-144) instead of a white flash: peak 22% white. */
+    #s1-hook-impact { position: absolute; left: 17.5%; top: -0.5%; width: 65%; height: 65%; border-radius: 50%; opacity: 0;
+      background: radial-gradient(circle closest-side, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.07) 45%, rgba(255, 255, 255, 0) 100%); }
+    #s1-hook-line { stroke: url(#s1-hook-linegrad); stroke-width: 6; stroke-linecap: butt; }
+    #s1-hook-ring1, #s1-hook-ring2 { fill: none; stroke: var(--c-accent); }
+    #s1-hook-arc-r, #s1-hook-arc-l { fill: none; stroke: var(--c-white); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 566 566; stroke-dashoffset: 566; }
+    .s1-hook-tick { stroke: var(--c-white); stroke-width: 4; stroke-linecap: butt; opacity: 0; }
+    /* Hot head of the charge front, r 40 local units at the tick band (radius 211). */
+    #s1-hook-head { position: absolute; left: 45%; top: 18.625%; width: 10%; height: 10%; border-radius: 50%;
+      background: radial-gradient(circle closest-side, rgba(253, 49, 46, 0.75) 0%, rgba(253, 49, 46, 0.25) 50%, rgba(253, 49, 46, 0) 100%); }
+    #s1-hook-iris-disc { fill: var(--c-accent); }
+    /* Decorative scroll cue (the real label lives in landing.html). */
+    #s1-hook-arrow { position: absolute; left: 942px; top: 896px; width: 36px; height: 52px; opacity: 0; }
+    #s1-hook-arrow-mark { display: block; width: 100%; height: 100%; }
+    #s1-hook-arrow-mark svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    #s1-hook-arrow-mark path { fill: none; stroke: rgba(255, 255, 255, 0.72); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    /* Portrait canvas (1080x1920): same timeline, bigger square at the centre (540, 960). */
+    @container (aspect-ratio < 1) {
+      #s1-hook-lift { background: radial-gradient(circle 520px at 50% 50%, var(--c-dark-hi) 0%, rgba(10, 10, 10, 0) 100%); }
+      #s1-hook-stage { left: -193.333px; top: 226.667px; width: 1466.667px; height: 1466.667px; }
+      #s1-hook-arrow { left: 507.6px; top: 1600px; width: 64.8px; height: 93.6px; }
+      #s1-hook-arrow-mark path { stroke-width: 2.2; }
+    }
+  </style>
+  <div id="root" data-composition-id="s1-hook" data-width="1920" data-height="1080">
+    <div id="s1-hook-bg"></div>
+    <div id="s1-hook-lift"></div>
+    <div id="s1-hook-stage" data-layout-allow-overflow>
+      <div id="s1-hook-redglow"></div>
+      <div id="s1-hook-impact"></div>
+      <div id="s1-hook-rings" class="s1-hook-layer clip" data-start="0.26" data-duration="0.36">
+        <svg class="s1-hook-svg" viewBox="-400 -400 800 800" aria-hidden="true">
+          <circle id="s1-hook-ring2" cx="0" cy="0" r="180"></circle>
+          <circle id="s1-hook-ring1" cx="0" cy="0" r="180"></circle>
+        </svg>
+      </div>
+      <div id="s1-hook-fall" class="s1-hook-layer clip" data-start="0" data-duration="0.4">
+        <svg class="s1-hook-svg" viewBox="-400 -400 800 800" aria-hidden="true">
+          <defs>
+            <linearGradient id="s1-hook-linegrad" gradientUnits="userSpaceOnUse" x1="0" y1="-560" x2="0" y2="-400">
+              <stop offset="0" stop-color="#FFFFFF" stop-opacity="0"></stop>
+              <stop offset="0.45" stop-color="#FFFFFF" stop-opacity="0.35"></stop>
+              <stop offset="1" stop-color="#FFFFFF" stop-opacity="1"></stop>
+            </linearGradient>
+            <radialGradient id="s1-hook-tipgrad">
+              <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.9"></stop>
+              <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <line id="s1-hook-line" x1="0" y1="-560" x2="0" y2="-400"></line>
+          <circle id="s1-hook-tip" cx="0" cy="-400" r="22" fill="url(#s1-hook-tipgrad)"></circle>
+        </svg>
+      </div>
+      <div id="s1-hook-dial" class="s1-hook-layer clip" data-start="0.26" data-duration="7.74">
+        <div id="s1-hook-spring" class="s1-hook-layer">
+          <div id="s1-hook-push" class="s1-hook-layer">
+            <svg class="s1-hook-svg" viewBox="-400 -400 800 800" aria-hidden="true">
+              <defs>
+                <filter id="s1-hook-bloom" filterUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600" color-interpolation-filters="sRGB">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="s1-hook-b1"></feGaussianBlur>
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="11" result="s1-hook-b2"></feGaussianBlur>
+                  <feMerge>
+                    <feMergeNode in="s1-hook-b2"></feMergeNode>
+                    <feMergeNode in="s1-hook-b1"></feMergeNode>
+                    <feMergeNode in="SourceGraphic"></feMergeNode>
+                  </feMerge>
+                </filter>
+              </defs>
+              <g filter="url(#s1-hook-bloom)">
+                <g id="s1-hook-ticks"></g>
+                <path id="s1-hook-arc-r" d="M 0 -180 A 180 180 0 0 1 0 180"></path>
+                <path id="s1-hook-arc-l" d="M 0 -180 A 180 180 0 0 0 0 180"></path>
+              </g>
+            </svg>
+            <div id="s1-hook-headclip" class="s1-hook-layer clip" data-start="1" data-duration="5">
+              <div id="s1-hook-headrot" class="s1-hook-layer"><div id="s1-hook-head"></div></div>
+            </div>
+            <div id="s1-hook-iris" class="s1-hook-layer clip" data-start="6" data-duration="2">
+              <svg class="s1-hook-svg" viewBox="-400 -400 800 800" aria-hidden="true">
+                <circle id="s1-hook-iris-disc" cx="0" cy="0" r="0"></circle>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="s1-hook-arrow" class="clip" data-start="0" data-duration="1.6">
+      <span id="s1-hook-arrow-mark">
+        <svg viewBox="0 0 36 52" aria-hidden="true"><path d="M 18 3 L 18 47 M 6 35 L 18 47 L 30 35"></path></svg>
+      </span>
+    </div>
+  </div>
+  <script>
+    (function () {
+      // Scene-local times (s). 0-1 is played once by the page on load; 0.6-1.0 is the still reading spot.
+      const T_IMPACT = 0.26; // line head reaches 12 o'clock of the (0.8x) circle
+      const CHARGE_FROM = 1; // ticks charge clockwise from 12 o'clock, linear in scroll
+      const CHARGE_TO = 6;
+      const IRIS_FROM = 6; // red disc fills the circle, then covers the canvas
+      const IRIS_FULL = 7.9; // whole canvas Active Red just before the 8 s hand-off
+      const R = 180; // circle radius (local units)
+      const TICKS = 72;
+      const TICK_R0 = 197; // R + stroke/2 + 14 gap
+      const TICK_LEN = 28;
+      const BUMP = 9; // extra length at the charge front
+      const SOFT = 15; // degrees over which one tick turns white -> red
+      const SPAN = 360 - 360 / TICKS + SOFT;
+      const TICK_D = ((CHARGE_TO - CHARGE_FROM) * SOFT) / SPAN;
+      const WHITE = "#FFFFFF";
+      const RED = "#FD312E";
+
+      // Pure eases (functions of progress only).
+      const fallEase = (p) => Math.pow(p, 2.4);
+      const bumpEase = (p) => Math.sin(Math.PI * p);
+      const ringFade = (p) => 1 - Math.pow(1 - p, 1.4);
+      const ringThin = (p) => 1 - Math.pow(1 - p, 1.2);
+      // intro-3 spring (zeta 0.28, first peak about +8 %), compressed into the tween and pinned to 1 at the end.
+      const springEase = (p) => {
+        if (p >= 1) return 1;
+        const tau = p * 0.45, z = 0.28, w = Math.sqrt(745), wd = w * Math.sqrt(1 - z * z);
+        const env = Math.exp(-z * w * tau);
+        return 1 - env * (Math.cos(wd * tau) + ((z * w) / wd) * Math.sin(wd * tau)) * (1 - p * p * p);
+      };
+
+      // 72 ticks, built once (no randomness).
+      const NS = "http://www.w3.org/2000/svg";
+      const group = document.getElementById("s1-hook-ticks");
+      const ticks = [];
+      for (let i = 0; i < TICKS; i++) {
+        const deg = (i * 360) / TICKS;
+        const a = (deg * Math.PI) / 180;
+        const sx = Math.sin(a), sy = -Math.cos(a);
+        const line = document.createElementNS(NS, "line");
+        line.setAttribute("id", "s1-hook-tick-" + i);
+        line.setAttribute("class", "s1-hook-tick");
+        line.setAttribute("x1", (sx * TICK_R0).toFixed(2));
+        line.setAttribute("y1", (sy * TICK_R0).toFixed(2));
+        line.setAttribute("x2", (sx * TICK_R0).toFixed(2));
+        line.setAttribute("y2", (sy * TICK_R0).toFixed(2));
+        group.appendChild(line);
+        ticks.push({ line, deg, sx, sy });
+      }
+      const at = (sx, sy, r) => ({ x2: +(sx * r).toFixed(2), y2: +(sy * r).toFixed(2) });
+
+      const tl = gsap.timeline({ paused: true });
+
+      // 0-0.26: the line is already in view at 0 s and falls (ease-in) onto 12 o'clock.
+      tl.fromTo(["#s1-hook-line", "#s1-hook-linegrad"], { attr: { y2: -400 } }, { attr: { y2: -R * 0.8 }, duration: T_IMPACT, ease: fallEase }, 0);
+      tl.fromTo("#s1-hook-tip", { attr: { cy: -400 } }, { attr: { cy: -R * 0.8 }, duration: T_IMPACT, ease: fallEase }, 0);
+      tl.fromTo("#s1-hook-tip", { opacity: 1 }, { opacity: 0, duration: 0.06, ease: "power1.out" }, T_IMPACT);
+      // After the impact the tail is pulled into the circle top.
+      tl.fromTo(["#s1-hook-line", "#s1-hook-linegrad"], { attr: { y1: -560, y2: -R * 0.8 } }, { attr: { y1: -R, y2: -R }, duration: 0.12, ease: "power1.in", immediateRender: false }, T_IMPACT);
+      tl.fromTo("#s1-hook-line", { opacity: 1 }, { opacity: 0, duration: 0.1, ease: "power1.in", immediateRender: false }, T_IMPACT + 0.02);
+
+      // Faint accent glow builds before the impact and grows with the charge.
+      tl.fromTo("#s1-hook-redglow", { opacity: 0.05 }, { opacity: 0.14, duration: T_IMPACT, ease: "power2.in" }, 0);
+      tl.fromTo("#s1-hook-redglow", { opacity: 0.14 }, { opacity: 0.3, duration: CHARGE_TO - CHARGE_FROM, ease: "sine.inOut", immediateRender: false }, CHARGE_FROM);
+
+      // Impact: soft light (no white flash), circle closes both ways, spring 0.8 -> ~1.08 -> 1.
+      tl.fromTo("#s1-hook-impact", { opacity: 0 }, { opacity: 1, duration: 0.04, ease: "power1.out" }, T_IMPACT);
+      tl.fromTo("#s1-hook-impact", { opacity: 1 }, { opacity: 0, duration: 0.24, ease: "power2.out", immediateRender: false }, T_IMPACT + 0.04);
+      tl.fromTo(["#s1-hook-arc-r", "#s1-hook-arc-l"], { strokeDashoffset: 566 }, { strokeDashoffset: 0, duration: 0.11, ease: "power2.out" }, T_IMPACT);
+      tl.fromTo("#s1-hook-spring", { scale: 0.8 }, { scale: 1, duration: 0.32, ease: springEase }, T_IMPACT);
+
+      // Two Active Red shock rings grow fast, thin out and fade.
+      [["#s1-hook-ring1", 0, 12, 1.5, 1], ["#s1-hook-ring2", 0.04, 24, 4, 0.3]].forEach(([sel, delay, w0, w1, a0]) => {
+        tl.fromTo(sel, { attr: { r: R } }, { attr: { r: 550 }, duration: 0.3, ease: "power3.out" }, T_IMPACT + delay);
+        tl.fromTo(sel, { strokeWidth: w0 }, { strokeWidth: w1, duration: 0.3, ease: ringThin }, T_IMPACT + delay);
+        tl.fromTo(sel, { opacity: a0 }, { opacity: 0, duration: 0.3, ease: ringFade }, T_IMPACT + delay);
+      });
+
+      // Ticks: born in a wave from 12 o'clock right after the impact (all white by 0.56 s).
+      ticks.forEach(({ line, deg, sx, sy }) => {
+        const d = Math.min(deg, 360 - deg) / 180;
+        const born = T_IMPACT + 0.02 + d * 0.12;
+        tl.fromTo(line, { attr: at(sx, sy, TICK_R0) }, { attr: at(sx, sy, TICK_R0 + TICK_LEN), duration: 0.18, ease: "back.out(2.2)" }, born);
+        tl.fromTo(line, { opacity: 0 }, { opacity: 0.6, duration: 0.06, ease: "none" }, born);
+        // 1-6 s: charge white -> Active Red, front moves at a constant rate with the scroll.
+        const tc = CHARGE_FROM + ((CHARGE_TO - CHARGE_FROM) * deg) / SPAN;
+        tl.fromTo(line, { stroke: WHITE, opacity: 0.6 }, { stroke: RED, opacity: 1, duration: TICK_D, ease: "none", immediateRender: false }, tc);
+        tl.fromTo(line,
+          { attr: at(sx, sy, TICK_R0 + TICK_LEN), strokeWidth: 4 },
+          { attr: at(sx, sy, TICK_R0 + TICK_LEN + BUMP), strokeWidth: 5.5, duration: TICK_D, ease: bumpEase, immediateRender: false }, tc);
+      });
+
+      // Hot head rides the charge front; slow push-in under the charge.
+      tl.fromTo("#s1-hook-headrot", { rotation: -SOFT / 2 }, { rotation: 360 - 360 / TICKS + SOFT / 2, duration: CHARGE_TO - CHARGE_FROM, ease: "none" }, CHARGE_FROM);
+      tl.fromTo("#s1-hook-headclip", { opacity: 0 }, { opacity: 1, duration: 0.15, ease: "none" }, CHARGE_FROM);
+      tl.fromTo("#s1-hook-headclip", { opacity: 1 }, { opacity: 0, duration: 0.15, ease: "none", immediateRender: false }, CHARGE_TO - 0.15);
+      tl.fromTo("#s1-hook-push", { scale: 1 }, { scale: 1.035, duration: CHARGE_TO - CHARGE_FROM, ease: "sine.inOut" }, CHARGE_FROM);
+
+      // 6-7.9 s: red core fills the circle, then the iris covers the canvas (radius 1120 > every corner).
+      tl.fromTo("#s1-hook-iris-disc", { attr: { r: 0 } }, { attr: { r: R - 3 }, duration: 0.4, ease: "power2.out" }, IRIS_FROM);
+      tl.fromTo("#s1-hook-iris-disc", { attr: { r: R - 3 } }, { attr: { r: 1120 }, duration: IRIS_FULL - IRIS_FROM - 0.4, ease: "power2.in", immediateRender: false }, IRIS_FROM + 0.4);
+
+      // Scroll cue: in by the reading spot (0.6 s), out once the scroll starts.
+      tl.fromTo("#s1-hook-arrow", { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power1.out" }, 0.38);
+      tl.fromTo("#s1-hook-arrow-mark", { y: -10 }, { y: 0, duration: 0.2, ease: "power2.out" }, 0.38);
+      tl.fromTo("#s1-hook-arrow", { opacity: 1 }, { opacity: 0, duration: 0.45, ease: "power1.in", immediateRender: false }, CHARGE_FROM);
+      tl.fromTo("#s1-hook-arrow-mark", { y: 0 }, { y: 14, duration: 0.45, ease: "power1.in", immediateRender: false }, CHARGE_FROM);
+
+      window.__timelines["s1-hook"] = tl;
+    })();
+  </script>
+</template>

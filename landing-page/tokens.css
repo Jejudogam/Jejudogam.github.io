@@ -1,0 +1,54 @@
+/* Shared tokens from intro-3/source/tokens.css. Linked by index.html (composition) and landing.html (page). */
+@font-face { font-family: 'LGEIText'; font-weight: 400; font-display: block; src: url('assets/fonts/LGEIText-Regular.otf') format('opentype'); }
+@font-face { font-family: 'LGEIText'; font-weight: 600; font-display: block; src: url('assets/fonts/LGEIText-SemiBold.otf') format('opentype'); }
+@font-face { font-family: 'LGEIText'; font-weight: 700; font-display: block; src: url('assets/fonts/LGEIText-Bold.otf') format('opentype'); }
+@font-face { font-family: 'LGEIHeadline'; font-weight: 700; font-display: block; src: url('assets/fonts/LGEIHeadline-Bold.otf') format('opentype'); }
+
+:root {
+  /* Colours. Active Red is the only accent. */
+  --c-accent: #FD312E;
+  --c-accent-hi: #FF4A47;
+  --c-dark: #0A0A0A;
+  --c-dark-hi: #1A1A1A;
+  --c-warm-grey: #F0ECE4;
+  --c-white: #FFFFFF;
+  --c-ink: #000000;
+  --c-ink-sub: #6B6560;      /* secondary text on light backgrounds; also the model pill border */
+  --c-paper-sub: #B8B2AC;    /* secondary text on dark backgrounds */
+  --c-note: #8A8580;         /* notes and conditions */
+  --c-glass: rgba(31, 29, 28, 0.8);          /* dark glass card #1F1D1C 80% */
+  --c-glass-line: rgba(255, 255, 255, 0.12); /* its 1px border */
+
+  --font-text: 'LGEIText', sans-serif;
+  --font-headline: 'LGEIHeadline', 'LGEIText', sans-serif;
+
+  /* Canvas sizes (landscape canvas 1920x1080), same as intro-3. */
+  --fs-hero: 252px;
+  --fs-title: 128px;
+  --fs-eyebrow: 30px;
+  --fs-sub: 34px;
+  --x-title: 144px;
+
+  /* Minimum text sizes in canvas px: landscape 1920x1080 and portrait (-p) 1080x1920. */
+  --fs-min-body: 24px;
+  --fs-min-note: 20px;
+  --fs-min-label: 21px;
+  --fs-min-body-p: 48px;
+  --fs-min-note-p: 36px;
+  --fs-min-label-p: 42px;
+  /* Content stays this far inside the canvas edges. */
+  --safe-x: 96px;
+  --safe-x-p: 60px;
+
+  /* Orientation-aware minimums: the stage document gets data-canvas="portrait" on the portrait canvas. */
+  --fs-body: var(--fs-min-body);
+  --fs-note: var(--fs-min-note);
+  --fs-label: var(--fs-min-label);
+  --safe: var(--safe-x);
+}
+:root[data-canvas="portrait"] {
+  --fs-body: var(--fs-min-body-p);
+  --fs-note: var(--fs-min-note-p);
+  --fs-label: var(--fs-min-label-p);
+  --safe: var(--safe-x-p);
+}

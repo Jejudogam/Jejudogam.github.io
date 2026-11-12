@@ -1,0 +1,292 @@
+<template>
+  <style>
+    /* s4-confirm (host 38-55 s, scene time = timeline - 38). Closed body, glowing height line, four glass tips, then the M5 card hands off to s5.
+       Landscape numbers: closed-body cut-out 470x864, product box l18 t17 r452 b844 (827 px tall, never upscaled), shown 750 px tall
+       (k 0.906892) centred on x 1380 with its floor on y 1000: image box 1166.88,234.58 426.24x783.56, product top y 250. */
+    #root { position: absolute; inset: 0; overflow: hidden; container-type: size; font-family: var(--font-text); }
+    #s4-confirm-bg { position: absolute; inset: 0; background: #0A0A0A; }
+    #s4-confirm-out, #s4-confirm-m5-layer { position: absolute; inset: 0; }
+    #s4-confirm-grid { position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, transparent 0 179px, rgba(255, 255, 255, 0.05) 179px 180px); }
+
+    /* Stage: everything tied to the product, in landscape canvas px. Portrait moves and scales it as one piece. */
+    #s4-confirm-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+    #s4-confirm-stage svg { position: absolute; left: 0; top: 0; overflow: visible; }
+    /* Hand-off: everything that leaves except the title block (body, height line, anchor dots, leaders, three tips) slides left as one piece, in canvas px. */
+    #s4-confirm-move { position: absolute; inset: 0; }
+    #s4-confirm-glow { position: absolute; left: 1536px; top: 920px; width: 160px; height: 160px; }
+    #s4-confirm-glow-ignite, #s4-confirm-glow-flare { position: absolute; inset: 0; }
+    #s4-confirm-glow-flare { border-radius: 50%; background: radial-gradient(circle at 50% 50%, #FFFFFF 0 3.5px, rgba(255, 74, 71, 0.88) 6.5px, rgba(253, 49, 46, 0.4) 19px, rgba(253, 49, 46, 0.12) 44px, rgba(253, 49, 46, 0) 78px); }
+    #s4-confirm-photo-wrap { position: absolute; inset: 0; }
+    #s4-confirm-photo { position: absolute; left: 1166.88px; top: 234.58px; width: 426.24px; height: 783.56px; }
+
+    /* Dotted leaders: one box per straight run, revealed from the anchor end with --g (0..1). */
+    #s4-confirm-leaders { position: absolute; inset: 0; --s4c-h: radial-gradient(circle at 4px 50%, rgba(184, 178, 172, 0.6) 1.6px, rgba(184, 178, 172, 0) 2.1px) 0 0 / 8px 4px repeat-x;
+      --s4c-v: radial-gradient(circle at 50% 4px, rgba(184, 178, 172, 0.6) 1.6px, rgba(184, 178, 172, 0) 2.1px) 0 0 / 4px 8px repeat-y; }
+    .s4c-seg { position: absolute; --g: 0; }
+    .s4c-seg.s4c-h { height: 4px; margin-top: -2px; background: var(--s4c-h); }
+    .s4c-seg.s4c-v { width: 4px; margin-left: -2px; background: var(--s4c-v); }
+    #s4-confirm-L0 { left: 1100px; top: 706.17px; width: 58.74px; clip-path: inset(0 0 0 calc((1 - var(--g)) * 100%)); }
+    #s4-confirm-L1a { left: 1380.91px; top: 144px; height: 79px; clip-path: inset(calc((1 - var(--g)) * 100%) 0 0 0); }
+    #s4-confirm-L1b { left: 1100px; top: 144px; width: 280.91px; clip-path: inset(0 0 0 calc((1 - var(--g)) * 100%)); }
+    #s4-confirm-L2 { left: 1100px; top: 279.93px; width: 72.34px; clip-path: inset(0 0 0 calc((1 - var(--g)) * 100%)); }
+    #s4-confirm-L3 { left: 1632px; top: 250px; width: 16px; clip-path: inset(0 calc((1 - var(--g)) * 100%) 0 0); }
+
+    /* Glass tips. Left tips hang off x 1100 (right edge), the 612 mm tip starts at x 1648 so it ends inside x 1824. */
+    .s4c-tip { position: absolute; width: 0; height: 112px; }
+    .s4c-glass { position: absolute; top: 0; height: 112px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; padding: 0 24px;
+      background: rgba(31, 29, 28, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px;
+      -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.09); color: #FFFFFF; white-space: nowrap; overflow: hidden; }
+    .s4c-sheen { position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 58%); }
+    .s4c-txt { position: relative; display: flex; flex-direction: column; gap: 4px; }
+    .s4c-val { font: 700 40px/1.1 var(--font-text); letter-spacing: -0.01em; }
+    .s4c-lab { font: 400 22px/1.3 var(--font-text); color: #B8B2AC; }
+    #s4-confirm-tip1, #s4-confirm-tip2 { right: 820px; }
+    #s4-confirm-tip1 { top: 88px; }
+    #s4-confirm-tip2 { top: 223.93px; }
+    #s4-confirm-tip3 { left: 1648px; top: 194px; }
+    #s4-confirm-tip1 .s4c-glass, #s4-confirm-tip2 .s4c-glass { right: 0; transform-origin: 100% 50%; }
+    #s4-confirm-tip3 .s4c-glass { left: 0; transform-origin: 0% 50%; }
+
+    /* M5 card: --k 0..1 carries it from the tip (right edge 1100, centre y 706.17, 200x112) to the s5 hand-off card. */
+    #s4-confirm-m5 { --k: 0; --cx0: 1000; --cy0: 706.17; --w0: 200; --h0: 112; --cx1: 1380; --cy1: 540; --w1: 426; --h1: 259;
+      --w: calc(var(--w0) + (var(--w1) - var(--w0)) * var(--k)); --h: calc(var(--h0) + (var(--h1) - var(--h0)) * var(--k));
+      position: absolute; width: calc(var(--w) * 1px); height: calc(var(--h) * 1px);
+      left: calc((var(--cx0) + (var(--cx1) - var(--cx0)) * var(--k) - var(--w) / 2) * 1px);
+      top: calc((var(--cy0) + (var(--cy1) - var(--cy0)) * var(--k) - var(--h) / 2) * 1px); }
+    #s4-confirm-m5 > .s4c-glass { inset: 0; height: auto; transform-origin: 100% 50%; border-radius: calc((16 + 8 * var(--k)) * 1px);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, calc(0.35 * (1 - var(--k)))), inset 0 1px 0 rgba(255, 255, 255, calc(0.09 * (1 - var(--k)))); }
+    #s4-confirm-m5 .s4c-sheen { opacity: calc(1 - var(--k)); }
+
+    /* Title block and note. */
+    #s4-confirm-title { position: absolute; left: 144px; top: 330px; display: flex; flex-direction: column; align-items: flex-start; }
+    #s4-confirm-eyebrow { display: inline-flex; align-items: center; gap: 0.45em; margin: 0 0 8px; font: 600 30px/1 var(--font-text); letter-spacing: 0.08em; color: #FD312E; white-space: nowrap; --s4c-dot: 0; }
+    #s4-confirm-eyebrow::before { content: ""; flex: none; width: 0.36em; height: 0.36em; border-radius: 50%; background: #FD312E; transform: scale(var(--s4c-dot)); }
+    #s4-confirm-heading { margin: 4px 0 0; font: 700 128px/1.08 var(--font-text); letter-spacing: -0.02em; color: #FFFFFF; white-space: nowrap; }
+    #s4-confirm-sub { margin: 44px 0 0; font: 400 34px/1.35 var(--font-text); color: #B8B2AC; white-space: nowrap; }
+    #s4-confirm-note { position: absolute; left: 144px; top: 948px; margin: 0; font: 400 22px/1.4 var(--font-text); color: #8A8580; white-space: nowrap; }
+    #s4-confirm-note span { white-space: nowrap; }
+    .s4c-mask { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.14em 0.02em; margin: -0.14em -0.02em; }
+    .s4c-ch { display: inline-block; }
+    .s4c-dot { color: #FD312E; }
+
+    /* Portrait canvas 1080x1920: title on top, tips in a 2x2 grid, body below (820 px tall, k 0.991536, centre x 540, floor y 1720), note at the bottom. */
+    @container (aspect-ratio < 1) {
+      #s4-confirm-stage { transform: translate(-968.8px, 626.67px) scale(1.093334); }
+      #s4-confirm-ring2a, #s4-confirm-ring2b, #s4-confirm-dot2, #s4-confirm-dotring2 { cx: 1380.91px; cy: 236px; }
+      #s4-confirm-leaders { --s4c-h: radial-gradient(circle at 6px 50%, rgba(184, 178, 172, 0.6) 2.6px, rgba(184, 178, 172, 0) 3.2px) 0 0 / 12px 6px repeat-x;
+        --s4c-v: radial-gradient(circle at 50% 6px, rgba(184, 178, 172, 0.6) 2.6px, rgba(184, 178, 172, 0) 3.2px) 0 0 / 6px 12px repeat-y; }
+      .s4c-seg.s4c-h, .s4c-seg.s4c-v, #s4-confirm-L0, #s4-confirm-L1a, #s4-confirm-L1b, #s4-confirm-L2, #s4-confirm-L3 { margin: 0; }
+      #s4-confirm-L0 { left: 309.3px; top: 838px; width: 6px; height: 546.5px; background: var(--s4c-v); clip-path: inset(calc((1 - var(--g)) * 100%) 0 0 0); }
+      #s4-confirm-L1a { left: 537.99px; top: 556px; width: 6px; height: 314.48px; background: var(--s4c-v); clip-path: inset(calc((1 - var(--g)) * 100%) 0 0 0); }
+      #s4-confirm-L1b { left: 540.99px; top: 553px; width: 23.01px; height: 6px; background: var(--s4c-h); clip-path: inset(0 calc((1 - var(--g)) * 100%) 0 0); }
+      #s4-confirm-L2 { left: 516px; top: 553px; width: 24.99px; height: 6px; background: var(--s4c-h); clip-path: inset(0 0 0 calc((1 - var(--g)) * 100%)); }
+      #s4-confirm-L3 { left: 795.03px; top: 838px; width: 6px; height: 44.5px; background: var(--s4c-v); clip-path: inset(calc((1 - var(--g)) * 100%) 0 0 0); }
+      .s4c-tip { width: 440px; height: 172px; right: auto; }
+      .s4c-glass { height: 172px; padding: 0 36px; }
+      .s4c-txt { gap: 8px; }
+      .s4c-val { font-size: 64px; }
+      .s4c-lab { font-size: 42px; }
+      #s4-confirm-tip1 { left: 564px; top: 470px; }
+      #s4-confirm-tip2 { left: 76px; top: 470px; }
+      #s4-confirm-tip3 { left: 564px; top: 666px; }
+      #s4-confirm-tip1 .s4c-glass, #s4-confirm-tip2 .s4c-glass, #s4-confirm-tip3 .s4c-glass { left: 0; right: 0; width: auto; }
+      #s4-confirm-tip1 .s4c-glass { transform-origin: 0% 50%; }
+      #s4-confirm-tip2 .s4c-glass { transform-origin: 100% 50%; }
+      #s4-confirm-tip3 .s4c-glass { transform-origin: 53.19% 100%; }
+      #s4-confirm-m5 { --cx0: 296; --cy0: 752; --w0: 440; --h0: 172; --cx1: 540; --cy1: 1000; --w1: 496; --h1: 301; }
+      #s4-confirm-m5 > .s4c-glass { transform-origin: 53.7% 100%; }
+      #s4-confirm-title { left: 76px; top: 100px; }
+      #s4-confirm-eyebrow { font-size: 42px; margin-bottom: 12px; }
+      #s4-confirm-heading { font-size: 168px; }
+      #s4-confirm-sub { font-size: 48px; margin-top: 28px; }
+      #s4-confirm-note { left: 76px; top: 1758px; font-size: 36px; white-space: normal; }
+      #s4-confirm-note span { display: block; }
+    }
+  </style>
+  <div id="root" data-composition-id="s4-confirm" data-width="1920" data-height="1080">
+    <div id="s4-confirm-bg" class="clip" data-start="0" data-duration="17"></div>
+
+    <div id="s4-confirm-out" class="clip" data-start="0" data-duration="17">
+      <div id="s4-confirm-grid"></div>
+
+      <div id="s4-confirm-move">
+      <div id="s4-confirm-stage" data-layout-allow-overflow>
+        <div id="s4-confirm-glow"><div id="s4-confirm-glow-ignite"><div id="s4-confirm-glow-flare"></div></div></div>
+        <!-- Under the photo: pulse rings and anchor dots, so nothing is drawn over the product. -->
+        <svg id="s4-confirm-under" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+          <g id="s4-confirm-ring0a-g" opacity="0"><circle id="s4-confirm-ring0a" cx="1171.74" cy="706.17" r="6" fill="none" stroke="#FD312E" stroke-width="3"></circle></g>
+          <g id="s4-confirm-ring0b-g" opacity="0"><circle id="s4-confirm-ring0b" cx="1171.74" cy="706.17" r="8" fill="none" stroke="#FD312E" stroke-width="2"></circle></g>
+          <g id="s4-confirm-ring1a-g" opacity="0"><circle id="s4-confirm-ring1a" cx="1380.91" cy="236" r="6" fill="none" stroke="#FD312E" stroke-width="3"></circle></g>
+          <g id="s4-confirm-ring1b-g" opacity="0"><circle id="s4-confirm-ring1b" cx="1380.91" cy="236" r="8" fill="none" stroke="#FD312E" stroke-width="2"></circle></g>
+          <g id="s4-confirm-ring2a-g" opacity="0"><circle id="s4-confirm-ring2a" cx="1185.34" cy="279.93" r="6" fill="none" stroke="#FD312E" stroke-width="3"></circle></g>
+          <g id="s4-confirm-ring2b-g" opacity="0"><circle id="s4-confirm-ring2b" cx="1185.34" cy="279.93" r="8" fill="none" stroke="#FD312E" stroke-width="2"></circle></g>
+          <g id="s4-confirm-ring3a-g" opacity="0"><circle id="s4-confirm-ring3a" cx="1616" cy="250" r="6" fill="none" stroke="#FD312E" stroke-width="3"></circle></g>
+          <g id="s4-confirm-ring3b-g" opacity="0"><circle id="s4-confirm-ring3b" cx="1616" cy="250" r="8" fill="none" stroke="#FD312E" stroke-width="2"></circle></g>
+          <circle id="s4-confirm-dotring0" cx="1171.74" cy="706.17" r="0" fill="none" stroke="#FD312E" stroke-width="2.5"></circle>
+          <circle id="s4-confirm-dot0" cx="1171.74" cy="706.17" r="0" fill="#FFFFFF"></circle>
+          <circle id="s4-confirm-dotring1" cx="1380.91" cy="236" r="0" fill="none" stroke="#FD312E" stroke-width="2.5"></circle>
+          <circle id="s4-confirm-dot1" cx="1380.91" cy="236" r="0" fill="#FFFFFF"></circle>
+          <circle id="s4-confirm-dotring2" cx="1185.34" cy="279.93" r="0" fill="none" stroke="#FD312E" stroke-width="2.5"></circle>
+          <circle id="s4-confirm-dot2" cx="1185.34" cy="279.93" r="0" fill="#FFFFFF"></circle>
+        </svg>
+        <div id="s4-confirm-photo-wrap"><img id="s4-confirm-photo" src="assets/img/cut-front-closed.png" alt="" /></div>
+        <!-- The height line: bottom tick on the product floor (row 844), top tick on its top (row 17), x 1616. -->
+        <svg id="s4-confirm-over" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+          <defs>
+            <filter id="s4-confirm-blur" filterUnits="userSpaceOnUse" x="1416" y="0" width="400" height="1200" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="7"></feGaussianBlur></filter>
+            <linearGradient id="s4-confirm-comet-grad" gradientUnits="userSpaceOnUse" x1="0" y1="1120" x2="0" y2="1000">
+              <stop offset="0" stop-color="#FD312E" stop-opacity="0"></stop>
+              <stop offset="0.72" stop-color="#FF4A47" stop-opacity="0.95"></stop>
+              <stop offset="1" stop-color="#FFFFFF" stop-opacity="1"></stop>
+            </linearGradient>
+          </defs>
+          <g id="s4-confirm-ext0-g" opacity="0"><line id="s4-confirm-ext0" x1="1598" y1="1000" x2="1598" y2="1000" stroke="#B8B2AC" stroke-opacity="0.42" stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round"></line></g>
+          <g id="s4-confirm-ext1-g" opacity="0"><line id="s4-confirm-ext1" x1="1598" y1="250" x2="1598" y2="250" stroke="#B8B2AC" stroke-opacity="0.42" stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round"></line></g>
+          <g id="s4-confirm-tick0-g" opacity="0"><line id="s4-confirm-tick0" x1="1616" y1="1000" x2="1616" y2="1000" stroke="#FD312E" stroke-width="3" stroke-linecap="round"></line></g>
+          <g id="s4-confirm-tick1-g" opacity="0"><line id="s4-confirm-tick1" x1="1616" y1="250" x2="1616" y2="250" stroke="#FD312E" stroke-width="3" stroke-linecap="round"></line></g>
+          <g id="s4-confirm-line-g" opacity="0">
+            <line id="s4-confirm-bloom" x1="1616" y1="1000" x2="1616" y2="1000" stroke="#FD312E" stroke-width="10" stroke-opacity="0.62" stroke-linecap="round" filter="url(#s4-confirm-blur)"></line>
+            <line id="s4-confirm-core" x1="1616" y1="1000" x2="1616" y2="1000" stroke="#FD312E" stroke-width="3" stroke-linecap="round"></line>
+            <line id="s4-confirm-comet" x1="1616" y1="1000" x2="1616" y2="1000" stroke="url(#s4-confirm-comet-grad)" stroke-width="3.4" stroke-linecap="round"></line>
+          </g>
+        </svg>
+      </div>
+
+      <div id="s4-confirm-leaders">
+        <div id="s4-confirm-L0" class="s4c-seg s4c-h"></div>
+        <div id="s4-confirm-L1a" class="s4c-seg s4c-v"></div>
+        <div id="s4-confirm-L1b" class="s4c-seg s4c-h"></div>
+        <div id="s4-confirm-L2" class="s4c-seg s4c-h"></div>
+        <div id="s4-confirm-L3" class="s4c-seg s4c-h"></div>
+      </div>
+
+      <div id="s4-confirm-tip1" class="s4c-tip"><div id="s4-confirm-tip1-glass" class="s4c-glass"><div class="s4c-sheen"></div><div class="s4c-txt"><div id="s4-confirm-tip1-val" class="s4c-val">8가지</div><div id="s4-confirm-tip1-lab" class="s4c-lab">감지 항목</div></div></div></div>
+      <div id="s4-confirm-tip2" class="s4c-tip"><div id="s4-confirm-tip2-glass" class="s4c-glass"><div class="s4c-sheen"></div><div class="s4c-txt"><div id="s4-confirm-tip2-val" class="s4c-val">4.3인치</div><div id="s4-confirm-tip2-lab" class="s4c-lab">터치 LCD</div></div></div></div>
+      <div id="s4-confirm-tip3" class="s4c-tip"><div id="s4-confirm-tip3-glass" class="s4c-glass"><div class="s4c-sheen"></div><div class="s4c-txt"><div id="s4-confirm-tip3-val" class="s4c-val">612mm</div><div id="s4-confirm-tip3-lab" class="s4c-lab">본체 높이</div></div></div></div>
+      </div>
+
+      <div id="s4-confirm-title">
+        <div id="s4-confirm-eyebrow"><span id="s4-confirm-eyebrow-text">제품 화면과 LG ThinQ</span></div>
+        <h2 id="s4-confirm-heading">확인.</h2>
+        <p id="s4-confirm-sub">어떤 항목인지 확인해 보세요.</p>
+      </div>
+      <p id="s4-confirm-note"><span>LG ThinQ 앱은 Wi-Fi 연결이 필요해요.</span> <span>본체 크기 가로 347 × 높이 612 × 깊이 347mm</span></p>
+    </div>
+
+    <!-- The M5 tip stays on its own layer: it grows into the s5 card while everything else leaves. -->
+    <div id="s4-confirm-m5-layer" class="clip" data-start="0" data-duration="17">
+      <div id="s4-confirm-m5"><div id="s4-confirm-tip0-glass" class="s4c-glass"><div class="s4c-sheen"></div><div id="s4-confirm-m5-text" class="s4c-txt"><div id="s4-confirm-tip0-val" class="s4c-val">M5</div><div id="s4-confirm-tip0-lab" class="s4c-lab">강력탈취청정 필터</div></div></div></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      // Split a text node into per-character clipping masks (spaces stay plain text). Safe to run twice.
+      function split(id, dot) {
+        var node = document.getElementById(id);
+        var text = node.textContent;
+        var chars = [];
+        node.textContent = "";
+        Array.from(text).forEach(function (ch) {
+          if (ch === " ") { node.appendChild(document.createTextNode(" ")); return; }
+          var m = document.createElement("span");
+          var c = document.createElement("span");
+          m.className = "s4c-mask";
+          c.className = dot && ch === "." ? "s4c-ch s4c-dot" : "s4c-ch";
+          c.textContent = ch;
+          m.appendChild(c);
+          node.appendChild(m);
+          chars.push(c);
+        });
+        return chars;
+      }
+      var eyebrowChars = split("s4-confirm-eyebrow-text", false);
+      var titleChars = split("s4-confirm-heading", true);
+      var valChars = [0, 1, 2, 3].map(function (i) { return split("s4-confirm-tip" + i + "-val", false); });
+
+      var NONE = "none";
+      var D0 = 2.0;   // 40 s: the light point starts to rise
+      var D1 = 11.4;  // 49.4 s: the line reaches the top, so the 612 mm tip has landed by the reading spot at 50 s
+      var RISE = D1 - D0;
+      var X0 = 15.5;  // 53.5 s: hand-off to s5 starts
+      var tl = gsap.timeline({ paused: true });
+
+      // 0-2 s: grid, photo, floor light point, title block, note.
+      tl.fromTo("#s4-confirm-grid", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "sine.out" }, 0);
+      tl.fromTo("#s4-confirm-photo-wrap", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 0.1);
+      tl.fromTo("#s4-confirm-glow-ignite", { opacity: 0, scale: 0.25 }, { opacity: 1, scale: 1, duration: 1.5, ease: "power3.out" }, 0.15);
+      tl.fromTo("#s4-confirm-eyebrow", { "--s4c-dot": 0 }, { "--s4c-dot": 1, duration: 0.3, ease: "back.out(2.4)" }, 0.45);
+      tl.fromTo(eyebrowChars, { yPercent: 130 }, { yPercent: 0, duration: 0.45, ease: "power4.out", stagger: 0.03 }, 0.5);
+      tl.fromTo(titleChars, { yPercent: 130 }, { yPercent: 0, duration: 0.55, ease: "expo.out", stagger: 0.08 }, 0.62);
+      tl.fromTo("#s4-confirm-sub", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 1.0);
+      tl.fromTo("#s4-confirm-note", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power1.out" }, 1.3);
+
+      // 2-11.4 s: the line rises with the scroll (linear), the light point is its head.
+      tl.fromTo("#s4-confirm-line-g", { opacity: 0 }, { opacity: 1, duration: 0.02, ease: NONE }, D0 - 0.02);
+      tl.fromTo(["#s4-confirm-core", "#s4-confirm-bloom"], { attr: { y2: 1000 } }, { attr: { y2: 250 }, duration: RISE, ease: NONE }, D0);
+      tl.fromTo("#s4-confirm-comet", { attr: { y1: 1000, y2: 1000 } }, { attr: { y1: 370, y2: 250 }, duration: RISE, ease: NONE }, D0);
+      tl.fromTo("#s4-confirm-comet-grad", { attr: { y1: 1120, y2: 1000 } }, { attr: { y1: 370, y2: 250 }, duration: RISE, ease: NONE }, D0);
+      tl.fromTo("#s4-confirm-comet", { opacity: 1 }, { opacity: 0, duration: 0.4, ease: "power1.out", immediateRender: false }, D1);
+      tl.fromTo("#s4-confirm-glow", { y: 0 }, { y: -750, duration: RISE, ease: NONE }, D0);
+      // Light bloom (no white flash): the head swells on the drop and on arrival.
+      tl.fromTo("#s4-confirm-glow-flare", { scale: 1 }, { scale: 1.28, duration: 0.16, ease: "sine.out" }, D0 - 0.02);
+      tl.fromTo("#s4-confirm-glow-flare", { scale: 1.28 }, { scale: 1, duration: 0.22, ease: "sine.inOut", immediateRender: false }, D0 + 0.14);
+      tl.fromTo("#s4-confirm-glow-flare", { scale: 1 }, { scale: 1.34, duration: 0.16, ease: "sine.out", immediateRender: false }, D1 - 0.02);
+      tl.fromTo("#s4-confirm-glow-flare", { scale: 1.34 }, { scale: 1, duration: 0.3, ease: "sine.inOut", immediateRender: false }, D1 + 0.14);
+      // End ticks and dotted extension lines.
+      [["#s4-confirm-tick0", 1000, D0], ["#s4-confirm-tick1", 250, D1]].forEach(function (d) {
+        tl.fromTo(d[0] + "-g", { opacity: 0 }, { opacity: 1, duration: 0.02, ease: NONE }, d[2]);
+        tl.fromTo(d[0], { attr: { x1: 1616, x2: 1616 } }, { attr: { x1: 1602, x2: 1630 }, duration: 0.24, ease: "back.out(2)" }, d[2]);
+      });
+      [["#s4-confirm-ext0", 1502.43, D0 + 0.08], ["#s4-confirm-ext1", 1529.64, D1 + 0.04]].forEach(function (d) {
+        tl.fromTo(d[0] + "-g", { opacity: 0 }, { opacity: 1, duration: 0.02, ease: NONE }, d[2]);
+        tl.fromTo(d[0], { attr: { x2: 1598 } }, { attr: { x2: d[1] }, duration: 0.42, ease: "power3.out" }, d[2]);
+      });
+
+      // Tips: pulse rings and the dotted leader first, then the card springs out of the leader end; digits drop into place.
+      var tips = [
+        { s: 3.0, digits: false, dot: true, segs: [["#s4-confirm-L0", -0.18, 0.2]] },
+        { s: 5.5, digits: true, dot: true, segs: [["#s4-confirm-L1a", -0.2, 0.12], ["#s4-confirm-L1b", -0.08, 0.1]] },
+        { s: 8.0, digits: true, dot: true, segs: [["#s4-confirm-L2", -0.18, 0.2]] },
+        { s: D1, digits: true, dot: false, segs: [["#s4-confirm-L3", -0.12, 0.12]] },
+      ];
+      tips.forEach(function (tip, i) {
+        var s = tip.s;
+        var p = "#s4-confirm-ring" + i;
+        tl.fromTo(p + "a-g", { opacity: 0 }, { opacity: 1, duration: 0.01, ease: NONE }, s - 0.2);
+        tl.fromTo(p + "a", { attr: { r: 6, "stroke-width": 3 } }, { attr: { r: 46, "stroke-width": 1 }, duration: 0.6, ease: "power3.out" }, s - 0.2);
+        tl.fromTo(p + "a", { opacity: 0.95 }, { opacity: 0, duration: 0.6, ease: NONE }, s - 0.2);
+        tl.fromTo(p + "b-g", { opacity: 0 }, { opacity: 1, duration: 0.01, ease: NONE }, s - 0.02);
+        tl.fromTo(p + "b", { attr: { r: 8, "stroke-width": 2 } }, { attr: { r: 64, "stroke-width": 0.6 }, duration: 0.58, ease: "power3.out" }, s - 0.02);
+        tl.fromTo(p + "b", { opacity: 0.5 }, { opacity: 0, duration: 0.58, ease: NONE }, s - 0.02);
+        if (tip.dot) {
+          tl.fromTo("#s4-confirm-dot" + i, { attr: { r: 0 } }, { attr: { r: 4.2 }, duration: 0.25, ease: "back.out(2.2)" }, s - 0.2);
+          tl.fromTo("#s4-confirm-dotring" + i, { attr: { r: 0 } }, { attr: { r: 8 }, duration: 0.25, ease: "back.out(2.2)" }, s - 0.2);
+        }
+        tip.segs.forEach(function (g) {
+          tl.fromTo(g[0], { "--g": 0 }, { "--g": 1, duration: g[2], ease: "power2.out" }, s + g[1]);
+        });
+        var glass = "#s4-confirm-tip" + i + "-glass";
+        tl.fromTo(glass, { scale: 0.4 }, { scale: 1, duration: 0.5, ease: "back.out(2)" }, s);
+        tl.fromTo(glass, { opacity: 0 }, { opacity: 1, duration: 0.08, ease: NONE }, s);
+        if (tip.digits) {
+          tl.fromTo(valChars[i], { yPercent: -130 }, { yPercent: 0, duration: 0.32, ease: "back.out(1.35)", stagger: 0.05 }, s + 0.02);
+          tl.fromTo(valChars[i], { filter: "blur(8px)" }, { filter: "blur(0px)", duration: 0.32, ease: "power2.out", stagger: 0.05 }, s + 0.02);
+        } else {
+          tl.fromTo(valChars[i], { yPercent: 130 }, { yPercent: 0, duration: 0.4, ease: "power4.out", stagger: 0.06 }, s + 0.02);
+        }
+        tl.fromTo("#s4-confirm-tip" + i + "-lab", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, s + 0.1);
+      });
+
+      // 15.5-16.9 s: everything but the M5 card fades over 1.2 s while the body, leaders and three tips slide 80 px left together (the title block stays);
+      // the card loses its text and grows into the s5 hand-off card.
+      tl.fromTo("#s4-confirm-out", { opacity: 1 }, { opacity: 0, duration: 1.2, ease: "power2.inOut", immediateRender: false }, X0);
+      tl.fromTo("#s4-confirm-move", { x: 0 }, { x: -80, duration: 1.2, ease: "power2.inOut", immediateRender: false }, X0);
+      tl.fromTo("#s4-confirm-m5-text", { opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(6px)", duration: 0.35, ease: "power2.in", immediateRender: false }, X0);
+      tl.fromTo("#s4-confirm-m5", { "--k": 0 }, { "--k": 1, duration: 1.4, ease: "power2.inOut", immediateRender: false }, X0);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["s4-confirm"] = tl;
+    })();
+  </script>
+</template>

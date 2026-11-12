@@ -1,0 +1,187 @@
+<template>
+  <!--
+    s7-cta: closing end card (timeline 84~100 s, scene time = timeline - 84). Ported from intro-3 scenes/s6-endcard.js.
+    0 s: full White (s6 hands over a white screen). 0~3 s pale Active Red rings spread from the centre and fade, product rises.
+    3~4.5 logo, 4.5~6 name (letters fly in, blurred only while moving), 6~7 tagline, 7~8 model line, 8~9 model pill.
+    From 9 s (93 s) the shell lays the real main button over the empty slot: landscape centre 700,830 h 76 /
+    portrait centre 540,1040 w 1000 h 144. Nothing is drawn there. 10~16 s (94~100 s) is the reading hold: nothing moves.
+  -->
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; container-type: size; font-family: var(--font-text); }
+    #s7-cta-bg { position: absolute; inset: 0; background: var(--c-white); }
+    #s7-cta-fx { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+    /* Pale rings: an svg of size 0 placed on the canvas centre; circles sit at 0,0. */
+    #s7-cta-rings { position: absolute; inset: 0; }
+    #s7-cta-rings-svg { position: absolute; left: 960px; top: 540px; width: 1px; height: 1px; overflow: visible; }
+    .s7-cta-ring { fill: none; stroke: var(--c-accent); opacity: 0; }
+
+    /* Product: official cut-out (518x1171, product box l27 t26 r490 b1141). Landscape slot: centre x 1380, bottom 1000, product height 850. */
+    #s7-cta-product, #s7-cta-product-in, #s7-cta-discs { position: absolute; inset: 0; }
+    #s7-cta-shadow { position: absolute; left: 1170px; top: 974px; width: 420px; height: 52px;
+      background: radial-gradient(closest-side, rgba(0, 0, 0, 0.14), rgba(0, 0, 0, 0)); }
+    #s7-cta-product-img { position: absolute; left: 1182.94px; top: 130.18px; width: 394.89px; height: 892.69px; }
+
+    /* Active Red concentric discs behind the product (15/35/85 % as intro-3), whole circles kept inside the
+       96 px margin even at the 3.7 % entrance overshoot, so the canvas edges stay plain White.
+       Landscape: centre 1380,630 (product axis), r 231/189/147 (30 % smaller than 330/270/210, so the red does not outweigh
+       the main button) -> y 399~861, x 1149~1611, clear of the name line. */
+    .s7-cta-disc { position: absolute; border-radius: 50%; }
+    #s7-cta-disc-0 { left: 1149px; top: 399px; width: 462px; height: 462px; background: rgba(253, 49, 46, 0.15); }
+    #s7-cta-disc-1 { left: 1191px; top: 441px; width: 378px; height: 378px; background: rgba(253, 49, 46, 0.35); }
+    #s7-cta-disc-2 { left: 1233px; top: 483px; width: 294px; height: 294px; background: rgba(253, 49, 46, 0.85); }
+
+    /* Text group, centred on x 700. Each line box is 1400 wide from x 0; top = line centre - height / 2. */
+    .s7-cta-line { position: absolute; left: 0; width: 1400px; text-align: center; white-space: nowrap; }
+    #s7-cta-logo { position: absolute; left: 563.25px; top: 270px; width: 273.5px; height: 96px; }
+    #s7-cta-logo-img { display: block; width: 100%; height: 100%; }
+    #s7-cta-name { top: 406px; height: 100px; font: 700 72px/100px var(--font-text); letter-spacing: -0.01em; color: var(--c-ink); }
+    .s7-cta-ch { display: inline-block; white-space: pre; }
+    #s7-cta-tagline { top: 521px; height: 70px; font: 600 50px/70px var(--font-text); letter-spacing: -0.005em; color: var(--c-ink); }
+    .s7-cta-word { display: inline-block; }
+    .s7-cta-dot { display: inline-block; color: var(--c-accent); transform-origin: 50% 85%; }
+    #s7-cta-model { top: 608px; height: 40px; font: 400 28px/40px var(--font-text); letter-spacing: 0.01em; color: var(--c-ink-sub); white-space: normal; word-break: keep-all; }
+    #s7-cta-model-text { display: inline-block; }
+    .s7-cta-keep { white-space: nowrap; }
+    /* The ring-above sign has wide side bearings; pull it in against "360" and the next word (as in intro-3). */
+    .s7-cta-deg { margin-left: -0.16em; margin-right: -0.08em; }
+    #s7-cta-pill-row { top: 692px; height: 60px; display: flex; justify-content: center; align-items: center; }
+    /* Model number, not a link: grey 1px outline and grey text, no fill (the filled red button is the shell's CTA). */
+    #s7-cta-pill { display: inline-flex; align-items: center; box-sizing: border-box; height: 60px; padding: 0 32px 2px;
+      border: 1px solid var(--c-ink-sub); border-radius: 999px; color: var(--c-ink-sub); font: 600 30px/1 var(--font-text); white-space: nowrap; }
+
+    /* Portrait canvas 1080x1920: text block on top (y 150~950), button slot y 968~1112 left empty, product below (y 1133~1860). */
+    @container (aspect-ratio < 1) {
+      #s7-cta-rings-svg { left: 540px; top: 960px; }
+      #s7-cta-shadow { left: 360px; top: 1838px; width: 360px; height: 44px; }
+      #s7-cta-product-img { left: 375.07px; top: 1133.45px; width: 329.85px; height: 745.66px; }
+      /* Portrait: centre 540,1520 under the button slot, r 224/182/140 (30 % smaller than 320/260/200) -> y 1296~1744, x 316~764. */
+      #s7-cta-disc-0 { left: 316px; top: 1296px; width: 448px; height: 448px; }
+      #s7-cta-disc-1 { left: 358px; top: 1338px; width: 364px; height: 364px; }
+      #s7-cta-disc-2 { left: 400px; top: 1380px; width: 280px; height: 280px; }
+      .s7-cta-line { width: 1080px; }
+      #s7-cta-logo { left: 354.8px; top: 265px; width: 370.4px; height: 130px; }
+      #s7-cta-name { top: 450px; height: 120px; font-size: 96px; line-height: 120px; }
+      #s7-cta-tagline { top: 592px; height: 96px; font-size: 72px; line-height: 96px; }
+      #s7-cta-model { left: 60px; width: 960px; top: 715px; height: 60px; font-size: 48px; line-height: 60px; }
+      #s7-cta-pill-row { top: 844px; height: 84px; }
+      #s7-cta-pill { height: 84px; padding: 0 44px 3px; font-size: 42px; }
+    }
+  </style>
+  <div id="root" data-composition-id="s7-cta" data-width="1920" data-height="1080">
+    <div id="s7-cta-bg"></div>
+
+    <!-- Horizontal-only motion blur for the name letters (CSS blur() cannot blur along one axis). -->
+    <svg id="s7-cta-fx" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <filter id="s7-cta-mb-0" x="-300%" y="-20%" width="700%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur class="s7-cta-mb" stdDeviation="0 0"></feGaussianBlur></filter>
+        <filter id="s7-cta-mb-1" x="-300%" y="-20%" width="700%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur class="s7-cta-mb" stdDeviation="0 0"></feGaussianBlur></filter>
+        <filter id="s7-cta-mb-2" x="-300%" y="-20%" width="700%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur class="s7-cta-mb" stdDeviation="0 0"></feGaussianBlur></filter>
+        <filter id="s7-cta-mb-3" x="-300%" y="-20%" width="700%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur class="s7-cta-mb" stdDeviation="0 0"></feGaussianBlur></filter>
+        <filter id="s7-cta-mb-4" x="-300%" y="-20%" width="700%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur class="s7-cta-mb" stdDeviation="0 0"></feGaussianBlur></filter>
+        <filter id="s7-cta-mb-5" x="-300%" y="-20%" width="700%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur class="s7-cta-mb" stdDeviation="0 0"></feGaussianBlur></filter>
+        <filter id="s7-cta-mb-6" x="-300%" y="-20%" width="700%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur class="s7-cta-mb" stdDeviation="0 0"></feGaussianBlur></filter>
+        <filter id="s7-cta-mb-7" x="-300%" y="-20%" width="700%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur class="s7-cta-mb" stdDeviation="0 0"></feGaussianBlur></filter>
+        <filter id="s7-cta-mb-8" x="-300%" y="-20%" width="700%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur class="s7-cta-mb" stdDeviation="0 0"></feGaussianBlur></filter>
+        <filter id="s7-cta-mb-9" x="-300%" y="-20%" width="700%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur class="s7-cta-mb" stdDeviation="0 0"></feGaussianBlur></filter>
+        <filter id="s7-cta-mb-10" x="-300%" y="-20%" width="700%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur class="s7-cta-mb" stdDeviation="0 0"></feGaussianBlur></filter>
+        <filter id="s7-cta-mb-11" x="-300%" y="-20%" width="700%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur class="s7-cta-mb" stdDeviation="0 0"></feGaussianBlur></filter>
+        <filter id="s7-cta-mb-12" x="-300%" y="-20%" width="700%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur class="s7-cta-mb" stdDeviation="0 0"></feGaussianBlur></filter>
+      </defs>
+    </svg>
+
+    <div id="s7-cta-rings" class="clip" data-start="0" data-duration="3.2">
+      <svg id="s7-cta-rings-svg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle class="s7-cta-ring" cx="0" cy="0" r="60" stroke-width="6"></circle>
+        <circle class="s7-cta-ring" cx="0" cy="0" r="60" stroke-width="5"></circle>
+        <circle class="s7-cta-ring" cx="0" cy="0" r="60" stroke-width="4"></circle>
+      </svg>
+    </div>
+
+    <!-- Discs come before the product so the product stands in front of them. -->
+    <div id="s7-cta-discs" class="clip" data-start="0" data-duration="16">
+      <div id="s7-cta-disc-0" class="s7-cta-disc"></div>
+      <div id="s7-cta-disc-1" class="s7-cta-disc"></div>
+      <div id="s7-cta-disc-2" class="s7-cta-disc"></div>
+    </div>
+
+    <div id="s7-cta-product" class="clip" data-start="0" data-duration="16" data-hold>
+      <div id="s7-cta-product-in">
+        <div id="s7-cta-shadow"></div>
+        <img id="s7-cta-product-img" src="assets/img/cut-front.png" alt="" />
+      </div>
+    </div>
+
+    <div id="s7-cta-logo" class="clip" data-start="0" data-duration="16">
+      <img id="s7-cta-logo-img" src="assets/img/logo-kr-light.webp" alt="" />
+    </div>
+
+    <div id="s7-cta-name" class="s7-cta-line clip" data-start="0" data-duration="16"><span class="s7-cta-ch">L</span><span class="s7-cta-ch">G</span><span class="s7-cta-ch"> </span><span class="s7-cta-ch">퓨</span><span class="s7-cta-ch">리</span><span class="s7-cta-ch">케</span><span class="s7-cta-ch">어</span><span class="s7-cta-ch"> </span><span class="s7-cta-ch">공</span><span class="s7-cta-ch">기</span><span class="s7-cta-ch">청</span><span class="s7-cta-ch">정</span><span class="s7-cta-ch">기</span></div>
+
+    <div id="s7-cta-tagline" class="s7-cta-line clip" data-start="0" data-duration="16"><span class="s7-cta-word"><span class="s7-cta-wb">감지</span><span class="s7-cta-dot">.</span></span> <span class="s7-cta-word"><span class="s7-cta-wb">구분</span><span class="s7-cta-dot">.</span></span> <span class="s7-cta-word"><span class="s7-cta-wb">확인</span><span class="s7-cta-dot">.</span></span></div>
+
+    <div id="s7-cta-model" class="s7-cta-line clip" data-start="0" data-duration="16"><span id="s7-cta-model-text"><span class="s7-cta-keep">AI 오브제컬렉션 360<span class="s7-cta-deg">˚</span></span> <span class="s7-cta-keep">공기청정기 M5</span></span></div>
+
+    <div id="s7-cta-pill-row" class="s7-cta-line clip" data-start="0" data-duration="16"><span id="s7-cta-pill">AS206NSHA</span></div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const q = (sel) => Array.prototype.slice.call(document.querySelectorAll(sel));
+      const later = { immediateRender: false };
+
+      // 0~3 s: three pale rings spread from the centre and are gone by 2.6 s. Frame 0 is plain White.
+      q("#s7-cta-rings .s7-cta-ring").forEach((ring, i) => {
+        const s = 0.1 + i * 0.28, dur = 2.2 - i * 0.2;
+        tl.fromTo(ring, { attr: { r: 60, "stroke-width": 6 - i } }, { attr: { r: 1150, "stroke-width": 1.5 }, duration: dur, ease: "expo.out" }, s);
+        tl.fromTo(ring, { opacity: 0 }, { opacity: 0.36 - i * 0.07, duration: 0.16, ease: "none" }, s);
+        tl.fromTo(ring, { opacity: 0.36 - i * 0.07 }, Object.assign({ opacity: 0, duration: dur - 0.16, ease: "sine.inOut" }, later), s + 0.16);
+      });
+
+      // Product rises 30 px and fades up (0.4~2.8 s).
+      tl.fromTo("#s7-cta-product-in", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 2.4, ease: "power2.inOut" }, 0.4);
+
+      // 3~4.5 s: official logo, opacity and uniform scale only (no blur, skew or crop).
+      tl.fromTo("#s7-cta-logo-img", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.inOut" }, 3.1);
+
+      // 4.5~6 s: name letters fly in from the right; horizontal blur only while moving, none at rest.
+      const blurs = q("#s7-cta-fx .s7-cta-mb");
+      q("#s7-cta-name .s7-cta-ch").forEach((ch, i) => {
+        const s = 4.5 + i * 0.055, dur = 0.7;
+        tl.fromTo(ch, { x: 560, scaleX: 1.35 }, { x: 0, scaleX: 1, duration: dur, ease: "expo.out" }, s);
+        tl.fromTo(ch, { opacity: 0 }, { opacity: 1, duration: 0.09, ease: "none" }, s);
+        tl.fromTo(blurs[i], { attr: { stdDeviation: "46 0" } }, { attr: { stdDeviation: "0 0" }, duration: dur, ease: "expo.out" }, s);
+        tl.set(ch, { filter: "url(#s7-cta-mb-" + i + ")" }, s);
+        tl.set(ch, { filter: "none" }, s + dur);
+      });
+
+      // 6~7 s: tagline one word at a time, pale to ink and rising 12 px; each red period pops just after its word.
+      q("#s7-cta-tagline .s7-cta-word").forEach((word, i) => {
+        const s = 6 + i * 0.3;
+        tl.fromTo(word, { opacity: 0 }, { opacity: 1, duration: 0.05, ease: "none" }, s);
+        tl.fromTo(word, { y: 12 }, { y: 0, duration: 0.3, ease: "power2.inOut" }, s);
+        tl.fromTo(word.querySelector(".s7-cta-wb"), { color: "#B8B2AC" }, { color: "#000000", duration: 0.3, ease: "power2.inOut" }, s);
+        const dot = word.querySelector(".s7-cta-dot");
+        tl.fromTo(dot, { scale: 0 }, { scale: 1, duration: 0.22, ease: "back.out(2.2)" }, s + 0.07);
+        tl.fromTo(dot, { opacity: 0 }, { opacity: 1, duration: 0.06, ease: "none" }, s + 0.07);
+      });
+
+      // Discs spread from their shared centre behind the product with the tagline, outer first, settled by 6.66 s.
+      // back.out(1) peaks at 1.037x, which the sizes above leave room for.
+      q("#s7-cta-discs .s7-cta-disc").forEach((disc, i) => {
+        tl.fromTo(disc, { scale: 0 }, { scale: 1, duration: 0.52, ease: "back.out(1)" }, 6 + i * 0.07);
+      });
+
+      // 7~8 s: model line.
+      tl.fromTo("#s7-cta-model-text", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.inOut" }, 7.05);
+
+      // 8~9 s: model number pill pops 0.9 -> 1.0 and is settled by 8.7 s. The shell's button follows at 9 s (93 s).
+      tl.fromTo("#s7-cta-pill", { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "none" }, 8.05);
+      tl.fromTo("#s7-cta-pill", { scale: 0.9 }, { scale: 1, duration: 0.6, ease: "back.out(1.6)" }, 8.05);
+
+      // Hold to the end of the 16 s slot (94~100 s is the reading position).
+      tl.set({}, {}, 16);
+      window.__timelines["s7-cta"] = tl;
+    })();
+  </script>
+</template>
